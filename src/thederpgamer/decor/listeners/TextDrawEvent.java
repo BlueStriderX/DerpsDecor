@@ -44,7 +44,10 @@ public class TextDrawEvent implements TextBoxDrawListener {
     public void preDrawBackground(SegmentDrawer.TextBoxSeg seg, AbstractTextBox abstractTextBox) {
         for(SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : seg.v) {
             if(textBoxElement.rawText.contains("<img>")) {
+                abstractTextBox.getBg().setInvisible(true);
                 abstractTextBox.getBg().setSprite(ResourceManager.getSprite("transparent"));
+                abstractTextBox.cleanUp();
+                abstractTextBox.getBg().cleanUp();
                 String str = StringUtils.substringBetween(textBoxElement.rawText, "<img>", "</img>");
                 String[] args = str.split(",");
                 String src = null;
@@ -70,7 +73,8 @@ public class TextDrawEvent implements TextBoxDrawListener {
                         }
                     }
                     //Log image details in case server staff need to remove inappropriate images
-                    LogManager.logMessage(MessageType.INFO, "An image link was entered into a display module on entity \"" + textBoxElement.c.getName() + "\" by player " + GameClient.getClientPlayerState().getName() + ":\n\"" + str + "\"");
+                    //LogManager.logMessage(MessageType.INFO, "An image link was entered into a display module on entity \"" + textBoxElement.c.getName() + "\" by player " + GameClient.getClientPlayerState().getName() + ":\n\"" + str + "\"");
+                    //Todo: Above line logs the message every frame the display module is drawn. Needs to be done in a way so that it only logs the message when the text is modified, not every time it's drawn.
                 } catch(Exception e) {
                     e.printStackTrace();
                 }

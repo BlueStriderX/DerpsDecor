@@ -23,11 +23,11 @@ import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.decor.DisplayScreen;
 import thederpgamer.decor.listeners.TextDrawEvent;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
+
 import java.util.Objects;
 
 /**
@@ -57,7 +57,7 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
 
         registerFastListeners();
-        registerListeners();
+        //registerListeners(); Todo: Fix DisplayScreen orientation
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DerpsDecor extends StarMod {
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
-        ElementManager.addBlock(new DisplayScreen());
+        //ElementManager.addBlock(new DisplayScreen());
 
         ElementManager.initialize();
     }
