@@ -21,6 +21,7 @@ public class ResourceManager {
     };
 
     private static final String[] spriteNames = {
+            "screen-gui-",
             "transparent"
     };
 
@@ -31,36 +32,41 @@ public class ResourceManager {
     private static HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
     private static HashMap<String, Sprite> spriteMap = new HashMap<>();
 
-    public static void loadResources(DerpsDecor instance, ResourceLoader loader) {
+    public static void loadResources(final DerpsDecor instance, final ResourceLoader loader) {
 
-        //Load Textures
-        for(String textureName : textureNames) {
-            try {
-                textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
-            } catch(Exception exception) {
-                LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
-            }
-        }
+        StarLoaderTexture.runOnGraphicsThread(new Runnable() {
+            @Override
+            public void run() {
+                //Load Textures
+                for(String textureName : textureNames) {
+                    try {
+                        textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+                    } catch(Exception exception) {
+                        LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
+                    }
+                }
 
-        //Load Sprites
-        for(String spriteName : spriteNames) {
-            try {
-                Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("thederpgamer/decor/resources/sprites/" + spriteName + ".png"), instance, spriteName);
-                sprite.setName(spriteName);
-                spriteMap.put(spriteName, sprite);
-            } catch(Exception exception) {
-                LogManager.logException("Failed to load sprite \"" + spriteName + "\"", exception);
-            }
-        }
+                //Load Sprites
+                for(String spriteName : spriteNames) {
+                    try {
+                        Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("thederpgamer/decor/resources/sprites/" + spriteName + ".png"), instance, spriteName);
+                        sprite.setName(spriteName);
+                        spriteMap.put(spriteName, sprite);
+                    } catch(Exception exception) {
+                        LogManager.logException("Failed to load sprite \"" + spriteName + "\"", exception);
+                    }
+                }
 
-        //Load models
-        for(String modelName : modelNames) {
-            try {
-                loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
-            } catch(ResourceException | IOException exception) {
-                LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
+                //Load models
+                for(String modelName : modelNames) {
+                    try {
+                        loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
+                    } catch(ResourceException | IOException exception) {
+                        LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
+                    }
+                }
             }
-        }
+        });
     }
 
     public static StarLoaderTexture getTexture(String name) {

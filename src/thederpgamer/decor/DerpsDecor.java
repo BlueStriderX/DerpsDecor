@@ -1,5 +1,6 @@
 package thederpgamer.decor;
 
+import api.common.GameClient;
 import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
@@ -16,6 +17,7 @@ import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.Segment;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
@@ -27,7 +29,7 @@ import thederpgamer.decor.listeners.TextDrawEvent;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-
+import thederpgamer.decor.utils.MessageType;
 import java.util.Objects;
 
 /**
@@ -108,6 +110,10 @@ public class DerpsDecor extends StarMod {
                             System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
                             ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
 
+                            if(entry.toLowerCase().contains("<img>")) {
+                                //Log image details in case server staff need to remove inappropriate images
+                                LogManager.logMessage(MessageType.INFO, "An image link was entered into a display module on entity \"" + event.getSegmentPiece().getSegmentController().getName() + "\" by player " + GameClient.getClientPlayerState().getName() + ":\n\"" + entry + "\"");
+                            }
                             return true;
                         }
 
@@ -125,13 +131,17 @@ public class DerpsDecor extends StarMod {
                         @Override
                         public void onFailedTextCheck(String msg) {
                         }
-
-
                     };
 
                     t.getTextInput().setAllowEmptyEntry(true);
                     t.getInputPanel().onInit();
                     t.activate();
+                } else if(piece.getType() == ElementKeyMap.TEXT_BOX) {
+                    final PlayerInteractionControlManager cm = event.getControlManager();
+                    String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
+                    if(text == null) text = "";
+
+
                 }
             }
         }, this);
