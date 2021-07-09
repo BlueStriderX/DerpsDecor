@@ -3,19 +3,19 @@ package thederpgamer.decor.element.blocks.decor;
 import api.config.BlockConfig;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
-import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.Block;
 
 /**
  * <Description>
  *
  * @author TheDerpGamer
- * @since 06/15/2021
+ * @since 07/09/2021
  */
-public class DisplayScreen extends Block {
+public class HoloProjector extends Block {
 
-    public DisplayScreen() {
-        super("Display Screen", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+    public HoloProjector() {
+        super("Holo Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
     }
 
     @Override
@@ -25,16 +25,16 @@ public class DisplayScreen extends Block {
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
-        blockInfo.setIndividualSides(1);
-        blockInfo.setBlockStyle(6);
-        blockInfo.lodShapeStyle = 2;
-        blockInfo.sideTexturesPointToOrientation = true;
+        //blockInfo.setIndividualSides(1);
+        //blockInfo.setBlockStyle(6);
+        //blockInfo.lodShapeStyle = 2;
+        //blockInfo.sideTexturesPointToOrientation = true;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-                new FactoryResource(1, ElementKeyMap.TEXT_BOX)
+                new FactoryResource(1, ElementManager.getBlock("Display Screen").getId())
         );
 
-        BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
+        //BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_projector", null);
         BlockConfig.add(blockInfo);
     }
 }

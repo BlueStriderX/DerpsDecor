@@ -50,6 +50,7 @@ public class ResourceManager {
                 for(String spriteName : spriteNames) {
                     try {
                         Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("thederpgamer/decor/resources/sprites/" + spriteName + ".png"), instance, spriteName);
+                        sprite.setPositionCenter(true);
                         sprite.setName(spriteName);
                         spriteMap.put(spriteName, sprite);
                     } catch(Exception exception) {

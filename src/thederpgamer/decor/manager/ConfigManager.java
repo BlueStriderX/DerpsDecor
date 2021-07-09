@@ -18,7 +18,7 @@ public class ConfigManager {
             "max-world-logs: 5",
             "max-display-draw-distance: 75",
             "max-image-scale: 15",
-            "max-image-offset: 30",
+            "max-image-offset: 15",
             "image-filter-mode: blacklist",
             "image-filter: porn,hentai,sex,nsfw,r34"
     };

@@ -7,9 +7,11 @@ import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
+import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.fastevents.FastListenerCommon;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.client.controller.PlayerTextAreaInput;
 import org.schema.game.client.controller.element.world.ClientSegmentProvider;
 import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
@@ -17,18 +19,22 @@ import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.Segment;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
+import thederpgamer.decor.drawer.HoloProjectorWorldDrawer;
 import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.element.blocks.decor.DisplayScreen;
+import thederpgamer.decor.element.blocks.decor.HoloProjector;
+import thederpgamer.decor.gui.panel.HoloProjectorConfigDialog;
 import thederpgamer.decor.listeners.TextDrawEvent;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.DataUtils;
 import thederpgamer.decor.utils.MessageType;
 import java.util.Objects;
 
@@ -52,14 +58,17 @@ public class DerpsDecor extends StarMod {
 
     }
 
+    //Data
+    public HoloProjectorWorldDrawer projectorDrawer;
+
     @Override
     public void onEnable() {
         instance = this;
         ConfigManager.initialize(this);
         LogManager.initialize();
 
-        registerFastListeners();
-        //registerListeners(); Todo: Fix DisplayScreen orientation
+        //registerFastListeners();
+        registerListeners();
     }
 
     @Override
@@ -70,7 +79,8 @@ public class DerpsDecor extends StarMod {
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
-        //ElementManager.addBlock(new DisplayScreen());
+        ElementManager.addBlock(new DisplayScreen());
+        ElementManager.addBlock(new HoloProjector());
 
         ElementManager.initialize();
     }
@@ -80,6 +90,13 @@ public class DerpsDecor extends StarMod {
     }
 
     private void registerListeners() {
+        StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
+            @Override
+            public void onEvent(RegisterWorldDrawersEvent event) {
+                event.getModDrawables().add(projectorDrawer = new HoloProjectorWorldDrawer());
+            }
+        }, this);
+
         StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
             @Override
             public void onEvent(final SegmentPieceActivateByPlayer event) {
@@ -136,12 +153,11 @@ public class DerpsDecor extends StarMod {
                     t.getTextInput().setAllowEmptyEntry(true);
                     t.getInputPanel().onInit();
                     t.activate();
-                } else if(piece.getType() == ElementKeyMap.TEXT_BOX) {
-                    final PlayerInteractionControlManager cm = event.getControlManager();
-                    String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                    if(text == null) text = "";
-
-
+                } else if(piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
+                    HoloProjectorConfigDialog configDialog = new HoloProjectorConfigDialog();
+                    configDialog.segmentPiece = piece;
+                    configDialog.activate();
+                    GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
                 }
             }
         }, this);
@@ -151,6 +167,8 @@ public class DerpsDecor extends StarMod {
             public void onEvent(SegmentPieceAddEvent event) {
                 if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
+                } else if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                    DataUtils.registerNewProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
                 }
             }
         }, this);
@@ -164,6 +182,8 @@ public class DerpsDecor extends StarMod {
                     long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
                     event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
                     event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
+                } else if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                    DataUtils.removeProjector(event.getSegment().getSegmentController(), new Vector3i(event.getX(), event.getY(), event.getZ()));
                 }
             }
         }, this);
@@ -173,6 +193,8 @@ public class DerpsDecor extends StarMod {
             public void onEvent(SegmentPieceAddByMetadataEvent event) {
                 if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
+                } else if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                    DataUtils.registerNewProjector(event.getAsSegmentPiece(new SegmentPiece()));
                 }
             }
         }, this);

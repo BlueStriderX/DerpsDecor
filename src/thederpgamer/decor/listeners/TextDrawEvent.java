@@ -14,7 +14,6 @@ import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.utils.MessageType;
-
 import java.lang.reflect.Field;
 
 /**
