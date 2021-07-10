@@ -67,7 +67,6 @@ public class DataUtils {
                 ProjectorDrawData drawData = (ProjectorDrawData) object;
                 if(drawData.entityId == controller.getDbId() && (!controller.getSegmentBuffer().existsPointUnsave(pos) || (controller.getSegmentBuffer().getPointUnsave(pos) != null && controller.getSegmentBuffer().getPointUnsave(pos).getType() != Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()))) {
                     toRemove.add(drawData);
-                    break;
                 }
             } catch(Exception ignored) { }
         }

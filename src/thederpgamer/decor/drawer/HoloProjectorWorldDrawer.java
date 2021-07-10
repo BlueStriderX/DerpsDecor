@@ -83,6 +83,7 @@ public class HoloProjectorWorldDrawer extends ModWorldDrawer implements Drawable
                         break;
                 }
 
+
                 offset.x -= 0.01f;
                 offset.y -= 0.01f;
                 offset.z -= 0.51f;

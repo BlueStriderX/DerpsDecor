@@ -1,13 +1,13 @@
 {
   "name": "DerpsDecor",
   "author": "TheDerpGamer",
-  "description": "Adds new decorative blocks for the creative builder.",
-  "version": "1.1.0",
+  "description": "Adds some new decorative blocks for the creative builder.",
+  "version": "1.1.1",
   "starmade_version": "0.202.112",
   "client_mod": false,
   "server_mod": false,
   "main_class": "thederpgamer.decor.DerpsDecor",
-  "smd_resource_id": 9999,
+  "smd_resource_id": 8280,
   "dependencies": [
     -1
   ],

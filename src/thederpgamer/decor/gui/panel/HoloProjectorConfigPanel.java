@@ -71,21 +71,21 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
         xOffsetSetting = new HoloProjectorOffsetSetting();
         GUIBuildToolSettingSelector xOffsetSelector = new GUIBuildToolSettingSelector(getState(), xOffsetSetting);
         xOffsetSelector.onInit();
-        xOffsetSelector.getPos().x += ((contentPane.getWidth() / 2) - (xOffsetSelector.getWidth() / 2)) - 150;
+        xOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (xOffsetSelector.getWidth() / 3)) - 100;
         xOffsetSelector.getPos().y += 100;
         contentPane.getContent(0).attach(xOffsetSelector);
 
         yOffsetSetting = new HoloProjectorOffsetSetting();
         GUIBuildToolSettingSelector yOffsetSelector = new GUIBuildToolSettingSelector(getState(), yOffsetSetting);
         yOffsetSelector.onInit();
-        yOffsetSelector.getPos().x += (contentPane.getWidth() / 2) - (yOffsetSelector.getWidth() / 2);
+        yOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (yOffsetSelector.getWidth() / 3));
         yOffsetSelector.getPos().y += 100;
         contentPane.getContent(0).attach(yOffsetSelector);
 
         zOffsetSetting = new HoloProjectorOffsetSetting();
         GUIBuildToolSettingSelector zOffsetSelector = new GUIBuildToolSettingSelector(getState(), zOffsetSetting);
         zOffsetSelector.onInit();
-        zOffsetSelector.getPos().x += ((contentPane.getWidth() / 2) - (zOffsetSelector.getWidth() / 2)) + 150;
+        zOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (zOffsetSelector.getWidth() / 3)) + 100;
         zOffsetSelector.getPos().y += 100;
         contentPane.getContent(0).attach(zOffsetSelector);
 
