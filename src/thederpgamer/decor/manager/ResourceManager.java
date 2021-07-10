@@ -17,12 +17,12 @@ import java.util.HashMap;
 public class ResourceManager {
 
     private static final String[] textureNames = {
-
+            "holo-projector-front",
+            "holo-projector-icon"
     };
 
     private static final String[] spriteNames = {
-            "screen-gui-",
-            "transparent"
+
     };
 
     private static final String[] modelNames = {
@@ -40,7 +40,11 @@ public class ResourceManager {
                 //Load Textures
                 for(String textureName : textureNames) {
                     try {
-                        textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+                        if(textureName.endsWith("icon")) {
+                            textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+                        } else {
+                            textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+                        }
                     } catch(Exception exception) {
                         LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
                     }

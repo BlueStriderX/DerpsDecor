@@ -17,7 +17,17 @@ import thederpgamer.decor.utils.DataUtils;
  */
 public class HoloProjectorConfigDialog extends GUIInputDialog {
 
-    public SegmentPiece segmentPiece;
+    private SegmentPiece segmentPiece;
+
+    public void setSegmentPiece(SegmentPiece segmentPiece) {
+        this.segmentPiece = segmentPiece;
+        ProjectorDrawData drawData = DataUtils.getProjectorDrawData(this.segmentPiece);
+        ((HoloProjectorConfigPanel) getInputPanel()).setXOffset(drawData.xOffset);
+        ((HoloProjectorConfigPanel) getInputPanel()).setYOffset(drawData.yOffset);
+        ((HoloProjectorConfigPanel) getInputPanel()).setZOffset(drawData.zOffset);
+        ((HoloProjectorConfigPanel) getInputPanel()).setScaleSetting(drawData.scale);
+        ((HoloProjectorConfigPanel) getInputPanel()).setSrc(drawData.src);
+    }
 
     @Override
     public GUIInputDialogPanel createPanel() {

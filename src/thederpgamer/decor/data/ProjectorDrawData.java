@@ -20,7 +20,7 @@ public class ProjectorDrawData implements Serializable {
     public int xOffset;
     public int yOffset;
     public int zOffset;
-    public float scale;
+    public int scale;
     public String src;
 
     public ProjectorDrawData(SegmentPiece segmentPiece) {

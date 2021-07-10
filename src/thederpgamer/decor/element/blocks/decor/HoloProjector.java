@@ -3,8 +3,9 @@ package thederpgamer.decor.element.blocks.decor;
 import api.config.BlockConfig;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
-import thederpgamer.decor.element.ElementManager;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.manager.ResourceManager;
 
 /**
  * <Description>
@@ -20,21 +21,21 @@ public class HoloProjector extends Block {
 
     @Override
     public void initialize() {
+        if(GraphicsContext.initialized) {
+            blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
+            blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
+            blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
+        }
         blockInfo.setInRecipe(true);
         blockInfo.setCanActivate(true);
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
-        //blockInfo.setIndividualSides(1);
-        //blockInfo.setBlockStyle(6);
-        //blockInfo.lodShapeStyle = 2;
-        //blockInfo.sideTexturesPointToOrientation = true;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-                new FactoryResource(1, ElementManager.getBlock("Display Screen").getId())
+                new FactoryResource(1, ElementKeyMap.TEXT_BOX),
+                new FactoryResource(50, (short) 220)
         );
-
-        //BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_projector", null);
         BlockConfig.add(blockInfo);
     }
 }

@@ -8,7 +8,6 @@ import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
-import api.listener.fastevents.FastListenerCommon;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import org.schema.common.util.linAlg.Vector3i;
@@ -27,15 +26,14 @@ import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.drawer.HoloProjectorWorldDrawer;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.decor.DisplayScreen;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
 import thederpgamer.decor.gui.panel.HoloProjectorConfigDialog;
-import thederpgamer.decor.listeners.TextDrawEvent;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.DataUtils;
 import thederpgamer.decor.utils.MessageType;
+
 import java.util.Objects;
 
 /**
@@ -79,14 +77,10 @@ public class DerpsDecor extends StarMod {
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
-        ElementManager.addBlock(new DisplayScreen());
+        //ElementManager.addBlock(new DisplayScreen());
         ElementManager.addBlock(new HoloProjector());
 
         ElementManager.initialize();
-    }
-
-    private void registerFastListeners() {
-        FastListenerCommon.textBoxListeners.add(new TextDrawEvent());
     }
 
     private void registerListeners() {
@@ -155,7 +149,7 @@ public class DerpsDecor extends StarMod {
                     t.activate();
                 } else if(piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
                     HoloProjectorConfigDialog configDialog = new HoloProjectorConfigDialog();
-                    configDialog.segmentPiece = piece;
+                    configDialog.setSegmentPiece(piece);
                     configDialog.activate();
                     GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
                 }

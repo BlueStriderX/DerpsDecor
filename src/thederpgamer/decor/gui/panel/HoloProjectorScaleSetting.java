@@ -22,10 +22,6 @@ public class HoloProjectorScaleSetting extends AbstractSizeSetting {
 
     @Override
     public int getMax() {
-        return (int) ConfigManager.getMainConfig().getDouble("max-image-scale") * 10;
-    }
-
-    public float getValue() {
-        return setting / 10f;
+        return (int) ConfigManager.getMainConfig().getDouble("max-image-scale");
     }
 }
