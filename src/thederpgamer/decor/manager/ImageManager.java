@@ -40,16 +40,18 @@ public class ImageManager {
             new Thread() {
                 @Override
                 public void run() {
-                    ImageManager.downloadingImages.add(url);
-                    final BufferedImage bufferedImage = fromURL(url);
-                    StarLoaderTexture.runOnGraphicsThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + System.currentTimeMillis());
-                            ImageManager.imgCache.put(url, sprite);
-                        }
-                    });
-                    ImageManager.downloadingImages.remove(url);
+                    try {
+                        ImageManager.downloadingImages.add(url);
+                        final BufferedImage bufferedImage = fromURL(url);
+                        StarLoaderTexture.runOnGraphicsThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + System.currentTimeMillis());
+                                ImageManager.imgCache.put(url, sprite);
+                            }
+                        });
+                        ImageManager.downloadingImages.remove(url);
+                    } catch(Exception ignored) { }
                 }
             }.start();
         }
@@ -63,9 +65,7 @@ public class ImageManager {
             urlConnection.setRequestProperty("User-Agent", "NING/1.0");
             InputStream stream = urlConnection.getInputStream();
             image = ImageIO.read(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) { }
         return image;
     }
 }

@@ -37,7 +37,7 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
         GUIContentPane contentPane = ((GUIDialogWindow) background).getMainContentPane();
         contentPane.setTextBoxHeightLast(350);
 
-        textInput = new GUIActivatableTextBar(getState(), FontLibrary.FontSize.MEDIUM, "Image src", contentPane.getContent(0), new TextCallback() {
+        textInput = new GUIActivatableTextBar(getState(), FontLibrary.FontSize.MEDIUM, 128, 1, "Image src", contentPane.getContent(0), new TextCallback() {
             @Override
             public String[] getCommandPrefixes() {
                 return null;

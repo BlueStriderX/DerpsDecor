@@ -11,17 +11,7 @@ import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.client.controller.PlayerTextAreaInput;
-import org.schema.game.client.controller.element.world.ClientSegmentProvider;
-import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
-import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.SendableGameState;
-import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.network.objects.remote.RemoteTextBlockPair;
-import org.schema.game.network.objects.remote.TextBlockPair;
-import org.schema.schine.common.TextCallback;
-import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.drawer.HoloProjectorWorldDrawer;
 import thederpgamer.decor.element.ElementManager;
@@ -31,8 +21,6 @@ import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.DataUtils;
-import thederpgamer.decor.utils.MessageType;
-
 import java.util.Objects;
 
 /**
@@ -94,6 +82,7 @@ public class DerpsDecor extends StarMod {
             @Override
             public void onEvent(final SegmentPieceActivateByPlayer event) {
                 final SegmentPiece piece = event.getSegmentPiece();
+                /*
                 if(piece.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
                     final PlayerInteractionControlManager cm = event.getControlManager();
                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
@@ -146,11 +135,15 @@ public class DerpsDecor extends StarMod {
                     t.getTextInput().setAllowEmptyEntry(true);
                     t.getInputPanel().onInit();
                     t.activate();
-                } else if(piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
+                } else
+
+                 */
+                if(piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
+
                     HoloProjectorConfigDialog configDialog = new HoloProjectorConfigDialog();
                     configDialog.setSegmentPiece(piece);
                     configDialog.activate();
-                    GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
+                    if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
                 }
             }
         }, this);
@@ -163,8 +156,10 @@ public class DerpsDecor extends StarMod {
                     event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
                 } else
                 */
-                if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
-                    DataUtils.registerNewProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
+                if(ElementManager.getBlock("Holo Projector") != null) {
+                    if (event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                        DataUtils.registerNewProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
+                    }
                 }
             }
         }, this);
@@ -180,9 +175,10 @@ public class DerpsDecor extends StarMod {
                     event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
                 } else
                  */
-                if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
-
-                    DataUtils.removeProjector(event.getSegment().getSegmentController(), new Vector3i(event.getX(), event.getY(), event.getZ()));
+                if(ElementManager.getBlock("Holo Projector") != null) {
+                    if (event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                        DataUtils.removeProjector(event.getSegment().getSegmentController(), new Vector3i(event.getX(), event.getY(), event.getZ()));
+                    }
                 }
             }
         }, this);
@@ -195,8 +191,10 @@ public class DerpsDecor extends StarMod {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 } else
                  */
-                if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
-                    DataUtils.registerNewProjector(event.getAsSegmentPiece(new SegmentPiece()));
+                if(ElementManager.getBlock("Holo Projector") != null) {
+                    if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                        DataUtils.registerNewProjector(event.getAsSegmentPiece(new SegmentPiece()));
+                    }
                 }
             }
         }, this);
