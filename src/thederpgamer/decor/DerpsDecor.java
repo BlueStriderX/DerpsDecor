@@ -10,6 +10,7 @@ import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.network.packets.PacketUtil;
 import api.utils.StarRunnable;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
@@ -21,6 +22,7 @@ import thederpgamer.decor.gui.panel.HoloProjectorConfigDialog;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.network.client.HoloProjectorModificationPacket;
 import thederpgamer.decor.utils.DataUtils;
 import java.util.Objects;
 
@@ -54,6 +56,7 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
 
         //registerFastListeners();
+        registerPackets();
         registerListeners();
         startRunners();
     }
@@ -70,6 +73,10 @@ public class DerpsDecor extends StarMod {
         ElementManager.addBlock(new HoloProjector());
 
         ElementManager.initialize();
+    }
+
+    private void registerPackets() {
+        PacketUtil.registerPacket(HoloProjectorModificationPacket.class);
     }
 
     private void registerListeners() {

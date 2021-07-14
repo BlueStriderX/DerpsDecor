@@ -1,5 +1,6 @@
 package thederpgamer.decor.drawer;
 
+import api.common.GameClient;
 import api.common.GameCommon;
 import api.utils.draw.ModWorldDrawer;
 import com.bulletphysics.linearmath.Transform;
@@ -16,6 +17,7 @@ import thederpgamer.decor.data.ProjectorDrawData;
 import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.DataUtils;
+
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 import java.util.Map;
@@ -59,11 +61,10 @@ public class HoloProjectorWorldDrawer extends ModWorldDrawer implements Drawable
             try {
                 SegmentController controller = (SegmentController) GameCommon.getGameObject(entry.getValue().entityId);
                 if(controller != null && controller.isFullyLoaded()) {
-                    SegmentPiece segmentPiece = controller.getSegmentBuffer().getPointUnsave(entry.getValue().xPos, entry.getValue().yPos, entry.getValue().zPos);
-                    if(segmentPiece != null && !segmentPiece.isActive()) {
-                        Transform newTransform = new Transform(segmentPiece.getSegmentController().getWorldTransform());
-                        segmentPiece.getWorldPos(newTransform.origin, segmentPiece.getSegmentController().getSectorId());
-                        Vector3f offset = new Vector3f(entry.getValue().xOffset, entry.getValue().yOffset, entry.getValue().zOffset);
+                    SegmentPiece segmentPiece = controller.getSegmentBuffer().getPointUnsave(entry.getValue().index);
+                    if(segmentPiece != null && (!segmentPiece.isActive() || (segmentPiece.isActive() && GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().isSuspended()))) {
+                        Transform newTransform = new Transform();
+                        segmentPiece.getTransform(newTransform);
 
                         int orientation = segmentPiece.getFullOrientation();
                         switch(orientation) {
@@ -87,10 +88,11 @@ public class HoloProjectorWorldDrawer extends ModWorldDrawer implements Drawable
                                 break;
                         }
 
-
+                        Vector3f offset = new Vector3f(entry.getValue().xOffset, entry.getValue().yOffset, entry.getValue().zOffset);
                         offset.x -= 0.01f;
                         offset.y -= 0.01f;
                         offset.z -= 0.51f;
+
 
                         if(entry.getValue().src != null && !entry.getValue().src.isEmpty()) {
                             Sprite image = ImageManager.getImage(entry.getValue().src);

@@ -12,7 +12,7 @@ import thederpgamer.decor.manager.ConfigManager;
 public class HoloProjectorScaleSetting extends AbstractSizeSetting {
 
     public HoloProjectorScaleSetting() {
-        set(1.0f);
+        set(1);
     }
 
     @Override
@@ -22,6 +22,6 @@ public class HoloProjectorScaleSetting extends AbstractSizeSetting {
 
     @Override
     public int getMax() {
-        return (int) ConfigManager.getMainConfig().getDouble("max-image-scale");
+        return ConfigManager.getMainConfig().getInt("max-image-scale");
     }
 }

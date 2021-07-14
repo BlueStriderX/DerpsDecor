@@ -1,12 +1,14 @@
 package thederpgamer.decor.gui.panel;
 
 import api.common.GameClient;
+import api.network.packets.PacketUtil;
 import api.utils.gui.GUIInputDialog;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.decor.data.ProjectorDrawData;
+import thederpgamer.decor.network.client.HoloProjectorModificationPacket;
 import thederpgamer.decor.utils.DataUtils;
 
 /**
@@ -50,6 +52,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         drawData.yOffset = ((HoloProjectorConfigPanel) getInputPanel()).getYOffset();
                         drawData.zOffset = ((HoloProjectorConfigPanel) getInputPanel()).getZOffset();
                         drawData.src = ((HoloProjectorConfigPanel) getInputPanel()).getSrc();
+                        PacketUtil.sendPacketToServer(new HoloProjectorModificationPacket(drawData));
                         deactivate();
                         break;
                 }

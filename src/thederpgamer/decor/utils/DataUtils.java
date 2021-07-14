@@ -53,13 +53,21 @@ public class DataUtils {
         }.runLater(DerpsDecor.getInstance(), 5);
     }
 
+    public static void modProjector(ProjectorDrawData drawData, String senderName) {
+        projectorDrawMap.remove(drawData.hashCode());
+        projectorDrawMap.put(drawData.hashCode(), drawData);
+        LogManager.logMessage(MessageType.INFO, "Player " + senderName + " activated a Holo Projector:\n[entityId = " + drawData.entityId + ", src = " + drawData.src + "]");
+    }
+
     public static void removeProjector(SegmentController controller, Vector3i pos) {
         projectorDrawMap.remove(ProjectorDrawData.getHashCode(controller.getId(), pos.x, pos.y, pos.z));
     }
 
     public static void save() {
-        PersistentObjectUtil.removeAllObjects(DerpsDecor.getInstance().getSkeleton(), ProjectorDrawData.class);
-        for(ProjectorDrawData drawData : projectorDrawMap.values()) PersistentObjectUtil.addObject(DerpsDecor.getInstance().getSkeleton(), drawData);
-        PersistentObjectUtil.save(DerpsDecor.getInstance().getSkeleton());
+        if(GameCommon.isOnSinglePlayer() || GameCommon.isDedicatedServer()) {
+            PersistentObjectUtil.removeAllObjects(DerpsDecor.getInstance().getSkeleton(), ProjectorDrawData.class);
+            for(ProjectorDrawData drawData : projectorDrawMap.values()) PersistentObjectUtil.addObject(DerpsDecor.getInstance().getSkeleton(), drawData);
+            PersistentObjectUtil.save(DerpsDecor.getInstance().getSkeleton());
+        }
     }
 }
