@@ -25,10 +25,10 @@ public class DisplayScreen extends Block {
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
-        blockInfo.setIndividualSides(1);
+        blockInfo.setIndividualSides(6);
         blockInfo.setBlockStyle(6);
         blockInfo.lodShapeStyle = 2;
-        blockInfo.sideTexturesPointToOrientation = true;
+        blockInfo.sideTexturesPointToOrientation = false;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                 new FactoryResource(1, ElementKeyMap.TEXT_BOX)

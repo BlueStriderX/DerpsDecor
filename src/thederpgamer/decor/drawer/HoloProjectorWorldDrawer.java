@@ -1,8 +1,10 @@
 package thederpgamer.decor.drawer;
 
+import api.common.GameCommon;
 import api.utils.draw.ModWorldDrawer;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.common.FastMath;
+import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.Element;
 import org.schema.schine.graphicsengine.core.*;
@@ -14,7 +16,6 @@ import thederpgamer.decor.data.ProjectorDrawData;
 import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.DataUtils;
-
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 import java.util.Map;
@@ -54,55 +55,60 @@ public class HoloProjectorWorldDrawer extends ModWorldDrawer implements Drawable
 
     @Override
     public void postWorldDraw() {
-        for(Map.Entry<SegmentPiece, ProjectorDrawData> entry : DataUtils.projectorDrawMap.entrySet()) {
-            if(entry.getKey() != null && entry.getKey().getSegmentController().isFullyLoaded()) {
-                Transform newTransform = new Transform(entry.getKey().getSegmentController().getWorldTransform());
-                //newTransform.basis.set(entry.getKey().getSegmentController().getWorldTransform().basis);
-                entry.getKey().getWorldPos(newTransform.origin, entry.getKey().getSegmentController().getSectorId());
-                Vector3f offset = new Vector3f(entry.getValue().xOffset, entry.getValue().yOffset, entry.getValue().zOffset);
+        for(Map.Entry<Integer, ProjectorDrawData> entry : DataUtils.projectorDrawMap.entrySet()) {
+            try {
+                SegmentController controller = (SegmentController) GameCommon.getGameObject(entry.getValue().entityId);
+                if(controller != null && controller.isFullyLoaded()) {
+                    SegmentPiece segmentPiece = controller.getSegmentBuffer().getPointUnsave(entry.getValue().xPos, entry.getValue().yPos, entry.getValue().zPos);
+                    if(segmentPiece != null && !segmentPiece.isActive()) {
+                        Transform newTransform = new Transform(segmentPiece.getSegmentController().getWorldTransform());
+                        segmentPiece.getWorldPos(newTransform.origin, segmentPiece.getSegmentController().getSectorId());
+                        Vector3f offset = new Vector3f(entry.getValue().xOffset, entry.getValue().yOffset, entry.getValue().zOffset);
 
-                int orientation = entry.getKey().getFullOrientation();
-                switch(orientation) {
-                    case(Element.FRONT):
-                        newTransform.basis.mul(mYC);
-                        break;
-                    case(Element.BACK):
-                        break;
-                    case(Element.TOP):
-                        newTransform.basis.mul(mX);
-                        break;
-                    case(Element.BOTTOM):
-                        newTransform.basis.mul(mYC);
-                        newTransform.basis.mul(mXB);
-                        break;
-                    case(Element.RIGHT):
-                        newTransform.basis.mul(mY);
-                        break;
-                    case(Element.LEFT):
-                        newTransform.basis.mul(mYB);
-                        break;
-                }
+                        int orientation = segmentPiece.getFullOrientation();
+                        switch(orientation) {
+                            case(Element.FRONT):
+                                newTransform.basis.mul(mYC);
+                                break;
+                            case(Element.BACK):
+                                break;
+                            case(Element.TOP):
+                                newTransform.basis.mul(mX);
+                                break;
+                            case(Element.BOTTOM):
+                                newTransform.basis.mul(mYC);
+                                newTransform.basis.mul(mXB);
+                                break;
+                            case(Element.RIGHT):
+                                newTransform.basis.mul(mY);
+                                break;
+                            case(Element.LEFT):
+                                newTransform.basis.mul(mYB);
+                                break;
+                        }
 
 
-                offset.x -= 0.01f;
-                offset.y -= 0.01f;
-                offset.z -= 0.51f;
+                        offset.x -= 0.01f;
+                        offset.y -= 0.01f;
+                        offset.z -= 0.51f;
 
-                if(entry.getValue().src != null && !entry.getValue().src.isEmpty()) {
-                    Sprite image = ImageManager.getImage(entry.getValue().src);
-                    if(image != null) {
-                        ShaderLibrary.scanlineShader.setShaderInterface(this);
-                        ShaderLibrary.scanlineShader.load();
-                        Transform tr = new Transform();
-                        tr.setIdentity();
-                        tr.origin.set(offset);
-                        newTransform.mul(tr);
-                        ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) entry.getValue().scale / image.getWidth()) * -1, newTransform)};
-                        Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
-                        ShaderLibrary.scanlineShader.unload();
+                        if(entry.getValue().src != null && !entry.getValue().src.isEmpty()) {
+                            Sprite image = ImageManager.getImage(entry.getValue().src);
+                            if(image != null) {
+                                ShaderLibrary.scanlineShader.setShaderInterface(this);
+                                ShaderLibrary.scanlineShader.load();
+                                Transform tr = new Transform();
+                                tr.setIdentity();
+                                tr.origin.set(offset);
+                                newTransform.mul(tr);
+                                ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) entry.getValue().scale / image.getWidth()) * -1, newTransform)};
+                                Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
+                                ShaderLibrary.scanlineShader.unload();
+                            }
+                        }
                     }
                 }
-            } else cleanUp();
+            } catch(Exception ignored) { }
         }
     }
 

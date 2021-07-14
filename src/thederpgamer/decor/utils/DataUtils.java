@@ -9,11 +9,8 @@ import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.SegmentPiece;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.ProjectorDrawData;
-import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.LogManager;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * <Description>
@@ -23,7 +20,7 @@ import java.util.Objects;
  */
 public class DataUtils {
 
-    public static HashMap<SegmentPiece, ProjectorDrawData> projectorDrawMap = new HashMap<>();
+    public static HashMap<Integer, ProjectorDrawData> projectorDrawMap = new HashMap<>();
 
     public static String getResourcesPath() {
         return DerpsDecor.getInstance().getSkeleton().getResourcesFolder().getPath().replace('\\', '/');
@@ -42,40 +39,27 @@ public class DataUtils {
     }
 
     public static ProjectorDrawData getProjectorDrawData(SegmentPiece segmentPiece) {
-        for(Object object : PersistentObjectUtil.getObjects(DerpsDecor.getInstance().getSkeleton(), ProjectorDrawData.class)) {
-            ProjectorDrawData drawData = (ProjectorDrawData) object;
-            if(drawData.entityId == segmentPiece.getSegmentController().getDbId() && drawData.index == segmentPiece.getAbsoluteIndex()) {
-                return drawData;
-            }
-        }
-        return new ProjectorDrawData(segmentPiece);
+        return projectorDrawMap.get(ProjectorDrawData.getHashCode(segmentPiece));
     }
 
     public static void registerNewProjector(final SegmentPiece segmentPiece) {
         new StarRunnable() {
             @Override
             public void run() {
-                if(!projectorDrawMap.containsKey(segmentPiece)) projectorDrawMap.put(segmentPiece, getProjectorDrawData(segmentPiece));
+                int hashCode = ProjectorDrawData.getHashCode(segmentPiece);
+                projectorDrawMap.remove(hashCode);
+                projectorDrawMap.put(hashCode, new ProjectorDrawData(segmentPiece));
             }
         }.runLater(DerpsDecor.getInstance(), 5);
     }
 
     public static void removeProjector(SegmentController controller, Vector3i pos) {
-        ArrayList<ProjectorDrawData> toRemove = new ArrayList<>();
-        for(Object object : PersistentObjectUtil.getObjects(DerpsDecor.getInstance().getSkeleton(), ProjectorDrawData.class)) {
-            try {
-                ProjectorDrawData drawData = (ProjectorDrawData) object;
-                if(drawData.entityId == controller.getDbId() && (!controller.getSegmentBuffer().existsPointUnsave(pos) || (controller.getSegmentBuffer().getPointUnsave(pos) != null && controller.getSegmentBuffer().getPointUnsave(pos).getType() != Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()))) {
-                    toRemove.add(drawData);
-                }
-            } catch(Exception ignored) { }
-        }
-        for(ProjectorDrawData drawData : toRemove) {
-            try {
-                projectorDrawMap.remove(controller.getSegmentBuffer().getPointUnsave(drawData.index));
-                PersistentObjectUtil.removeObject(DerpsDecor.getInstance().getSkeleton(), drawData);
-            } catch(Exception ignored) { }
-        }
+        projectorDrawMap.remove(ProjectorDrawData.getHashCode(controller.getId(), pos.x, pos.y, pos.z));
+    }
+
+    public static void save() {
+        PersistentObjectUtil.removeAllObjects(DerpsDecor.getInstance().getSkeleton(), ProjectorDrawData.class);
+        for(ProjectorDrawData drawData : projectorDrawMap.values()) PersistentObjectUtil.addObject(DerpsDecor.getInstance().getSkeleton(), drawData);
         PersistentObjectUtil.save(DerpsDecor.getInstance().getSkeleton());
     }
 }

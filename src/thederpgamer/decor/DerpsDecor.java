@@ -10,6 +10,7 @@ import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.utils.StarRunnable;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.resource.ResourceLoader;
@@ -54,6 +55,7 @@ public class DerpsDecor extends StarMod {
 
         //registerFastListeners();
         registerListeners();
+        startRunners();
     }
 
     @Override
@@ -108,11 +110,6 @@ public class DerpsDecor extends StarMod {
                             f.text = entry;
                             System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
                             ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
-
-                            if(entry.toLowerCase().contains("<img>")) {
-                                //Log image details in case server staff need to remove inappropriate images
-                                LogManager.logMessage(MessageType.INFO, "An image link was entered into a display module on entity \"" + event.getSegmentPiece().getSegmentController().getName() + "\" by player " + GameClient.getClientPlayerState().getName() + ":\n\"" + entry + "\"");
-                            }
                             return true;
                         }
 
@@ -136,7 +133,6 @@ public class DerpsDecor extends StarMod {
                     t.getInputPanel().onInit();
                     t.activate();
                 } else
-
                  */
                 if(piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
 
@@ -151,11 +147,9 @@ public class DerpsDecor extends StarMod {
         StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
             @Override
             public void onEvent(SegmentPieceAddEvent event) {
-                /*
-                if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                    event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
-                } else
-                */
+                //if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+                    //event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
+               // } else
                 if(ElementManager.getBlock("Holo Projector") != null) {
                     if (event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
                         DataUtils.registerNewProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
@@ -167,7 +161,8 @@ public class DerpsDecor extends StarMod {
         StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
             @Override
             public void onEvent(SegmentPieceRemoveEvent event) {
-                /*if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+                /*
+                if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
                     Segment segment = event.getSegment();
                     long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
                     long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
@@ -175,8 +170,8 @@ public class DerpsDecor extends StarMod {
                     event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
                 } else
                  */
-                if(ElementManager.getBlock("Holo Projector") != null) {
-                    if (event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                 if(ElementManager.getBlock("Holo Projector") != null) {
+                    if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
                         DataUtils.removeProjector(event.getSegment().getSegmentController(), new Vector3i(event.getX(), event.getY(), event.getZ()));
                     }
                 }
@@ -186,11 +181,9 @@ public class DerpsDecor extends StarMod {
         StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
             @Override
             public void onEvent(SegmentPieceAddByMetadataEvent event) {
-                /*
-                if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                    event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
-                } else
-                 */
+                //if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+                    //event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
+               // } else
                 if(ElementManager.getBlock("Holo Projector") != null) {
                     if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
                         DataUtils.registerNewProjector(event.getAsSegmentPiece(new SegmentPiece()));
@@ -198,5 +191,14 @@ public class DerpsDecor extends StarMod {
                 }
             }
         }, this);
+    }
+
+    private void startRunners() {
+        new StarRunnable() {
+            @Override
+            public void run() {
+                DataUtils.save();
+            }
+        }.runTimer(this, 5000);
     }
 }
