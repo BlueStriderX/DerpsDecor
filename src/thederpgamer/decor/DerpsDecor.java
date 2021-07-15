@@ -10,22 +10,13 @@ import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.fastevents.FastListenerCommon;
 import api.mod.StarLoader;
 import api.mod.StarMod;
-import org.schema.game.client.controller.PlayerTextAreaInput;
-import org.schema.game.client.controller.element.world.ClientSegmentProvider;
-import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
-import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.Segment;
-import org.schema.game.network.objects.remote.RemoteTextBlockPair;
-import org.schema.game.network.objects.remote.TextBlockPair;
-import org.schema.schine.common.TextCallback;
-import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.drawer.ProjectorDrawListener;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.decor.DisplayScreen;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.gui.panel.holoprojector.HoloProjectorConfigDialog;
@@ -33,7 +24,6 @@ import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-import java.util.Objects;
 
 /**
  * Main class for DerpsDecor mod.
@@ -73,7 +63,7 @@ public class DerpsDecor extends StarMod {
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
-        ElementManager.addBlock(new DisplayScreen());
+        //ElementManager.addBlock(new DisplayScreen());
         ElementManager.addBlock(new HoloProjector());
         ElementManager.addBlock(new TextProjector());
 
@@ -97,7 +87,8 @@ public class DerpsDecor extends StarMod {
                     configDialog.activate();
                     piece.setActive(!piece.isActive());
                     if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
-                } else if(ElementManager.getBlock("Display Screen") != null && piece.getType() == ElementManager.getBlock("Display Screen").getId()) {
+
+                }/* else if(ElementManager.getBlock("Display Screen") != null && piece.getType() == ElementManager.getBlock("Display Screen").getId()) {
                     final PlayerInteractionControlManager cm = event.getControlManager();
                     String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
                     if(text == null) text = "";
@@ -145,19 +136,27 @@ public class DerpsDecor extends StarMod {
                     t.getInputPanel().onInit();
                     t.activate();
                 }
+
+               */
             }
         }, this);
 
         StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
             @Override
             public void onEvent(SegmentPieceAddEvent event) {
-                if(ElementManager.getBlock("Holo Projector") != null && event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+                if(ElementManager.getBlock("Holo Projector") != null && event.getNewType() == ElementManager.getBlock("Holo Projector").getId()) {
                     long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
+                    event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
                     event.getSegmentController().getTextBlocks().add(indexAndOrientation);
-                } else if(ElementManager.getBlock("Text Projector") != null && event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Text Projector")).getId()) {
+                } else if(ElementManager.getBlock("Text Projector") != null && event.getNewType() == ElementManager.getBlock("Text Projector").getId()) {
                     long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
+                    event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
                     event.getSegmentController().getTextBlocks().add(indexAndOrientation);
-                } else if(ElementManager.getBlock("Display Screen") != null && event.getNewType() == ElementManager.getBlock("Display Screen").getId()) {
+                //} else if(ElementManager.getBlock("Display Screen") != null && event.getNewType() == ElementManager.getBlock("Display Screen").getId()) {
+                    //event.getSegment().getSegmentController().getTextBlocks().remove(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
+                   // event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
+                } else if(event.getNewType() == ElementKeyMap.TEXT_BOX) {
+                    event.getSegment().getSegmentController().getTextBlocks().remove(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
                     event.getSegment().getSegmentController().getTextBlocks().add(ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation()));
                 }
             }
@@ -178,12 +177,11 @@ public class DerpsDecor extends StarMod {
                     long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
                     event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
                     event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
-                } else if(ElementManager.getBlock("Display Screen") != null && event.getType() == ElementManager.getBlock("Display Screen").getId()) {
-                    Segment segment = event.getSegment();
-                    long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
-                    long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
-                    event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
-                    event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
+               // } else if(ElementManager.getBlock("Display Screen") != null && event.getType() == ElementManager.getBlock("Display Screen").getId()) {
+                  //  Segment segment = event.getSegment();
+//                    long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
+                    //event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
+                    //event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
                 }
             }
         }, this);
@@ -195,8 +193,8 @@ public class DerpsDecor extends StarMod {
                         event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 } else if(ElementManager.getBlock("Text Projector") != null && event.getType() == ElementManager.getBlock("Text Projector").getId()) {
                     event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
-                } else if(ElementManager.getBlock("Display Screen") != null && event.getType() == ElementManager.getBlock("Display Screen").getId()) {
-                    event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
+                //} else if(ElementManager.getBlock("Display Screen") != null && event.getType() == ElementManager.getBlock("Display Screen").getId()) {
+                   // event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
                 }
             }
         }, this);

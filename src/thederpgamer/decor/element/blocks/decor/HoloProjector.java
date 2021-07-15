@@ -31,6 +31,7 @@ public class HoloProjector extends Block {
                 LogManager.logException("Encountered an exception while trying to load textures for Holo Projector! This will result in missing textures in-game!", exception);
             }
         }
+        blockInfo.setDescription("A block used to project an image at a specified location, scale, and rotation.");
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setCanActivate(true);

@@ -9,8 +9,6 @@ import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.DerpsDecor;
-
-import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +26,7 @@ public class ResourceManager {
             "holo-projector-icon",
             "text-projector-front",
             "text-projector-icon"
+            //"display-screen-icon"
     };
 
     private static final String[] spriteNames = {
@@ -82,7 +81,6 @@ public class ResourceManager {
                     try {
                         loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
                         Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
-                        mesh.setRot(new Vector3f(90f, 90f,0));
                         mesh.setFirstDraw(true);
                     } catch(ResourceException | IOException exception) {
                         LogManager.logException("Failed to load model \"" + modelName + "\"", exception);

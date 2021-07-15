@@ -72,7 +72,7 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel {
         textInput.onInit();
         contentPane.getContent(0).attach(textInput);
 
-        colorInput = new GUIActivatableTextBar(getState(), FontLibrary.FontSize.MEDIUM, 6, 1, "Color Code", contentPane.getContent(0), new TextCallback() {
+        colorInput = new GUIActivatableTextBar(getState(), FontLibrary.FontSize.MEDIUM, 6, 1, "Color Code (Hex Format)", contentPane.getContent(0), new TextCallback() {
             @Override
             public String[] getCommandPrefixes() {
                 return null;

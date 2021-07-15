@@ -31,6 +31,7 @@ public class TextProjector  extends Block {
                 LogManager.logException("Encountered an exception while trying to load textures for Text Projector! This will result in missing textures in-game!", exception);
             }
         }
+        blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.");
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setCanActivate(true);
