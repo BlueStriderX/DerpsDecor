@@ -21,8 +21,11 @@ public class HoloProjectorDrawer implements TextBoxDrawListener {
 
     @Override
     public void draw(SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement, AbstractTextBox abstractTextBox) {
-        //abstractTextBox.getBg().setSprite(ImageManager.getImage("https://i.imgur.com/Ochqd5r.png"));
-        if(abstractTextBox.getBg() != null) abstractTextBox.getBg().getSprite().setTint(new Vector4f(0, 0, 0, 0));
+        if(textBoxElement.rawText.contains("~") && textBoxElement.rawText.split("~").length == 5) {
+            if(abstractTextBox.getBg() != null) abstractTextBox.getBg().getSprite().setTint(new Vector4f(0, 0, 0, 0));
+        } else {
+            if(abstractTextBox.getBg() != null) abstractTextBox.getBg().getSprite().setTint(new Vector4f(0, 0, 0, 1));
+        }
     }
 
     @Override

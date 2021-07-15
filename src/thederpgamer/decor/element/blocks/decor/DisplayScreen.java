@@ -21,7 +21,6 @@ public class DisplayScreen extends Block {
     @Override
     public void initialize() {
         blockInfo.setInRecipe(true);
-        blockInfo.setCanActivate(true);
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
