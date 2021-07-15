@@ -27,8 +27,8 @@ public class HoloProjector extends Block {
             blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
         }
         blockInfo.setInRecipe(true);
-        blockInfo.setCanActivate(true);
         blockInfo.setShoppable(true);
+        blockInfo.setCanActivate(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
 

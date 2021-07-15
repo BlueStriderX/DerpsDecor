@@ -22,7 +22,7 @@ public class ResourceManager {
     };
 
     private static final String[] spriteNames = {
-
+            "transparent"
     };
 
     private static final String[] modelNames = {

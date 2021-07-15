@@ -47,6 +47,7 @@ public class ImageManager {
                             @Override
                             public void run() {
                                 Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + System.currentTimeMillis());
+                                sprite.setPositionCenter(false);
                                 ImageManager.imgCache.put(url, sprite);
                             }
                         });

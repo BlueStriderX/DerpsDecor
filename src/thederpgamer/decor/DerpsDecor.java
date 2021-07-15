@@ -126,6 +126,7 @@ public class DerpsDecor extends StarMod {
                     HoloProjectorConfigDialog configDialog = new HoloProjectorConfigDialog();
                     configDialog.setSegmentPiece(piece);
                     configDialog.activate();
+                    piece.setActive(!piece.isActive());
                     if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
                 }
             }
