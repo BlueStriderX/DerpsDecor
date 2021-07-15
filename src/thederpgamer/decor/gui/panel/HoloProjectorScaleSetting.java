@@ -16,6 +16,18 @@ public class HoloProjectorScaleSetting extends AbstractSizeSetting {
     }
 
     @Override
+    public void dec() {
+        this.setting = Math.max(this.getMin(), this.setting - 1);
+        if(this.guiCallBack != null) this.guiCallBack.settingChanged(this.setting);
+    }
+
+    @Override
+    public void inc() {
+        this.setting = Math.min(this.getMax(), this.setting + 1);
+        if(this.guiCallBack != null) this.guiCallBack.settingChanged(this.setting);
+    }
+
+    @Override
     public int getMin() {
         return 1;
     }
