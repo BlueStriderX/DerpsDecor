@@ -12,12 +12,12 @@ import thederpgamer.decor.manager.ResourceManager;
  * <Description>
  *
  * @author TheDerpGamer
- * @since 07/09/2021
+ * @since 07/15/2021
  */
-public class HoloProjector extends Block {
+public class TextProjector  extends Block {
 
-    public HoloProjector() {
-        super("Holo Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+    public TextProjector() {
+        super("Text Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
     }
 
     @Override
@@ -25,10 +25,10 @@ public class HoloProjector extends Block {
         if(GraphicsContext.initialized) {
             try {
                 blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-                blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
-                blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
+                blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
+                blockInfo.setBuildIconNum(ResourceManager.getTexture("text-projector-icon").getTextureId());
             } catch(Exception exception) {
-                LogManager.logException("Encountered an exception while trying to load textures for Holo Projector! This will result in missing textures in-game!", exception);
+                LogManager.logException("Encountered an exception while trying to load textures for Text Projector! This will result in missing textures in-game!", exception);
             }
         }
         blockInfo.setInRecipe(true);
@@ -49,7 +49,7 @@ public class HoloProjector extends Block {
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                 new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-                new FactoryResource(50, (short) 220)
+                new FactoryResource(50, (short) 440)
         );
         BlockConfig.add(blockInfo);
     }

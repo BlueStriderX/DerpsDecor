@@ -1,10 +1,17 @@
 package thederpgamer.decor.manager;
 
 import api.utils.textures.StarLoaderTexture;
+import org.newdawn.slick.UnicodeFont;
+import org.newdawn.slick.font.effects.ColorEffect;
+import org.newdawn.slick.font.effects.OutlineEffect;
 import org.schema.schine.graphicsengine.core.ResourceException;
+import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.DerpsDecor;
+
+import javax.vecmath.Vector3f;
+import java.awt.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -18,7 +25,9 @@ public class ResourceManager {
 
     private static final String[] textureNames = {
             "holo-projector-front",
-            "holo-projector-icon"
+            "holo-projector-icon",
+            "text-projector-front",
+            "text-projector-icon"
     };
 
     private static final String[] spriteNames = {
@@ -29,8 +38,14 @@ public class ResourceManager {
             "display_screen"
     };
 
+    private static final String[] fontNames = {
+            "Monda-Regular",
+            "Monda-Bold"
+    };
+
     private static HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
     private static HashMap<String, Sprite> spriteMap = new HashMap<>();
+    private static HashMap<String, Font> fontMap = new HashMap<>();
 
     public static void loadResources(final DerpsDecor instance, final ResourceLoader loader) {
 
@@ -66,8 +81,20 @@ public class ResourceManager {
                 for(String modelName : modelNames) {
                     try {
                         loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
+                        Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+                        mesh.setRot(new Vector3f(90f, 90f,0));
+                        mesh.setFirstDraw(true);
                     } catch(ResourceException | IOException exception) {
                         LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
+                    }
+                }
+
+                //Load fonts
+                for(String fontName : fontNames) {
+                    try {
+                        fontMap.put(fontName, Font.createFont(Font.TRUETYPE_FONT, instance.getJarResource("thederpgamer/decor/resources/fonts/" + fontName + ".ttf")));
+                    } catch(Exception exception) {
+                        LogManager.logException("Failed to load font \"" + fontName + "\"", exception);
                     }
                 }
             }
@@ -80,5 +107,32 @@ public class ResourceManager {
 
     public static Sprite getSprite(String name) {
         return spriteMap.get(name);
+    }
+
+    public static UnicodeFont getFont(String fontName, int size, Color color, Color outlineColor, int outlineSize) {
+        try {
+            Font font = fontMap.get(fontName).deriveFont((float) size);
+            UnicodeFont unicodeFont = new UnicodeFont(font);
+            unicodeFont.getEffects().add(new OutlineEffect(outlineSize, outlineColor));
+            unicodeFont.getEffects().add(new ColorEffect(color));
+            unicodeFont.addGlyphs(0x4E00, 0x9FBF);
+            unicodeFont.addAsciiGlyphs();
+            unicodeFont.loadGlyphs();
+            return unicodeFont;
+        } catch(Exception ignored) { }
+        return null;
+    }
+
+    public static UnicodeFont getFont(String fontName, int size, Color color) {
+        try {
+            Font font = fontMap.get(fontName).deriveFont((float) size);
+            UnicodeFont unicodeFont = new UnicodeFont(font);
+            unicodeFont.getEffects().add(new ColorEffect(color));
+            unicodeFont.addGlyphs(0x4E00, 0x9FBF);
+            unicodeFont.addAsciiGlyphs();
+            unicodeFont.loadGlyphs();
+            return unicodeFont;
+        } catch(Exception ignored) { }
+        return null;
     }
 }

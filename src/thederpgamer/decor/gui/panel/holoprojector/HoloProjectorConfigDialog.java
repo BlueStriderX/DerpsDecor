@@ -1,4 +1,4 @@
-package thederpgamer.decor.gui.panel;
+package thederpgamer.decor.gui.panel.holoprojector;
 
 import api.common.GameClient;
 import api.utils.gui.GUIInputDialog;
@@ -26,17 +26,25 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
         this.segmentPiece = segmentPiece;
         String text = segmentPiece.getSegmentController().getTextMap().get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
         if(!text.equals("[no data]")) {
-            String[] values = text.split("~");
-            int xOffset = Integer.parseInt(values[0]);
-            int yOffset = Integer.parseInt(values[1]);
-            int zOffset = Integer.parseInt(values[2]);
-            int scale = Integer.parseInt(values[3]);
-            String src = values[4];
-            ((HoloProjectorConfigPanel) getInputPanel()).setXOffset(xOffset);
-            ((HoloProjectorConfigPanel) getInputPanel()).setYOffset(yOffset);
-            ((HoloProjectorConfigPanel) getInputPanel()).setZOffset(zOffset);
-            ((HoloProjectorConfigPanel) getInputPanel()).setScaleSetting(scale);
-            ((HoloProjectorConfigPanel) getInputPanel()).setSrc(src);
+            try {
+                String[] values = text.split("~");
+                int xOffset = Integer.parseInt(values[0]);
+                int yOffset = Integer.parseInt(values[1]);
+                int zOffset = Integer.parseInt(values[2]);
+                int xRot = Integer.parseInt(values[3]);
+                int yRot = Integer.parseInt(values[4]);
+                int zRot = Integer.parseInt(values[5]);
+                int scale = Integer.parseInt(values[6]);
+                String src = values[7];
+                ((HoloProjectorConfigPanel) getInputPanel()).setXOffset(xOffset);
+                ((HoloProjectorConfigPanel) getInputPanel()).setYOffset(yOffset);
+                ((HoloProjectorConfigPanel) getInputPanel()).setZOffset(zOffset);
+                ((HoloProjectorConfigPanel) getInputPanel()).setXRot(xRot);
+                ((HoloProjectorConfigPanel) getInputPanel()).setYRot(yRot);
+                ((HoloProjectorConfigPanel) getInputPanel()).setZRot(zRot);
+                ((HoloProjectorConfigPanel) getInputPanel()).setScaleSetting(scale);
+                ((HoloProjectorConfigPanel) getInputPanel()).setText(src);
+            } catch(Exception ignored) { }
         }
     }
 
@@ -61,9 +69,12 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         int xOffset = ((HoloProjectorConfigPanel) getInputPanel()).getXOffset();
                         int yOffset = ((HoloProjectorConfigPanel) getInputPanel()).getYOffset();
                         int zOffset = ((HoloProjectorConfigPanel) getInputPanel()).getZOffset();
+                        int xRot = ((HoloProjectorConfigPanel) getInputPanel()).getXRot();
+                        int yRot = ((HoloProjectorConfigPanel) getInputPanel()).getYRot();
+                        int zRot = ((HoloProjectorConfigPanel) getInputPanel()).getZRot();
                         int scale = ((HoloProjectorConfigPanel) getInputPanel()).getScaleSetting();
-                        String src = ((HoloProjectorConfigPanel) getInputPanel()).getSrc();
-                        f.text = xOffset + "~" + yOffset + "~" + zOffset + "~" + scale + "~" + src;
+                        String text = ((HoloProjectorConfigPanel) getInputPanel()).getText();
+                        f.text = xOffset + "~" + yOffset + "~" + zOffset + "~" + xRot + "~" + yRot + "~" + zRot + "~" + scale + "~" + text;
                         ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
                         deactivate();
                         break;
