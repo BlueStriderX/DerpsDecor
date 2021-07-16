@@ -48,6 +48,7 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                 ((TextProjectorConfigPanel) getInputPanel()).setText(src);
             } catch(Exception ignored) { }
         }
+        if(((TextProjectorConfigPanel) getInputPanel()).getScaleSetting() == 0) ((TextProjectorConfigPanel) getInputPanel()).setScaleSetting(1);
     }
 
     @Override
@@ -68,16 +69,7 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                         SendableSegmentProvider ss = ((ClientSegmentProvider) segmentPiece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
                         TextBlockPair f = new TextBlockPair();
                         f.block = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-                        int xOffset = ((TextProjectorConfigPanel) getInputPanel()).getXOffset();
-                        int yOffset = ((TextProjectorConfigPanel) getInputPanel()).getYOffset();
-                        int zOffset = ((TextProjectorConfigPanel) getInputPanel()).getZOffset();
-                        int xRot = ((TextProjectorConfigPanel) getInputPanel()).getXRot();
-                        int yRot = ((TextProjectorConfigPanel) getInputPanel()).getYRot();
-                        int zRot = ((TextProjectorConfigPanel) getInputPanel()).getZRot();
-                        int scale = ((TextProjectorConfigPanel) getInputPanel()).getScaleSetting();
-                        String color = ((TextProjectorConfigPanel) getInputPanel()).getColor();
-                        String text = ((TextProjectorConfigPanel) getInputPanel()).getText();
-                        f.text = xOffset + "~" + yOffset + "~" + zOffset + "~" + xRot + "~" + yRot + "~" + zRot + "~" + scale + "~" + color + "~" + text;
+                        f.text = ((TextProjectorConfigPanel) getInputPanel()).getValues();
                         ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
                         deactivate();
                         break;

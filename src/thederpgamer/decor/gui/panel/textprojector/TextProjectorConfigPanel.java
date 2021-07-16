@@ -3,16 +3,23 @@ package thederpgamer.decor.gui.panel.textprojector;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.game.client.view.gui.buildtools.GUIBuildToolSettingSelector;
 import org.schema.schine.common.TextCallback;
+import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
+import org.schema.schine.graphicsengine.forms.gui.GUIElement;
+import org.schema.schine.graphicsengine.forms.gui.GUITextButton;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIActivatableTextBar;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIContentPane;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIDialogWindow;
 import org.schema.schine.input.InputState;
+import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.gui.elements.GUIMinMaxSetting;
 import thederpgamer.decor.manager.ConfigManager;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
 
 /**
  * <Description>
@@ -20,7 +27,7 @@ import thederpgamer.decor.manager.ConfigManager;
  * @author TheDerpGamer
  * @since 07/15/2021
  */
-public class TextProjectorConfigPanel extends GUIInputDialogPanel {
+public class TextProjectorConfigPanel extends GUIInputDialogPanel implements ClipboardOwner {
 
     private GUIActivatableTextBar textInput;
     private GUIActivatableTextBar colorInput;
@@ -102,54 +109,94 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel {
         colorInput.getPos().y += 50;
         contentPane.getContent(0).attach(colorInput);
 
-        xOffsetSetting = new GUIMinMaxSetting(0, ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
+        xOffsetSetting = new GUIMinMaxSetting(ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
         GUIBuildToolSettingSelector xOffsetSelector = new GUIBuildToolSettingSelector(getState(), xOffsetSetting);
         xOffsetSelector.onInit();
         xOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (xOffsetSelector.getWidth() / 3)) - 100;
         xOffsetSelector.getPos().y += 150;
         contentPane.getContent(0).attach(xOffsetSelector);
 
-        yOffsetSetting = new GUIMinMaxSetting(0, ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
+        yOffsetSetting = new GUIMinMaxSetting(ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
         GUIBuildToolSettingSelector yOffsetSelector = new GUIBuildToolSettingSelector(getState(), yOffsetSetting);
         yOffsetSelector.onInit();
         yOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (yOffsetSelector.getWidth() / 3));
         yOffsetSelector.getPos().y += 150;
         contentPane.getContent(0).attach(yOffsetSelector);
 
-        zOffsetSetting = new GUIMinMaxSetting(0, ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
+        zOffsetSetting = new GUIMinMaxSetting(ConfigManager.getMainConfig().getInt("max-projector-offset") * -1, ConfigManager.getMainConfig().getInt("max-projector-offset"));
         GUIBuildToolSettingSelector zOffsetSelector = new GUIBuildToolSettingSelector(getState(), zOffsetSetting);
         zOffsetSelector.onInit();
         zOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (zOffsetSelector.getWidth() / 3)) + 100;
         zOffsetSelector.getPos().y += 150;
         contentPane.getContent(0).attach(zOffsetSelector);
 
-        xRotSetting = new GUIMinMaxSetting(0, -180, 180);
+        xRotSetting = new GUIMinMaxSetting(-180, 180);
         GUIBuildToolSettingSelector xRotSelector = new GUIBuildToolSettingSelector(getState(), xRotSetting);
         xRotSelector.onInit();
         xRotSelector.getPos().x = ((contentPane.getWidth() / 3) + (xRotSelector.getWidth() / 3)) - 100;
         xRotSelector.getPos().y += 250;
         contentPane.getContent(0).attach(xRotSelector);
 
-        yRotSetting = new GUIMinMaxSetting(0, -180, 180);
+        yRotSetting = new GUIMinMaxSetting(-180, 180);
         GUIBuildToolSettingSelector yRotSelector = new GUIBuildToolSettingSelector(getState(), yRotSetting);
         yRotSelector.onInit();
         yRotSelector.getPos().x = ((contentPane.getWidth() / 3) + (yRotSelector.getWidth() / 3));
         yRotSelector.getPos().y += 250;
         contentPane.getContent(0).attach(yRotSelector);
 
-        zRotSetting = new GUIMinMaxSetting(0, -180, 180);
+        zRotSetting = new GUIMinMaxSetting(-180, 180);
         GUIBuildToolSettingSelector zRotSelector = new GUIBuildToolSettingSelector(getState(), zRotSetting);
         zRotSelector.onInit();
         zRotSelector.getPos().x = ((contentPane.getWidth() / 3) + (zRotSelector.getWidth() / 3)) + 100;
         zRotSelector.getPos().y += 250;
         contentPane.getContent(0).attach(zRotSelector);
 
-        scaleSetting = new GUIMinMaxSetting(1, 1, ConfigManager.getMainConfig().getInt("max-projector-scale"));
+        scaleSetting = new GUIMinMaxSetting(1, ConfigManager.getMainConfig().getInt("max-projector-scale"));
         GUIBuildToolSettingSelector scaleSelector = new GUIBuildToolSettingSelector(getState(), scaleSetting);
         scaleSelector.onInit();
         scaleSelector.getPos().x = yOffsetSelector.getPos().x;
         scaleSelector.getPos().y += 350;
         contentPane.getContent(0).attach(scaleSelector);
+
+        GUITextButton copySettingsButton = new GUITextButton(getState(), 150, 30, GUITextButton.ColorPalette.OK, "COPY SETTINGS", new GUICallback() {
+            @Override
+            public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
+                if (mouseEvent.pressedLeftMouse() && guiElement != null && guiElement.getUserPointer() != null && guiElement.getUserPointer().equals("COPY")) {
+                    getState().getController().queueUIAudio("0022_menu_ui - select 1");
+                    DerpsDecor.getInstance().clipboard.setClipboard(getValues());
+                }
+            }
+
+            @Override
+            public boolean isOccluded() {
+                return false;
+            }
+        });
+        copySettingsButton.setUserPointer("COPY");
+        copySettingsButton.onInit();
+        copySettingsButton.getPos().x = xOffsetSelector.getPos().x - 60;
+        copySettingsButton.getPos().y = scaleSelector.getPos().y;
+        contentPane.getContent(0).attach(copySettingsButton);
+
+        GUITextButton pasteSettingsButton = new GUITextButton(getState(), 150, 30, GUITextButton.ColorPalette.OK, "PASTE SETTINGS", new GUICallback() {
+            @Override
+            public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
+                if (mouseEvent.pressedLeftMouse() && guiElement != null && guiElement.getUserPointer() != null && guiElement.getUserPointer().equals("PASTE")) {
+                    getState().getController().queueUIAudio("0022_menu_ui - select 2");
+                    setValues(DerpsDecor.getInstance().clipboard.getClipboard());
+                }
+            }
+
+            @Override
+            public boolean isOccluded() {
+                return false;
+            }
+        });
+        pasteSettingsButton.setUserPointer("PASTE");
+        pasteSettingsButton.onInit();
+        pasteSettingsButton.getPos().x = zOffsetSelector.getPos().x;
+        pasteSettingsButton.getPos().y = scaleSelector.getPos().y;
+        contentPane.getContent(0).attach(pasteSettingsButton);
 
         getButtonCancel().setUserPointer("CANCEL");
         getButtonOK().setUserPointer("OK");
@@ -290,5 +337,31 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel {
 
     public void setText(String text) {
         textInput.setTextWithoutCallback(text);
+    }
+
+    public String getValues() {
+        return getXOffset() + "~" + getYOffset() + "~" + getZOffset() + "~" + getXRot() + "~" + getYRot() + "~" + getZRot() + "~" + getScaleSetting() + "~" + getColor() + "~" + getText();
+    }
+
+    public void setValues(String s) {
+        if(s != null && !s.equals("")) {
+            try {
+                String[] values = s.split("~");
+                setXOffset(Integer.parseInt(values[0]));
+                setYOffset(Integer.parseInt(values[1]));
+                setZOffset(Integer.parseInt(values[2]));
+                setXRot(Integer.parseInt(values[3]));
+                setYRot(Integer.parseInt(values[4]));
+                setZRot(Integer.parseInt(values[5]));
+                setScaleSetting(Integer.parseInt(values[6]));
+                setColor(values[7]);
+                setText(values[8]);
+            } catch(Exception ignored) { }
+        }
+    }
+
+    @Override
+    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+
     }
 }

@@ -24,6 +24,7 @@ import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.ClipboardUtils;
 
 /**
  * Main class for DerpsDecor mod.
@@ -38,19 +39,18 @@ public class DerpsDecor extends StarMod {
     public static DerpsDecor getInstance() {
         return instance;
     }
-    public DerpsDecor() {
+    public DerpsDecor() { }
+    public static void main(String[] args) { }
 
-    }
-    public static void main(String[] args) {
-
-    }
+    //Utils
+    public ClipboardUtils clipboard;
 
     @Override
     public void onEnable() {
         instance = this;
+        clipboard = new ClipboardUtils();
         ConfigManager.initialize(this);
         LogManager.initialize();
-
         registerFastListeners();
         registerListeners();
     }

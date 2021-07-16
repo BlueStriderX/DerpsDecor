@@ -13,8 +13,7 @@ public class GUIMinMaxSetting extends AbstractSizeSetting {
     private final int min;
     private final int max;
 
-    public GUIMinMaxSetting(int defaultValue, int min, int max) {
-        this.setting = defaultValue;
+    public GUIMinMaxSetting(int min, int max) {
         this.min = min;
         this.max = max;
     }

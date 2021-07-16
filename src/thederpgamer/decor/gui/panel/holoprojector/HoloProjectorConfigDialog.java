@@ -46,6 +46,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                 ((HoloProjectorConfigPanel) getInputPanel()).setText(src);
             } catch(Exception ignored) { }
         }
+        if(((HoloProjectorConfigPanel) getInputPanel()).getScaleSetting() == 0) ((HoloProjectorConfigPanel) getInputPanel()).setScaleSetting(1);
     }
 
     @Override
@@ -66,15 +67,8 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         SendableSegmentProvider ss = ((ClientSegmentProvider) segmentPiece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
                         TextBlockPair f = new TextBlockPair();
                         f.block = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-                        int xOffset = ((HoloProjectorConfigPanel) getInputPanel()).getXOffset();
-                        int yOffset = ((HoloProjectorConfigPanel) getInputPanel()).getYOffset();
-                        int zOffset = ((HoloProjectorConfigPanel) getInputPanel()).getZOffset();
-                        int xRot = ((HoloProjectorConfigPanel) getInputPanel()).getXRot();
-                        int yRot = ((HoloProjectorConfigPanel) getInputPanel()).getYRot();
-                        int zRot = ((HoloProjectorConfigPanel) getInputPanel()).getZRot();
-                        int scale = ((HoloProjectorConfigPanel) getInputPanel()).getScaleSetting();
-                        String text = ((HoloProjectorConfigPanel) getInputPanel()).getText();
-                        f.text = xOffset + "~" + yOffset + "~" + zOffset + "~" + xRot + "~" + yRot + "~" + zRot + "~" + scale + "~" + text;
+                        f.text = ((HoloProjectorConfigPanel) getInputPanel()).getValues();
+                        System.out.println(f.text);
                         ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
                         deactivate();
                         break;
