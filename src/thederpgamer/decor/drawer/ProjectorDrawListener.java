@@ -16,6 +16,7 @@ import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.MathUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
@@ -52,16 +53,14 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                 holoProjector = ElementManager.getBlock("Holo Projector").getId();
                 textProjector = ElementManager.getBlock("Text Projector").getId();
                 initialized = true;
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
         }
 
         for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : textBoxSeg.v) {
             try {
                 SegmentPiece segmentPiece = textBoxElement.c.getSegmentBuffer().getPointUnsave(textBoxElement.v);
                 if (segmentPiece != null && !segmentPiece.isActive()) {
-                    if (segmentPiece.getType() == ElementKeyMap.TEXT_BOX)
-                        abstractTextBox.getBg().setSprite(Controller.getResLoader().getSprite("screen-gui-"));
+                    if (segmentPiece.getType() == ElementKeyMap.TEXT_BOX) abstractTextBox.getBg().setSprite(Controller.getResLoader().getSprite("screen-gui-"));
                     else {
                         textBoxElement.text.setTextSimple("");
                         abstractTextBox.getBg().setSprite(ResourceManager.getSprite("transparent"));
@@ -89,6 +88,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                         Quat4f addRot = new Quat4f();
                                         QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
                                         currentRot.mul(addRot);
+                                        MathUtils.roundQuat(currentRot);
                                         pos.setRotation(currentRot);
 
                                         float maxDim = Math.max(image.getWidth(), image.getHeight());
@@ -117,6 +117,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 Quat4f addRot = new Quat4f();
                                 QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
                                 currentRot.mul(addRot);
+                                MathUtils.roundQuat(currentRot);
                                 pos.setRotation(currentRot);
 
                                 if (!textDrawMap.containsKey(segmentPiece)) {
