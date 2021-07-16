@@ -116,7 +116,8 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
                                 currentRot.mul(addRot);
                                 pos.setRotation(currentRot);
-                                if (!textDrawMap.containsKey(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()))) {
+
+                                if (!textDrawMap.containsKey(segmentPiece.getAbsoluteIndex())) {
                                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                                     textOverlay.onInit();
                                     textOverlay.setTransform(pos);
@@ -124,11 +125,11 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                     textOverlay.setTextSimple(text);
                                     textOverlay.setBlend(true);
                                     textOverlay.doDepthTest = true;
-                                    textDrawMap.remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                                    textDrawMap.put(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), textOverlay);
+                                    textDrawMap.remove(segmentPiece.getAbsoluteIndex());
+                                    textDrawMap.put(segmentPiece.getAbsoluteIndex(), textOverlay);
                                 } else {
-                                    textDrawMap.get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
-                                    textDrawMap.get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())).draw();
+                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
+                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).draw();
                                 }
                             }
                         }
