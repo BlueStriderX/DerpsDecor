@@ -83,13 +83,15 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                         Transform pos = textBoxElement.worldpos;
                                         pos.origin.add(offset);
 
-                                        Quat4f currentRot = new Quat4f();
-                                        pos.getRotation(currentRot);
-                                        Quat4f addRot = new Quat4f();
-                                        QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
-                                        currentRot.mul(addRot);
-                                        MathUtils.roundQuat(currentRot);
-                                        pos.setRotation(currentRot);
+                                        if (xRot != 0 || yRot != 0 || zRot != 0) {
+                                            Quat4f currentRot = new Quat4f();
+                                            pos.getRotation(currentRot);
+                                            Quat4f addRot = new Quat4f();
+                                            QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
+                                            currentRot.mul(addRot);
+                                            MathUtils.roundQuat(currentRot);
+                                            pos.setRotation(currentRot);
+                                        }
 
                                         float maxDim = Math.max(image.getWidth(), image.getHeight());
                                         ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) scale / maxDim) * -1, pos)};
@@ -112,13 +114,15 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 Transform pos = textBoxElement.worldpos;
                                 pos.origin.add(offset);
 
-                                Quat4f currentRot = new Quat4f();
-                                pos.getRotation(currentRot);
-                                Quat4f addRot = new Quat4f();
-                                QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
-                                currentRot.mul(addRot);
-                                MathUtils.roundQuat(currentRot);
-                                pos.setRotation(currentRot);
+                                if (xRot != 0 || yRot != 0 || zRot != 0) {
+                                    Quat4f currentRot = new Quat4f();
+                                    pos.getRotation(currentRot);
+                                    Quat4f addRot = new Quat4f();
+                                    QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
+                                    currentRot.mul(addRot);
+                                    MathUtils.roundQuat(currentRot);
+                                    pos.setRotation(currentRot);
+                                }
 
                                 if (!textDrawMap.containsKey(segmentPiece)) {
                                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
