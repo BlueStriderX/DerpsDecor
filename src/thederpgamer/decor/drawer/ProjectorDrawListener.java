@@ -7,6 +7,7 @@ import com.bulletphysics.linearmath.Transform;
 import org.schema.game.client.view.SegmentDrawer;
 import org.schema.game.client.view.textbox.AbstractTextBox;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.forms.Sprite;
@@ -15,12 +16,11 @@ import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.manager.ResourceManager;
+
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <Description>
@@ -31,8 +31,6 @@ import java.util.Map;
 public class ProjectorDrawListener implements TextBoxDrawListener {
 
     private final HashMap<Long, GUITextOverlay> textDrawMap = new HashMap<>();
-    private float timer;
-
     private boolean initialized;
     private short holoProjector;
     private short textProjector;
@@ -118,7 +116,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
                                 currentRot.mul(addRot);
                                 pos.setRotation(currentRot);
-                                if (!textDrawMap.containsKey(segmentPiece.getAbsoluteIndex()) || !textDrawMap.get(segmentPiece.getAbsoluteIndex()).getTransform().equals(pos) || !textDrawMap.get(segmentPiece.getAbsoluteIndex()).getText().get(0).equals(text)) {
+                                if (!textDrawMap.containsKey(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()))) {
                                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                                     textOverlay.onInit();
                                     textOverlay.setTransform(pos);
@@ -126,33 +124,17 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                     textOverlay.setTextSimple(text);
                                     textOverlay.setBlend(true);
                                     textOverlay.doDepthTest = true;
-                                    textDrawMap.remove(segmentPiece.getAbsoluteIndex());
-                                    textDrawMap.put(segmentPiece.getAbsoluteIndex(), textOverlay);
+                                    textDrawMap.remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                                    textDrawMap.put(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), textOverlay);
                                 } else {
-                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
-                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).draw();
+                                    textDrawMap.get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
+                                    textDrawMap.get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())).draw();
                                 }
                             }
                         }
                     }
                 }
             } catch (Exception ignored) { }
-        }
-
-        try {
-            if (timer == 0) {
-                ArrayList<Long> toRemove = new ArrayList<>();
-                for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : textBoxSeg.v) {
-                    for (Map.Entry<Long, GUITextOverlay> entry : textDrawMap.entrySet()) {
-                        if (!textBoxElement.c.getSegmentBuffer().existsPointUnsave(entry.getKey()) || textBoxElement.c.getSegmentBuffer().getPointUnsave(entry.getKey()).getType() != textProjector) {
-                            toRemove.add(entry.getKey());
-                        }
-                    }
-                }
-                for (long l : toRemove) textDrawMap.remove(l);
-                timer = 1000f;
-            } else timer--;
-        } catch (Exception ignored) {
         }
     }
 
