@@ -25,7 +25,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
     public void setSegmentPiece(SegmentPiece segmentPiece) {
         this.segmentPiece = segmentPiece;
         String text = segmentPiece.getSegmentController().getTextMap().get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-        if(!text.equals("[no data]")) {
+        if(text != null && !text.equals("[no data]")) {
             try {
                 String[] values = text.split("~");
                 int xOffset = Integer.parseInt(values[0]);

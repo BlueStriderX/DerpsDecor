@@ -4,7 +4,6 @@ import api.common.GameClient;
 import api.listener.fastevents.TextBoxDrawListener;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
-import org.schema.common.FastMath;
 import org.schema.game.client.view.SegmentDrawer;
 import org.schema.game.client.view.textbox.AbstractTextBox;
 import org.schema.game.common.data.SegmentPiece;
@@ -16,11 +15,12 @@ import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.manager.ResourceManager;
-import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <Description>
@@ -31,26 +31,14 @@ import java.util.HashMap;
 public class ProjectorDrawListener implements TextBoxDrawListener {
 
     private final HashMap<Long, GUITextOverlay> textDrawMap = new HashMap<>();
-    private final Matrix3f mY = new Matrix3f();
-    private final Matrix3f mYB = new Matrix3f();
-    private final Matrix3f mYC = new Matrix3f();
-    private final Matrix3f mX = new Matrix3f();
-    private final Matrix3f mXB = new Matrix3f();
-    private final Matrix3f mXC = new Matrix3f();
+    private float timer;
+
+    private boolean initialized;
+    private short holoProjector;
+    private short textProjector;
 
     public ProjectorDrawListener() {
-        mY.setIdentity();
-        mY.rotY(FastMath.HALF_PI);
-        mYB.setIdentity();
-        mYB.rotY(-FastMath.HALF_PI);
-        mYC.setIdentity();
-        mYC.rotY(FastMath.PI);
-        mX.setIdentity();
-        mX.rotX(FastMath.HALF_PI);
-        mXB.setIdentity();
-        mXB.rotX(-FastMath.HALF_PI);
-        mXC.setIdentity();
-        mXC.rotX(FastMath.PI);
+        initialized = false;
     }
 
     @Override
@@ -60,16 +48,25 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
 
     @Override
     public void preDrawBackground(final SegmentDrawer.TextBoxSeg textBoxSeg, final AbstractTextBox abstractTextBox) {
+        if (!initialized) {
+            try {
+                holoProjector = ElementManager.getBlock("Holo Projector").getId();
+                textProjector = ElementManager.getBlock("Text Projector").getId();
+                initialized = true;
+            } catch (Exception ignored) {
+            }
+        }
         for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : textBoxSeg.v) {
             try {
                 SegmentPiece segmentPiece = textBoxElement.c.getSegmentBuffer().getPointUnsave(textBoxElement.v);
                 if (segmentPiece != null && !segmentPiece.isActive()) {
-                    if (segmentPiece.getType() == ElementKeyMap.TEXT_BOX) abstractTextBox.getBg().setSprite(Controller.getResLoader().getSprite("screen-gui-"));
+                    if (segmentPiece.getType() == ElementKeyMap.TEXT_BOX)
+                        abstractTextBox.getBg().setSprite(Controller.getResLoader().getSprite("screen-gui-"));
                     else {
                         textBoxElement.text.setTextSimple("");
                         abstractTextBox.getBg().setSprite(ResourceManager.getSprite("transparent"));
                         if (textBoxElement.rawText.contains("~") && (textBoxElement.rawText.split("~").length == 8 || textBoxElement.rawText.split("~").length == 9)) {
-                            if (segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
+                            if (segmentPiece.getType() == holoProjector) {
                                 String[] values = textBoxElement.rawText.split("~");
                                 int xOffset = Integer.parseInt(values[0]);
                                 int yOffset = Integer.parseInt(values[1]);
@@ -99,7 +96,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                         Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
                                     }
                                 }
-                            } else if (segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
+                            } else if (segmentPiece.getType() == textProjector) {
                                 String[] values = textBoxElement.rawText.split("~");
                                 int xOffset = Integer.parseInt(values[0]);
                                 int yOffset = Integer.parseInt(values[1]);
@@ -127,6 +124,8 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                     textOverlay.setTransform(pos);
                                     textOverlay.setFont(ResourceManager.getFont("Monda-Bold", scale * 10, Color.decode("0x" + colorCode)));
                                     textOverlay.setTextSimple(text);
+                                    textOverlay.setBlend(true);
+                                    textOverlay.doDepthTest = true;
                                     textDrawMap.remove(segmentPiece.getAbsoluteIndex());
                                     textDrawMap.put(segmentPiece.getAbsoluteIndex(), textOverlay);
                                 } else {
@@ -138,6 +137,22 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                     }
                 }
             } catch (Exception ignored) { }
+        }
+
+        try {
+            if (timer == 0) {
+                ArrayList<Long> toRemove = new ArrayList<>();
+                for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : textBoxSeg.v) {
+                    for (Map.Entry<Long, GUITextOverlay> entry : textDrawMap.entrySet()) {
+                        if (!textBoxElement.c.getSegmentBuffer().existsPointUnsave(entry.getKey()) || textBoxElement.c.getSegmentBuffer().getPointUnsave(entry.getKey()).getType() != textProjector) {
+                            toRemove.add(entry.getKey());
+                        }
+                    }
+                }
+                for (long l : toRemove) textDrawMap.remove(l);
+                timer = 1000f;
+            } else timer--;
+        } catch (Exception ignored) {
         }
     }
 
