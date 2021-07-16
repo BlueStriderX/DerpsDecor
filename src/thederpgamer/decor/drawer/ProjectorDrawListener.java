@@ -16,10 +16,10 @@ import thederpgamer.decor.data.image.ScalableImageSubSprite;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.manager.ResourceManager;
-
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -30,10 +30,11 @@ import java.util.HashMap;
  */
 public class ProjectorDrawListener implements TextBoxDrawListener {
 
-    private final HashMap<Long, GUITextOverlay> textDrawMap = new HashMap<>();
+    private final HashMap<SegmentPiece, GUITextOverlay> textDrawMap = new HashMap<>();
     private boolean initialized;
     private short holoProjector;
     private short textProjector;
+    private float timer;
 
     public ProjectorDrawListener() {
         initialized = false;
@@ -54,6 +55,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
             } catch (Exception ignored) {
             }
         }
+
         for (SegmentDrawer.TextBoxSeg.TextBoxElement textBoxElement : textBoxSeg.v) {
             try {
                 SegmentPiece segmentPiece = textBoxElement.c.getSegmentBuffer().getPointUnsave(textBoxElement.v);
@@ -117,7 +119,7 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 currentRot.mul(addRot);
                                 pos.setRotation(currentRot);
 
-                                if (!textDrawMap.containsKey(segmentPiece.getAbsoluteIndex())) {
+                                if (!textDrawMap.containsKey(segmentPiece)) {
                                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                                     textOverlay.onInit();
                                     textOverlay.setTransform(pos);
@@ -125,11 +127,11 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                     textOverlay.setTextSimple(text);
                                     textOverlay.setBlend(true);
                                     textOverlay.doDepthTest = true;
-                                    textDrawMap.remove(segmentPiece.getAbsoluteIndex());
-                                    textDrawMap.put(segmentPiece.getAbsoluteIndex(), textOverlay);
+                                    textDrawMap.put(segmentPiece, textOverlay);
                                 } else {
-                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
-                                    textDrawMap.get(segmentPiece.getAbsoluteIndex()).draw();
+                                    textDrawMap.get(segmentPiece).setTextSimple(text);
+                                    textDrawMap.get(segmentPiece).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
+                                    textDrawMap.get(segmentPiece).draw();
                                 }
                             }
                         }
@@ -137,6 +139,18 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                 }
             } catch (Exception ignored) { }
         }
+
+        if(timer == 0) {
+            ArrayList<SegmentPiece> toRemove = new ArrayList<>();
+            for(SegmentPiece segmentPiece : textDrawMap.keySet()) if(segmentPiece.getType() != textProjector) toRemove.add(segmentPiece);
+            for(SegmentPiece segmentPiece : toRemove) {
+                if(segmentPiece.getType() != ElementKeyMap.TEXT_BOX && segmentPiece.getType() != holoProjector) {
+                    segmentPiece.getSegmentController().getTextBlocks().remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                }
+                textDrawMap.remove(segmentPiece);
+            }
+            timer = 1000f;
+        } else timer --;
     }
 
     @Override
