@@ -75,24 +75,21 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
                                 int zRot = Integer.parseInt(values[5]);
                                 int scale = Integer.parseInt(values[6]);
                                 String src = values[7];
-                                Vector3f offset = new Vector3f(xOffset, yOffset, zOffset);
 
+                                Vector3f offset = new Vector3f(xOffset, yOffset, zOffset);
                                 if (src.toLowerCase().endsWith(".png") || src.toLowerCase().endsWith(".jpg")) {
                                     Sprite image = ImageManager.getImage(src);
                                     if (image != null) {
                                         Transform pos = textBoxElement.worldpos;
+                                        Quat4f currentRot = new Quat4f();
+                                        pos.getRotation(currentRot);
+                                        Quat4f addRot = new Quat4f();
+                                        QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
+                                        currentRot.mul(addRot);
+                                        MathUtils.roundQuat(currentRot);
+                                        pos.setRotation(currentRot);
                                         pos.origin.add(offset);
-
-                                        if (xRot != 0 || yRot != 0 || zRot != 0) {
-                                            Quat4f currentRot = new Quat4f();
-                                            pos.getRotation(currentRot);
-                                            Quat4f addRot = new Quat4f();
-                                            QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
-                                            currentRot.mul(addRot);
-                                            MathUtils.roundQuat(currentRot);
-                                            pos.setRotation(currentRot);
-                                        }
-
+                                        MathUtils.roundVector(pos.origin);
                                         float maxDim = Math.max(image.getWidth(), image.getHeight());
                                         ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) scale / maxDim) * -1, pos)};
                                         Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
@@ -112,28 +109,25 @@ public class ProjectorDrawListener implements TextBoxDrawListener {
 
                                 Vector3f offset = new Vector3f(xOffset, yOffset, zOffset);
                                 Transform pos = textBoxElement.worldpos;
+                                Quat4f currentRot = new Quat4f();
+                                pos.getRotation(currentRot);
+                                Quat4f addRot = new Quat4f();
+                                QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
+                                currentRot.mul(addRot);
+                                MathUtils.roundQuat(currentRot);
+                                pos.setRotation(currentRot);
                                 pos.origin.add(offset);
-
-                                if (xRot != 0 || yRot != 0 || zRot != 0) {
-                                    Quat4f currentRot = new Quat4f();
-                                    pos.getRotation(currentRot);
-                                    Quat4f addRot = new Quat4f();
-                                    QuaternionUtil.setEuler(addRot, xRot / 100.0f, yRot / 100.0f, zRot / 100.0f);
-                                    currentRot.mul(addRot);
-                                    MathUtils.roundQuat(currentRot);
-                                    pos.setRotation(currentRot);
-                                }
-
+                                MathUtils.roundVector(pos.origin);
                                 if (!textDrawMap.containsKey(segmentPiece)) {
                                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                                     textOverlay.onInit();
-                                    textOverlay.setTransform(pos);
                                     textOverlay.setFont(ResourceManager.getFont("Monda-Bold", scale * 10, Color.decode("0x" + colorCode)));
                                     textOverlay.setTextSimple(text);
                                     textOverlay.setBlend(true);
                                     textOverlay.doDepthTest = true;
                                     textDrawMap.put(segmentPiece, textOverlay);
                                 } else {
+                                    textDrawMap.get(segmentPiece).setTransform(pos);
                                     textDrawMap.get(segmentPiece).setTextSimple(text);
                                     textDrawMap.get(segmentPiece).setScale(-scale / 100.0f, -scale / 100.0f, -scale / 100.0f);
                                     textDrawMap.get(segmentPiece).draw();
