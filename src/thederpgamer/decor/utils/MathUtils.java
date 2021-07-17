@@ -14,12 +14,14 @@ import java.math.RoundingMode;
  */
 public class MathUtils {
 
+    public static RoundingMode roundingMode;
+
     /**
      * Rounds a Quat4f for use in matrix rotation.
      * @param out The Quat to round.
      */
     public static void roundQuat(Quat4f out) {
-        MathContext context = new MathContext(0, RoundingMode.UP);
+        MathContext context = new MathContext(0, roundingMode);
         BigDecimal bdX = new BigDecimal(out.x);
         BigDecimal bdY = new BigDecimal(out.y);
         BigDecimal bdZ = new BigDecimal(out.z);
@@ -28,7 +30,7 @@ public class MathUtils {
     }
 
     public static void roundVector(Vector3f out) {
-        MathContext context = new MathContext(0, RoundingMode.UP);
+        MathContext context = new MathContext(0, roundingMode);
         BigDecimal bdX = new BigDecimal(out.x);
         BigDecimal bdY = new BigDecimal(out.y);
         BigDecimal bdZ = new BigDecimal(out.z);
