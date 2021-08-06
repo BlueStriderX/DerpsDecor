@@ -1,4 +1,4 @@
-package thederpgamer.decor.data.image;
+package thederpgamer.decor.data.graphics.image;
 
 import com.bulletphysics.linearmath.Transform;
 import org.schema.schine.graphicsengine.forms.Sprite;

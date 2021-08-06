@@ -3,14 +3,18 @@ package thederpgamer.decor.gui.panel.textprojector;
 import api.common.GameClient;
 import api.utils.gui.GUIInputDialog;
 import api.utils.gui.GUIInputDialogPanel;
-import org.schema.game.client.controller.element.world.ClientSegmentProvider;
-import org.schema.game.common.controller.SendableSegmentProvider;
+import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.Ship;
+import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.network.objects.remote.RemoteTextBlockPair;
-import org.schema.game.network.objects.remote.TextBlockPair;
+import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
+import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.data.projector.TextProjectorDrawData;
+import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.modules.TextProjectorModule;
 
 /**
  * <Description>
@@ -24,31 +28,17 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
 
     public void setSegmentPiece(SegmentPiece segmentPiece) {
         this.segmentPiece = segmentPiece;
-        String text = segmentPiece.getSegmentController().getTextMap().get(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-        if(text != null && !text.equals("[no data]")) {
-            try {
-                String[] values = text.split("~");
-                int xOffset = Integer.parseInt(values[0]);
-                int yOffset = Integer.parseInt(values[1]);
-                int zOffset = Integer.parseInt(values[2]);
-                int xRot = Integer.parseInt(values[3]);
-                int yRot = Integer.parseInt(values[4]);
-                int zRot = Integer.parseInt(values[5]);
-                int scale = Integer.parseInt(values[6]);
-                String colorCode = values[7];
-                String src = values[8];
-                ((TextProjectorConfigPanel) getInputPanel()).setXOffset(xOffset);
-                ((TextProjectorConfigPanel) getInputPanel()).setYOffset(yOffset);
-                ((TextProjectorConfigPanel) getInputPanel()).setZOffset(zOffset);
-                ((TextProjectorConfigPanel) getInputPanel()).setXRot(xRot);
-                ((TextProjectorConfigPanel) getInputPanel()).setYRot(yRot);
-                ((TextProjectorConfigPanel) getInputPanel()).setZRot(zRot);
-                ((TextProjectorConfigPanel) getInputPanel()).setScaleSetting(scale);
-                ((TextProjectorConfigPanel) getInputPanel()).setColor(colorCode);
-                ((TextProjectorConfigPanel) getInputPanel()).setText(src);
-            } catch(Exception ignored) { }
-        }
-        if(((TextProjectorConfigPanel) getInputPanel()).getScaleSetting() == 0) ((TextProjectorConfigPanel) getInputPanel()).setScaleSetting(1);
+
+        TextProjectorDrawData drawData = (TextProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        getConfigPanel().setText(drawData.text);
+        getConfigPanel().setColor(drawData.color);
+        getConfigPanel().setXOffset(drawData.offset.x);
+        getConfigPanel().setYOffset(drawData.offset.y);
+        getConfigPanel().setZOffset(drawData.offset.z);
+        getConfigPanel().setXRot(drawData.rotation.x);
+        getConfigPanel().setYRot(drawData.rotation.y);
+        getConfigPanel().setZRot(drawData.rotation.z);
+        getConfigPanel().setScaleSetting(drawData.scale);
     }
 
     @Override
@@ -66,11 +56,15 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                         deactivate();
                         break;
                     case "OK":
-                        SendableSegmentProvider ss = ((ClientSegmentProvider) segmentPiece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
-                        TextBlockPair f = new TextBlockPair();
-                        f.block = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-                        f.text = ((TextProjectorConfigPanel) getInputPanel()).getValues();
-                        ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
+                        TextProjectorDrawData drawData = (TextProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                        drawData.text = getConfigPanel().getText();
+                        drawData.color = getConfigPanel().getColor();
+                        drawData.offset = new Vector3i(getConfigPanel().getXOffset(), getConfigPanel().getYOffset(), getConfigPanel().getZOffset());
+                        drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
+                        drawData.scale = getConfigPanel().getScaleSetting();
+                        getModule().projectorMap.remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                        getModule().projectorMap.put(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
+                        DerpsDecor.getInstance().projectorDrawer.addProjector(segmentPiece);
                         deactivate();
                         break;
                 }
@@ -82,5 +76,17 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
     public void onDeactivate() {
         super.onDeactivate();
         GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(false);
+    }
+
+    private TextProjectorConfigPanel getConfigPanel() {
+        return (TextProjectorConfigPanel) getInputPanel();
+    }
+
+    private TextProjectorModule getModule() {
+        if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+            return (TextProjectorModule) ((Ship) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
+        } else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+            return (TextProjectorModule) ((SpaceStation) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
+        } else return null;
     }
 }
