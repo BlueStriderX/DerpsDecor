@@ -48,9 +48,9 @@ public class SegmentPieceUtils {
         transform.setIdentity();
         segmentPiece.getTransform(transform);
 
-        float sNormalDir = 0.51f;
+        float sNormalDir = 0.51f - 1.0f;
         float sVertical = 0.51f;
-        float sHorizontal = 0.5f;
+        float sHorizontal = 0.51f;
         
         int orientation = segmentPiece.getOrientation();
         switch(orientation) { 

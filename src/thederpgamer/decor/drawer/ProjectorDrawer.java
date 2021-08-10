@@ -65,7 +65,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
             ProjectorDrawData drawData = entry.getValue();
             if(canDraw(segmentPiece)) {
                 Transform transform = new Transform(drawData.pieceTransform);
-
                 Quat4f currentRot = new Quat4f();
                 transform.getRotation(currentRot);
                 Quat4f addRot = new Quat4f();
@@ -164,33 +163,47 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
             ShipManagerContainer managerContainer = (ShipManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
             if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
                 HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                projectorDrawMap.put(segmentPiece, module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())));
+                HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                projectorDrawMap.put(segmentPiece, drawData);
+                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
             } else if(segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
                 TextProjectorModule module = (TextProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
                 TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
                 GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                 textOverlay.onInit();
-                textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
+                try {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
+                } catch(Exception exception) {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0xFFFFFF")));
+                }
                 textOverlay.setBlend(true);
                 textOverlay.doDepthTest = true;
                 projectorDrawMap.put(segmentPiece, drawData);
                 textDrawMap.put(segmentPiece, textOverlay);
+                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
             }
         } else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
             SpaceStationManagerContainer managerContainer = (SpaceStationManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
             if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
                 HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                projectorDrawMap.put(segmentPiece, module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())));
+                HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                projectorDrawMap.put(segmentPiece, drawData);
+                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
             } else if(segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
                 TextProjectorModule module = (TextProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
                 TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
                 GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                 textOverlay.onInit();
-                textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
+                try {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
+                } catch(Exception exception) {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0xFFFFFF")));
+                }
                 textOverlay.setBlend(true);
                 textOverlay.doDepthTest = true;
                 projectorDrawMap.put(segmentPiece, drawData);
                 textDrawMap.put(segmentPiece, textOverlay);
+                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
             }
         }
     }

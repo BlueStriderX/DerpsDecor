@@ -53,7 +53,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
                         exception1.printStackTrace();
                     }
                 }
-            }
+            } else packetWriteBuffer.writeInt(0);
         } catch(Exception exception2) {
             exception2.printStackTrace();
         }
@@ -63,25 +63,27 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
         try {
             int count = packetReadBuffer.readInt();
-            while(count >= 0) {
-                try {
-                    long indexAndOrientation = packetReadBuffer.readLong();
-                    String src = packetReadBuffer.readString();
-                    Vector3i offset = packetReadBuffer.readVector();
-                    Vector3i rotation = packetReadBuffer.readVector();
-                    int scale = packetReadBuffer.readInt();
-                    HoloProjectorDrawData drawData = (HoloProjectorDrawData) getDrawData(indexAndOrientation);
-                    drawData.indexAndOrientation = indexAndOrientation;
-                    drawData.src = src;
-                    drawData.offset = offset;
-                    drawData.rotation = rotation;
-                    drawData.scale = scale;
-                    projectorMap.remove(indexAndOrientation);
-                    projectorMap.put(indexAndOrientation, drawData);
-                } catch(Exception exception1) {
-                    exception1.printStackTrace();
+            if(count > 0) {
+                while(count > 0) {
+                    try {
+                        long indexAndOrientation = packetReadBuffer.readLong();
+                        String src = packetReadBuffer.readString();
+                        Vector3i offset = packetReadBuffer.readVector();
+                        Vector3i rotation = packetReadBuffer.readVector();
+                        int scale = packetReadBuffer.readInt();
+                        HoloProjectorDrawData drawData = (HoloProjectorDrawData) getDrawData(indexAndOrientation);
+                        drawData.indexAndOrientation = indexAndOrientation;
+                        drawData.src = src;
+                        drawData.offset = offset;
+                        drawData.rotation = rotation;
+                        drawData.scale = scale;
+                        projectorMap.remove(indexAndOrientation);
+                        projectorMap.put(indexAndOrientation, drawData);
+                    } catch(Exception exception1) {
+                        exception1.printStackTrace();
+                    }
+                    count --;
                 }
-                count --;
             }
         } catch(Exception exception2) {
             exception2.printStackTrace();

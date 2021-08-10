@@ -60,6 +60,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         drawData.offset = new Vector3i(getConfigPanel().getXOffset(), getConfigPanel().getYOffset(), getConfigPanel().getZOffset());
                         drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
                         drawData.scale = getConfigPanel().getScaleSetting();
+                        drawData.changed = true;
                         getModule().projectorMap.remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
                         getModule().projectorMap.put(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
                         DerpsDecor.getInstance().projectorDrawer.addProjector(segmentPiece);
