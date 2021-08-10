@@ -9,6 +9,7 @@ import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.controller.elements.ShipManagerContainer;
+import org.schema.game.common.controller.elements.SpaceStationManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
@@ -42,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shaderable {
 
+    //Draw Data
     private final ConcurrentHashMap<SegmentPiece, ProjectorDrawData> projectorDrawMap;
     private final ConcurrentHashMap<SegmentPiece, GUITextOverlay> textDrawMap;
     private float time;
@@ -62,8 +64,8 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
             SegmentPiece segmentPiece = entry.getKey();
             ProjectorDrawData drawData = entry.getValue();
             if(canDraw(segmentPiece)) {
-                Transform transform = new Transform();
-                segmentPiece.getTransform(transform);
+                Transform transform = new Transform(drawData.pieceTransform);
+
                 Quat4f currentRot = new Quat4f();
                 transform.getRotation(currentRot);
                 Quat4f addRot = new Quat4f();
@@ -83,6 +85,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                     if(image != null) {
                         float maxDim = Math.max(image.getWidth(), image.getHeight());
                         ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) holoDrawData.scale / maxDim) * -1, transform)};
+                        image.setTransform(transform);
                         Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
                     }
                 } else if(drawData instanceof TextProjectorDrawData) {
@@ -91,16 +94,26 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                         GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                         textOverlay.onInit();
                         textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + ((TextProjectorDrawData) drawData).color)));
-                        textOverlay.setBlend(true);
-                        textOverlay.doDepthTest = true;
-                        projectorDrawMap.put(segmentPiece, drawData);
-                        textDrawMap.put(segmentPiece, textOverlay);
-                    } else {
-                        GUITextOverlay textOverlay = textDrawMap.get(segmentPiece);
                         textOverlay.setScale(-textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f);
                         textOverlay.setTextSimple(textDrawData.text);
                         textOverlay.setTransform(transform);
-                        textOverlay.draw();
+                        textOverlay.setBlend(true);
+                        textOverlay.doDepthTest = true;
+                        textDrawData.changed = false;
+                        projectorDrawMap.put(segmentPiece, drawData);
+                        textDrawMap.put(segmentPiece, textOverlay);
+                    } else {
+                        if(!textDrawData.text.isEmpty()) {
+                            GUITextOverlay textOverlay = textDrawMap.get(segmentPiece);
+                            if(textDrawData.changed) {
+                                textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + ((TextProjectorDrawData) drawData).color)));
+                                textOverlay.setScale(-textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f);
+                                textOverlay.setTextSimple(textDrawData.text);
+                                textOverlay.setTransform(transform);
+                                textDrawData.changed = false;
+                            }
+                            textOverlay.draw();
+                        }
                     }
                 }
 
@@ -149,6 +162,22 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
         textDrawMap.remove(segmentPiece);
         if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
             ShipManagerContainer managerContainer = (ShipManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
+            if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
+                HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
+                projectorDrawMap.put(segmentPiece, module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())));
+            } else if(segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
+                TextProjectorModule module = (TextProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
+                TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+                GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
+                textOverlay.onInit();
+                textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
+                textOverlay.setBlend(true);
+                textOverlay.doDepthTest = true;
+                projectorDrawMap.put(segmentPiece, drawData);
+                textDrawMap.put(segmentPiece, textOverlay);
+            }
+        } else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+            SpaceStationManagerContainer managerContainer = (SpaceStationManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
             if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
                 HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
                 projectorDrawMap.put(segmentPiece, module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation())));

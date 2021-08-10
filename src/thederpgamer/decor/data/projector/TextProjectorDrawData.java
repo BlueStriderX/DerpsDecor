@@ -12,10 +12,12 @@ public class TextProjectorDrawData extends ProjectorDrawData {
 
     public String text;
     public String color;
+    public boolean changed;
 
     public TextProjectorDrawData(SegmentPiece segmentPiece) {
         super(segmentPiece);
         text = "";
         color = "FFFFFF";
+        changed = true;
     }
 }

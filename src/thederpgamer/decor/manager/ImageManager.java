@@ -46,9 +46,11 @@ public class ImageManager {
                         StarLoaderTexture.runOnGraphicsThread(new Runnable() {
                             @Override
                             public void run() {
-                                Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + System.currentTimeMillis());
-                                sprite.setPositionCenter(true);
-                                ImageManager.imgCache.put(url, sprite);
+                                try {
+                                    Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + System.currentTimeMillis());
+                                    sprite.setPositionCenter(true);
+                                    ImageManager.imgCache.put(url, sprite);
+                                } catch(Exception ignored) { }
                             }
                         });
                         ImageManager.downloadingImages.remove(url);

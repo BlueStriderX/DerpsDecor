@@ -25,11 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TextProjectorModule extends ModManagerContainerModule implements ProjectorInterface {
 
-    public final ConcurrentHashMap<Long, TextProjectorDrawData> projectorMap;
+    public final ConcurrentHashMap<Long, TextProjectorDrawData> projectorMap = new ConcurrentHashMap<>();
 
     public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
-        projectorMap = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -39,38 +38,56 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
-        packetWriteBuffer.writeInt(projectorMap.size());
-        for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
-            TextProjectorDrawData drawData = entry.getValue();
-            packetWriteBuffer.writeLong(drawData.indexAndOrientation);
-            packetWriteBuffer.writeString(drawData.text);
-            packetWriteBuffer.writeString(drawData.color);
-            packetWriteBuffer.writeVector(drawData.offset);
-            packetWriteBuffer.writeVector(drawData.rotation);
-            packetWriteBuffer.writeInt(drawData.scale);
+        try {
+            if(!projectorMap.isEmpty()) {
+                packetWriteBuffer.writeInt(projectorMap.size());
+                for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
+                    try {
+                        TextProjectorDrawData drawData = entry.getValue();
+                        packetWriteBuffer.writeLong(drawData.indexAndOrientation);
+                        packetWriteBuffer.writeString(drawData.text);
+                        packetWriteBuffer.writeString(drawData.color);
+                        packetWriteBuffer.writeVector(drawData.offset);
+                        packetWriteBuffer.writeVector(drawData.rotation);
+                        packetWriteBuffer.writeInt(drawData.scale);
+                    } catch(Exception exception1) {
+                        exception1.printStackTrace();
+                    }
+                }
+            }
+        } catch(Exception exception2) {
+            exception2.printStackTrace();
         }
     }
 
     @Override
     public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        int count = packetReadBuffer.readInt();
-        while(count >= 0) {
-            long indexAndOrientation = packetReadBuffer.readLong();
-            String text = packetReadBuffer.readString();
-            String color = packetReadBuffer.readString();
-            Vector3i offset = packetReadBuffer.readVector();
-            Vector3i rotation = packetReadBuffer.readVector();
-            int scale = packetReadBuffer.readInt();
-            TextProjectorDrawData drawData = (TextProjectorDrawData) getDrawData(indexAndOrientation);
-            drawData.indexAndOrientation = indexAndOrientation;
-            drawData.text = text;
-            drawData.color = color;
-            drawData.offset = offset;
-            drawData.rotation = rotation;
-            drawData.scale = scale;
-            projectorMap.remove(indexAndOrientation);
-            projectorMap.put(indexAndOrientation, drawData);
-            count --;
+        try {
+            int count = packetReadBuffer.readInt();
+            while(count >= 0) {
+                try {
+                    long indexAndOrientation = packetReadBuffer.readLong();
+                    String text = packetReadBuffer.readString();
+                    String color = packetReadBuffer.readString();
+                    Vector3i offset = packetReadBuffer.readVector();
+                    Vector3i rotation = packetReadBuffer.readVector();
+                    int scale = packetReadBuffer.readInt();
+                    TextProjectorDrawData drawData = (TextProjectorDrawData) getDrawData(indexAndOrientation);
+                    drawData.indexAndOrientation = indexAndOrientation;
+                    drawData.text = text;
+                    drawData.color = color;
+                    drawData.offset = offset;
+                    drawData.rotation = rotation;
+                    drawData.scale = scale;
+                    projectorMap.remove(indexAndOrientation);
+                    projectorMap.put(indexAndOrientation, drawData);
+                } catch(Exception exception1) {
+                    exception1.printStackTrace();
+                }
+                count --;
+            }
+        } catch(Exception exception2) {
+            exception2.printStackTrace();
         }
     }
 

@@ -7,6 +7,7 @@ import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
+import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import org.schema.game.common.data.SegmentPiece;
@@ -20,7 +21,10 @@ import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.modules.HoloProjectorModule;
+import thederpgamer.decor.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ClipboardUtils;
+import thederpgamer.decor.utils.SegmentPieceUtils;
 
 /**
  * Main class for DerpsDecor mod.
@@ -50,6 +54,7 @@ public class DerpsDecor extends StarMod {
         clipboard = new ClipboardUtils();
         ConfigManager.initialize(this);
         LogManager.initialize();
+        SegmentPieceUtils.initialize();
         registerListeners();
     }
 
@@ -73,6 +78,14 @@ public class DerpsDecor extends StarMod {
             @Override
             public void onEvent(RegisterWorldDrawersEvent event) {
                 event.getModDrawables().add(projectorDrawer = new ProjectorDrawer());
+            }
+        }, this);
+
+        StarLoader.registerListener(ManagerContainerRegisterEvent.class, new Listener<ManagerContainerRegisterEvent>() {
+            @Override
+            public void onEvent(ManagerContainerRegisterEvent event) {
+                event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
+                event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
             }
         }, this);
 
