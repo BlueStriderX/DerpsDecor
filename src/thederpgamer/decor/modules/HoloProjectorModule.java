@@ -184,6 +184,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         return false;
     }
 
+
     private HoloProjectorDrawData createNewDrawData(long indexAndOrientation) {
         long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
         SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);

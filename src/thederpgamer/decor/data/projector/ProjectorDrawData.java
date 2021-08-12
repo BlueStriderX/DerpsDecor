@@ -26,12 +26,17 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
     public transient Transform pieceTransform;
 
     public ProjectorDrawData(SegmentPiece segmentPiece) {
-        indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-        offset = new Vector3i();
-        rotation = new Vector3i();
+        if(segmentPiece != null) {
+            indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
+            pieceTransform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+        } else {
+            indexAndOrientation = 0;
+            pieceTransform = new Transform();
+        }
         scale = 1;
         changed = true;
-        pieceTransform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+        offset = new Vector3i();
+        rotation = new Vector3i();
     }
 
     @Override
