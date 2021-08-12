@@ -33,7 +33,13 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
     public void setSegmentPiece(SegmentPiece segmentPiece) {
         this.segmentPiece = segmentPiece;
 
-        TextProjectorDrawData drawData = (TextProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        TextProjectorDrawData drawData;
+        if(GameCommon.isOnSinglePlayer()) {
+            ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) GameCommon.getGameObject(getModule().getManagerContainer().getSegmentController().getId());
+            TextProjectorModule realModule = (TextProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
+            assert realModule != getModule() : "Uh oh";
+            drawData = (TextProjectorDrawData) realModule.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        } else drawData = (TextProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
         getConfigPanel().setText(drawData.text);
         getConfigPanel().setColor(drawData.color);
         getConfigPanel().setXOffset(drawData.offset.x);

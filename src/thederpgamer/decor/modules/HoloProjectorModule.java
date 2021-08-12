@@ -45,7 +45,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void handle(Timer timer) {
-        if(isOnServer()) return;
+        if(!((GameCommon.isOnSinglePlayer() && isOnServer()) || (!GameCommon.isOnSinglePlayer() && !isOnServer()))) return;
         for(Map.Entry<Long, HoloProjectorDrawData> entry : projectorMap.entrySet()) {
             long indexAndOrientation = entry.getKey();
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
@@ -92,11 +92,10 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void handlePlace(long abs, byte orientation) {
         super.handlePlace(abs, orientation);
-        long indexAndOrientation = ElementCollection.getIndex4(abs, orientation);
-        projectorMap.remove(indexAndOrientation);
-        projectorMap.put(indexAndOrientation, createNewDrawData(indexAndOrientation));
+        projectorMap.remove(abs);
+        projectorMap.put(abs, createNewDrawData(abs));
         if(!GameCommon.isOnSinglePlayer() && !isOnServer()) {
-            PacketUtil.sendPacketToServer(new RequestProjectorDataPacket((ManagedUsableSegmentController<?>) getManagerContainer().getSegmentController(), indexAndOrientation, DerpsDecor.HOLO_PROJECTOR));
+            PacketUtil.sendPacketToServer(new RequestProjectorDataPacket((ManagedUsableSegmentController<?>) getManagerContainer().getSegmentController(), abs, DerpsDecor.HOLO_PROJECTOR));
         }
     }
 
@@ -141,12 +140,6 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         } catch(Exception exception2) {
             exception2.printStackTrace();
         }
-    }
-
-    @Override
-    public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
-        onTagDeserialize(packetReadBuffer);
-        syncToNearbyClients();
     }
 
     @Override

@@ -33,7 +33,13 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
     public void setSegmentPiece(SegmentPiece segmentPiece) {
         this.segmentPiece = segmentPiece;
 
-        HoloProjectorDrawData drawData = (HoloProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        HoloProjectorDrawData drawData;
+        if(GameCommon.isOnSinglePlayer()) {
+            ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) GameCommon.getGameObject(getModule().getManagerContainer().getSegmentController().getId());
+            HoloProjectorModule realModule = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
+            assert realModule != getModule() : "Uh oh";
+            drawData = (HoloProjectorDrawData) realModule.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        } else drawData = (HoloProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
         getConfigPanel().setText(drawData.src);
         getConfigPanel().setXOffset(drawData.offset.x);
         getConfigPanel().setYOffset(drawData.offset.y);
