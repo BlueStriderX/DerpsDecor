@@ -4,12 +4,11 @@ import api.common.GameClient;
 import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
-import api.listener.events.block.SegmentPieceAddByMetadataEvent;
-import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.network.packets.PacketUtil;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.drawer.ProjectorDrawer;
@@ -23,6 +22,9 @@ import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.modules.HoloProjectorModule;
 import thederpgamer.decor.modules.TextProjectorModule;
+import thederpgamer.decor.network.client.RequestProjectorDataPacket;
+import thederpgamer.decor.network.client.SendProjectorDataToServerPacket;
+import thederpgamer.decor.network.server.UpdateProjectorDataPacket;
 import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
@@ -48,6 +50,10 @@ public class DerpsDecor extends StarMod {
     //Utils
     public ClipboardUtils clipboard;
 
+    //Constants
+    public static final int HOLO_PROJECTOR = 1;
+    public static final int TEXT_PROJECTOR = 2;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -56,6 +62,7 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
         SegmentPieceUtils.initialize();
         registerListeners();
+        registerPackets();
     }
 
     @Override
@@ -66,7 +73,6 @@ public class DerpsDecor extends StarMod {
     @Override
     public void onBlockConfigLoad(BlockConfig config) {
         //Decor Blocks
-        //ElementManager.addBlock(new DisplayScreen());
         ElementManager.addBlock(new HoloProjector());
         ElementManager.addBlock(new TextProjector());
 
@@ -108,27 +114,11 @@ public class DerpsDecor extends StarMod {
                 }
             }
         }, this);
+    }
 
-        StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
-            @Override
-            public void onEvent(SegmentPieceAddEvent event) {
-                if(ElementManager.getBlock("Holo Projector") != null && event.getNewType() == ElementManager.getBlock("Holo Projector").getId()) {
-                    projectorDrawer.addProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
-                } else if(ElementManager.getBlock("Text Projector") != null && event.getNewType() == ElementManager.getBlock("Text Projector").getId()) {
-                    projectorDrawer.addProjector(event.getSegmentController().getSegmentBuffer().getPointUnsave(event.getAbsIndex()));
-                }
-            }
-        }, this);
-
-        StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
-            @Override
-            public void onEvent(SegmentPieceAddByMetadataEvent event) {
-                if(ElementManager.getBlock("Holo Projector") != null && event.getType() == ElementManager.getBlock("Holo Projector").getId()) {
-                    projectorDrawer.addProjector(event.getAsSegmentPiece(new SegmentPiece()));
-                } else if(ElementManager.getBlock("Text Projector") != null && event.getType() == ElementManager.getBlock("Text Projector").getId()) {
-                    projectorDrawer.addProjector(event.getAsSegmentPiece(new SegmentPiece()));
-                }
-            }
-        }, this);
+    private void registerPackets() {
+        PacketUtil.registerPacket(RequestProjectorDataPacket.class);
+        PacketUtil.registerPacket(SendProjectorDataToServerPacket.class);
+        PacketUtil.registerPacket(UpdateProjectorDataPacket.class);
     }
 }

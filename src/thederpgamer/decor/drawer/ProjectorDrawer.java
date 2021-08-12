@@ -1,21 +1,9 @@
 package thederpgamer.decor.drawer;
 
-import api.common.GameClient;
 import api.utils.draw.ModWorldDrawer;
-import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
-import org.schema.game.common.controller.SegmentController;
-import org.schema.game.common.controller.Ship;
-import org.schema.game.common.controller.SpaceStation;
-import org.schema.game.common.controller.elements.ManagerContainer;
-import org.schema.game.common.controller.elements.ShipManagerContainer;
-import org.schema.game.common.controller.elements.SpaceStationManagerContainer;
-import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.schine.graphicsengine.core.*;
 import org.schema.schine.graphicsengine.forms.Sprite;
-import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
@@ -23,17 +11,6 @@ import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
 import thederpgamer.decor.data.projector.HoloProjectorDrawData;
 import thederpgamer.decor.data.projector.ProjectorDrawData;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
-import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.manager.ImageManager;
-import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.modules.HoloProjectorModule;
-import thederpgamer.decor.modules.TextProjectorModule;
-import thederpgamer.decor.utils.MathUtils;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-import java.awt.*;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mod world drawer for projector blocks.
@@ -43,85 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shaderable {
 
-    //Draw Data
-    private final ConcurrentHashMap<SegmentPiece, ProjectorDrawData> projectorDrawMap;
-    private final ConcurrentHashMap<SegmentPiece, GUITextOverlay> textDrawMap;
     private float time;
-
-    public ProjectorDrawer() {
-        projectorDrawMap = new ConcurrentHashMap<>();
-        textDrawMap = new ConcurrentHashMap<>();
-    }
 
     @Override
     public void onInit() {
 
-    }
-
-    @Override
-    public void draw() {
-        for(Map.Entry<SegmentPiece, ProjectorDrawData> entry : projectorDrawMap.entrySet()) {
-            SegmentPiece segmentPiece = entry.getKey();
-            ProjectorDrawData drawData = entry.getValue();
-            if(canDraw(segmentPiece)) {
-                Transform transform = new Transform(drawData.pieceTransform);
-                Quat4f currentRot = new Quat4f();
-                transform.getRotation(currentRot);
-                Quat4f addRot = new Quat4f();
-                QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
-                currentRot.mul(addRot);
-                MathUtils.roundQuat(currentRot);
-                transform.setRotation(currentRot);
-                transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-                MathUtils.roundVector(transform.origin);
-
-                ShaderLibrary.scanlineShader.setShaderInterface(this);
-                ShaderLibrary.scanlineShader.load();
-
-                if(drawData instanceof HoloProjectorDrawData) {
-                    HoloProjectorDrawData holoDrawData = (HoloProjectorDrawData) drawData;
-                    Sprite image = ImageManager.getImage(holoDrawData.src);
-                    if(image != null) {
-                        float maxDim = Math.max(image.getWidth(), image.getHeight());
-                        ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) holoDrawData.scale / maxDim) * -1, transform)};
-                        image.setTransform(transform);
-                        Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
-                    }
-                } else if(drawData instanceof TextProjectorDrawData) {
-                    TextProjectorDrawData textDrawData = (TextProjectorDrawData) drawData;
-                    if(!textDrawMap.containsKey(segmentPiece)) {
-                        GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-                        textOverlay.onInit();
-                        textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + ((TextProjectorDrawData) drawData).color)));
-                        textOverlay.setScale(-textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f);
-                        textOverlay.setTextSimple(textDrawData.text);
-                        textOverlay.setTransform(transform);
-                        textOverlay.setBlend(true);
-                        textOverlay.doDepthTest = true;
-                        textDrawData.changed = false;
-                        projectorDrawMap.put(segmentPiece, drawData);
-                        textDrawMap.put(segmentPiece, textOverlay);
-                    } else {
-                        if(!textDrawData.text.isEmpty()) {
-                            GUITextOverlay textOverlay = textDrawMap.get(segmentPiece);
-                            if(textDrawData.changed) {
-                                textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + ((TextProjectorDrawData) drawData).color)));
-                                textOverlay.setScale(-textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f, -textDrawData.scale / 100.0f);
-                                textOverlay.setTextSimple(textDrawData.text);
-                                textOverlay.setTransform(transform);
-                                textDrawData.changed = false;
-                            }
-                            textOverlay.draw();
-                        }
-                    }
-                }
-
-                ShaderLibrary.scanlineShader.unload();
-            } else {
-                projectorDrawMap.remove(segmentPiece);
-                textDrawMap.remove(segmentPiece);
-            }
-        }
     }
 
     @Override
@@ -156,71 +59,21 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
     }
 
-    public void addProjector(SegmentPiece segmentPiece) {
-        projectorDrawMap.remove(segmentPiece);
-        textDrawMap.remove(segmentPiece);
-        if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-            ShipManagerContainer managerContainer = (ShipManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
-            if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
-                HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                projectorDrawMap.put(segmentPiece, drawData);
-                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
-            } else if(segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
-                TextProjectorModule module = (TextProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-                textOverlay.onInit();
-                try {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
-                } catch(Exception exception) {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0xFFFFFF")));
-                }
-                textOverlay.setBlend(true);
-                textOverlay.doDepthTest = true;
-                projectorDrawMap.put(segmentPiece, drawData);
-                textDrawMap.put(segmentPiece, textOverlay);
-                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
-            }
-        } else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-            SpaceStationManagerContainer managerContainer = (SpaceStationManagerContainer) getManagerContainer(segmentPiece.getSegmentController());
-            if(segmentPiece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
-                HoloProjectorModule module = (HoloProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                projectorDrawMap.put(segmentPiece, drawData);
-                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
-            } else if(segmentPiece.getType() == ElementManager.getBlock("Text Projector").getId()) {
-                TextProjectorModule module = (TextProjectorModule) managerContainer.getModMCModule(segmentPiece.getType());
-                TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-                textOverlay.onInit();
-                try {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0x" + drawData.color)));
-                } catch(Exception exception) {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 10, Color.decode("0xFFFFFF")));
-                }
-                textOverlay.setBlend(true);
-                textOverlay.doDepthTest = true;
-                projectorDrawMap.put(segmentPiece, drawData);
-                textDrawMap.put(segmentPiece, textOverlay);
-                module.setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
-            }
+    public void drawProjector(ProjectorDrawData drawData, Transform transform) {
+        ShaderLibrary.scanlineShader.setShaderInterface(this);
+        ShaderLibrary.scanlineShader.load();
+        if(drawData instanceof HoloProjectorDrawData) {
+            HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
+            Sprite image = holoProjectorDrawData.image;
+            float maxDim = Math.max(image.getWidth(), image.getHeight());
+            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / maxDim) * -1, transform)};
+            image.setTransform(transform);
+            Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
+        } else if(drawData instanceof TextProjectorDrawData) {
+            TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
+            textProjectorDrawData.textOverlay.setTransform(transform);
+            textProjectorDrawData.textOverlay.draw();
         }
-    }
-
-    private ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
-        if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-            return ((Ship) segmentController).getManagerContainer();
-        } else if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-            return ((SpaceStation) segmentController).getManagerContainer();
-        } else return null;
-    }
-
-    private boolean canDraw(SegmentPiece segmentPiece) {
-        if(segmentPiece.getSegmentController().isFullyLoaded() && segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex())) {
-            short type = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType();
-            return type == ElementManager.getBlock("Holo Projector").getId() || type == ElementManager.getBlock("Text Projector").getId();
-        }
-        return false;
+        ShaderLibrary.scanlineShader.unload();
     }
 }

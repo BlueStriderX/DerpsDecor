@@ -1,9 +1,12 @@
 package thederpgamer.decor.gui.panel.textprojector;
 
 import api.common.GameClient;
+import api.common.GameCommon;
+import api.network.packets.PacketUtil;
 import api.utils.gui.GUIInputDialog;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.SegmentPiece;
@@ -15,6 +18,7 @@ import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.modules.TextProjectorModule;
+import thederpgamer.decor.network.client.SendProjectorDataToServerPacket;
 
 /**
  * <Description>
@@ -63,11 +67,13 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                         drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
                         drawData.scale = getConfigPanel().getScaleSetting();
                         drawData.changed = true;
-                        getModule().projectorMap.remove(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-                        getModule().projectorMap.put(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
-                        DerpsDecor.getInstance().projectorDrawer.addProjector(segmentPiece);
+                        getModule().setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
                         deactivate();
                         break;
+                }
+                if(!GameCommon.isOnSinglePlayer()) {
+                    SendProjectorDataToServerPacket packet = new SendProjectorDataToServerPacket((ManagedUsableSegmentController<?>) getModule().getManagerContainer().getSegmentController(), ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), DerpsDecor.TEXT_PROJECTOR);
+                    PacketUtil.sendPacketToServer(packet);
                 }
             }
         }
