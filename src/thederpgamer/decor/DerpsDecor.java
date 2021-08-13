@@ -62,7 +62,7 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
         SegmentPieceUtils.initialize();
         registerListeners();
-        registerPackets();
+        //registerPackets();
     }
 
     @Override

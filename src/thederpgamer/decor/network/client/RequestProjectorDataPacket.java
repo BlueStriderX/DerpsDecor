@@ -6,6 +6,10 @@ import api.network.PacketWriteBuffer;
 import api.network.packets.PacketUtil;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.data.player.PlayerState;
+import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.data.projector.HoloProjectorDrawData;
+import thederpgamer.decor.data.projector.ProjectorDrawData;
+import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.network.server.UpdateProjectorDataPacket;
 import java.io.IOException;
 
@@ -18,31 +22,37 @@ import java.io.IOException;
 public class RequestProjectorDataPacket extends Packet {
 
     private ManagedUsableSegmentController<?> segmentController;
-    private long indexAndOrientation;
-    private int type;
+    private ProjectorDrawData drawData;
 
     public RequestProjectorDataPacket() {
 
     }
 
-    public RequestProjectorDataPacket(ManagedUsableSegmentController<?> segmentController, long indexAndOrientation, int type) {
+    public RequestProjectorDataPacket(ManagedUsableSegmentController<?> segmentController, ProjectorDrawData drawData) {
        this.segmentController = segmentController;
-       this.indexAndOrientation = indexAndOrientation;
-       this.type = type;
+       this.drawData = drawData;
     }
 
     @Override
     public void readPacketData(PacketReadBuffer packetReadBuffer) throws IOException {
         segmentController = (ManagedUsableSegmentController<?>) packetReadBuffer.readSendable();
-        indexAndOrientation = packetReadBuffer.readLong();
-        type = packetReadBuffer.readInt();
+        int type = packetReadBuffer.readInt();
+        switch(type) {
+            case DerpsDecor.HOLO_PROJECTOR:
+                drawData = new HoloProjectorDrawData(packetReadBuffer);
+                break;
+            case DerpsDecor.TEXT_PROJECTOR:
+                drawData = new TextProjectorDrawData(packetReadBuffer);
+                break;
+        }
     }
 
     @Override
     public void writePacketData(PacketWriteBuffer packetWriteBuffer) throws IOException {
         packetWriteBuffer.writeSendable(segmentController);
-        packetWriteBuffer.writeLong(indexAndOrientation);
-        packetWriteBuffer.writeInt(type);
+        packetWriteBuffer.writeSendable(segmentController);
+        packetWriteBuffer.writeInt(getType(drawData));
+        drawData.onTagSerialize(packetWriteBuffer);
     }
 
     @Override
@@ -52,6 +62,12 @@ public class RequestProjectorDataPacket extends Packet {
 
     @Override
     public void processPacketOnServer(PlayerState playerState) {
-        PacketUtil.sendPacket(playerState, new UpdateProjectorDataPacket(segmentController, indexAndOrientation, type));
+        PacketUtil.sendPacket(playerState, new UpdateProjectorDataPacket(segmentController, drawData));
+    }
+
+    private int getType(ProjectorDrawData drawData) {
+        if(drawData instanceof HoloProjectorDrawData) return DerpsDecor.HOLO_PROJECTOR;
+        else if(drawData instanceof TextProjectorDrawData) return DerpsDecor.TEXT_PROJECTOR;
+        else return 0;
     }
 }

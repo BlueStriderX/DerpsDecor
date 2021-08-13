@@ -2,8 +2,11 @@ package thederpgamer.decor.data.projector;
 
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
+import com.bulletphysics.linearmath.Transform;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
+import thederpgamer.decor.manager.LogManager;
 import java.io.IOException;
 
 /**
@@ -22,6 +25,22 @@ public class TextProjectorDrawData extends ProjectorDrawData {
         super(segmentPiece);
         text = "";
         color = "FFFFFF";
+    }
+
+    public TextProjectorDrawData(PacketReadBuffer packetReadBuffer) {
+        super();
+        try {
+            onTagDeserialize(packetReadBuffer);
+        } catch(IOException exception) {
+            LogManager.logException("Using default values because something went wrong while trying to deserialize text projector data", exception);
+            text = "";
+            color = "";
+            pieceTransform = new Transform();
+            scale = 1;
+            offset = new Vector3i();
+            rotation = new Vector3i();
+            changed = true;
+        }
     }
 
     @Override

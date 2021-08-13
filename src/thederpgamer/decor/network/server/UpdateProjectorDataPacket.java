@@ -7,10 +7,8 @@ import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.data.player.PlayerState;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.projector.HoloProjectorDrawData;
+import thederpgamer.decor.data.projector.ProjectorDrawData;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
-import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.modules.HoloProjectorModule;
-import thederpgamer.decor.modules.TextProjectorModule;
 
 import java.io.IOException;
 
@@ -23,49 +21,36 @@ import java.io.IOException;
 public class UpdateProjectorDataPacket extends Packet {
 
     private ManagedUsableSegmentController<?> segmentController;
-    private long indexAndOrientation;
-    private int type;
+    private ProjectorDrawData drawData;
 
     public UpdateProjectorDataPacket() {
 
     }
 
-    public UpdateProjectorDataPacket(ManagedUsableSegmentController<?> segmentController, long indexAndOrientation, int type) {
+    public UpdateProjectorDataPacket(ManagedUsableSegmentController<?> segmentController, ProjectorDrawData drawData) {
         this.segmentController = segmentController;
-        this.indexAndOrientation = indexAndOrientation;
-        this.type = type;
+        this.drawData = drawData;
     }
 
     @Override
     public void readPacketData(PacketReadBuffer packetReadBuffer) throws IOException {
         segmentController = (ManagedUsableSegmentController<?>) packetReadBuffer.readSendable();
-        indexAndOrientation = packetReadBuffer.readLong();
-        type = packetReadBuffer.readInt();
-        if(type == DerpsDecor.HOLO_PROJECTOR) {
-            HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-            HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(indexAndOrientation);
-            drawData.onTagDeserialize(packetReadBuffer);
-        } else if(type == DerpsDecor.TEXT_PROJECTOR) {
-            TextProjectorModule module = (TextProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
-            TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(indexAndOrientation);
-            drawData.onTagDeserialize(packetReadBuffer);
+        int type = packetReadBuffer.readInt();
+        switch(type) {
+            case DerpsDecor.HOLO_PROJECTOR:
+                drawData = new HoloProjectorDrawData(packetReadBuffer);
+                break;
+            case DerpsDecor.TEXT_PROJECTOR:
+                drawData = new TextProjectorDrawData(packetReadBuffer);
+                break;
         }
     }
 
     @Override
     public void writePacketData(PacketWriteBuffer packetWriteBuffer) throws IOException {
         packetWriteBuffer.writeSendable(segmentController);
-        packetWriteBuffer.writeLong(indexAndOrientation);
-        packetWriteBuffer.writeInt(type);
-        if(type == DerpsDecor.HOLO_PROJECTOR) {
-            HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-            HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(indexAndOrientation);
-            drawData.onTagSerialize(packetWriteBuffer);
-        } else if(type == DerpsDecor.TEXT_PROJECTOR) {
-            TextProjectorModule module = (TextProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
-            TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(indexAndOrientation);
-            drawData.onTagSerialize(packetWriteBuffer);
-        }
+        packetWriteBuffer.writeInt(getType(drawData));
+        drawData.onTagSerialize(packetWriteBuffer);
     }
 
     @Override
@@ -76,5 +61,11 @@ public class UpdateProjectorDataPacket extends Packet {
     @Override
     public void processPacketOnServer(PlayerState playerState) {
 
+    }
+
+    private int getType(ProjectorDrawData drawData) {
+        if(drawData instanceof HoloProjectorDrawData) return DerpsDecor.HOLO_PROJECTOR;
+        else if(drawData instanceof TextProjectorDrawData) return DerpsDecor.TEXT_PROJECTOR;
+        else return 0;
     }
 }

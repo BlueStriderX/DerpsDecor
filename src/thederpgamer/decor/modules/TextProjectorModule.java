@@ -4,11 +4,9 @@ import api.common.GameClient;
 import api.common.GameCommon;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
-import api.network.packets.PacketUtil;
 import api.utils.game.module.ModManagerContainerModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
-import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -20,8 +18,8 @@ import thederpgamer.decor.data.projector.ProjectorDrawData;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.network.client.RequestProjectorDataPacket;
 import thederpgamer.decor.utils.MathUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -98,8 +96,28 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
         super.handlePlace(abs, orientation);
         projectorMap.remove(abs);
         projectorMap.put(abs, createNewDrawData(abs));
+        /*
         if(!GameCommon.isOnSinglePlayer() && !isOnServer()) {
             PacketUtil.sendPacketToServer(new RequestProjectorDataPacket((ManagedUsableSegmentController<?>) getManagerContainer().getSegmentController(), abs, DerpsDecor.TEXT_PROJECTOR));
+        }
+
+         */
+    }
+
+    @Override
+    public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
+        onTagDeserialize(packetReadBuffer);
+        syncToNearbyClients();
+    }
+
+    public void updateToServer() {
+        try {
+            PacketWriteBuffer packetWriteBuffer = openCSBuffer();
+            onTagSerialize(packetWriteBuffer);
+            sendBufferToServer();
+            syncToNearbyClients();
+        } catch(IOException exception) {
+            LogManager.logException("Something went wrong while trying to send text projector data to server", exception);
         }
     }
 
@@ -168,24 +186,20 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public ProjectorDrawData getDrawData(long indexAndOrientation) {
-        ProjectorDrawData drawData;
-        if(projectorMap.containsKey(indexAndOrientation)) drawData = projectorMap.get(indexAndOrientation);
-        else drawData = createNewDrawData(indexAndOrientation);
-        if(GameCommon.isOnSinglePlayer() || GameCommon.isClientConnectedToServer()) {
-            try {
-                onTagSerialize(openCSBuffer());
-                sendBufferToServer();
-            } catch(IOException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return drawData;
+        if(projectorMap.containsKey(indexAndOrientation)) return projectorMap.get(indexAndOrientation);
+        else return createNewDrawData(indexAndOrientation);
+    }
+
+    @Override
+    public ProjectorDrawData getDrawData(SegmentPiece segmentPiece) {
+        return getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
     }
 
     @Override
     public void setDrawData(long indexAndOrientation, ProjectorDrawData drawData) {
         projectorMap.remove(indexAndOrientation);
         projectorMap.put(indexAndOrientation, (TextProjectorDrawData) drawData);
+        updateToServer();
     }
 
     private boolean canDraw(SegmentPiece segmentPiece) {
@@ -199,7 +213,10 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     private TextProjectorDrawData createNewDrawData(long indexAndOrientation) {
         long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
         SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);
-        return new TextProjectorDrawData(segmentPiece);
+        TextProjectorDrawData drawData = new TextProjectorDrawData(segmentPiece);
+        projectorMap.put(indexAndOrientation, drawData);
+        updateToServer();
+        return drawData;
     }
 
     private ProjectorDrawer getProjectorDrawer() {

@@ -2,7 +2,6 @@ package thederpgamer.decor.gui.panel.textprojector;
 
 import api.common.GameClient;
 import api.common.GameCommon;
-import api.network.packets.PacketUtil;
 import api.utils.gui.GUIInputDialog;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.common.util.linAlg.Vector3i;
@@ -14,11 +13,9 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
-import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.modules.TextProjectorModule;
-import thederpgamer.decor.network.client.SendProjectorDataToServerPacket;
 
 /**
  * <Description>
@@ -77,10 +74,7 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                         deactivate();
                         break;
                 }
-                if(!GameCommon.isOnSinglePlayer()) {
-                    SendProjectorDataToServerPacket packet = new SendProjectorDataToServerPacket((ManagedUsableSegmentController<?>) getModule().getManagerContainer().getSegmentController(), ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), DerpsDecor.TEXT_PROJECTOR);
-                    PacketUtil.sendPacketToServer(packet);
-                }
+                //PacketUtil.sendPacketToServer(new SendProjectorDataToServerPacket((ManagedUsableSegmentController<?>) getModule().getManagerContainer().getSegmentController(), ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), DerpsDecor.TEXT_PROJECTOR));
             }
         }
     }
