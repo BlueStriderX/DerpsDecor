@@ -2,7 +2,6 @@ package thederpgamer.decor.data.projector;
 
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
-import com.bulletphysics.linearmath.Transform;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.graphicsengine.forms.Sprite;
@@ -33,7 +32,6 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
         } catch(IOException exception) {
             LogManager.logException("Using default values because something went wrong while trying to deserialize holo projector data", exception);
             src = "";
-            pieceTransform = new Transform();
             scale = 1;
             offset = new Vector3i();
             rotation = new Vector3i();

@@ -21,6 +21,7 @@ import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.MathUtils;
+
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
@@ -70,19 +71,21 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
                 //Transform the relative-to-entity position to a relative-to-world position
                 segmentController.getWorldTransform().transform(pos);
-                SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-                if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
-                    Transform transform = new Transform(drawData.pieceTransform);
-                    Quat4f currentRot = new Quat4f();
-                    transform.getRotation(currentRot);
-                    Quat4f addRot = new Quat4f();
-                    QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
-                    currentRot.mul(addRot);
-                    MathUtils.roundQuat(currentRot);
-                    transform.setRotation(currentRot);
-                    transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-                    MathUtils.roundVector(transform.origin);
-                    getProjectorDrawer().drawProjector(drawData, transform);
+                if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
+                    SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+                    if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
+                        Transform transform = drawData.getTransform(segmentPiece);
+                        Quat4f currentRot = new Quat4f();
+                        transform.getRotation(currentRot);
+                        Quat4f addRot = new Quat4f();
+                        QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
+                        currentRot.mul(addRot);
+                        MathUtils.roundQuat(currentRot);
+                        transform.setRotation(currentRot);
+                        transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
+                        MathUtils.roundVector(transform.origin);
+                        getProjectorDrawer().drawProjector(drawData, transform);
+                    }
                 }
             }
         }

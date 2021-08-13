@@ -8,6 +8,7 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import thederpgamer.decor.utils.SegmentPieceUtils;
+
 import java.io.IOException;
 
 /**
@@ -23,16 +24,13 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
     public Vector3i rotation;
     public int scale;
     public boolean changed;
-    public transient Transform pieceTransform;
+    private transient Transform transform;
 
     public ProjectorDrawData(SegmentPiece segmentPiece) {
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-            pieceTransform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
-        } else {
-            indexAndOrientation = 0;
-            pieceTransform = new Transform();
-        }
+            transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+        } else transform = new Transform();
         scale = 1;
         offset = new Vector3i();
         rotation = new Vector3i();
@@ -58,5 +56,10 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
         rotation = packetReadBuffer.readVector();
         scale = packetReadBuffer.readInt();
         changed = packetReadBuffer.readBoolean();
+    }
+
+    public final Transform getTransform(SegmentPiece segmentPiece) {
+        if(transform == null) transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+        return transform;
     }
 }
