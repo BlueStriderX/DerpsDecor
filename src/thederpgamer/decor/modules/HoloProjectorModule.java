@@ -65,9 +65,8 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
 
                 //Transform the relative-to-entity position to a relative-to-world position
                 segmentController.getWorldTransform().transform(pos);
-
                 SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-                if(canDraw(segmentPiece) && segmentPiece.isActive()) {
+                if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                     Transform transform = new Transform(drawData.pieceTransform);
                     Quat4f currentRot = new Quat4f();
                     transform.getRotation(currentRot);
@@ -79,10 +78,8 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
                     transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                     MathUtils.roundVector(transform.origin);
                     getProjectorDrawer().drawProjector(drawData, transform);
-                    continue;
                 }
             }
-            projectorMap.remove(indexAndOrientation);
         }
     }
 
@@ -90,7 +87,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     public void handlePlace(long abs, byte orientation) {
         super.handlePlace(abs, orientation);
         projectorMap.remove(abs);
-        projectorMap.put(abs, createNewDrawData(abs));
+        createNewDrawData(abs);
         /*
         if(!GameCommon.isOnSinglePlayer() && !isOnServer()) {
             PacketUtil.sendPacketToServer(new RequestProjectorDataPacket((ManagedUsableSegmentController<?>) getManagerContainer().getSegmentController(), abs, DerpsDecor.HOLO_PROJECTOR));
@@ -124,7 +121,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
                     try {
                         entry.getValue().onTagSerialize(packetWriteBuffer);
                     } catch(Exception exception1) {
-                        exception1.printStackTrace();
+                        LogManager.logException("Something went wrong while trying to serialize holo projector data", exception1);
                     }
                 }
             } else packetWriteBuffer.writeInt(0);
@@ -141,14 +138,12 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
                 while(count > 0) {
                     try {
                         long indexAndOrientation = packetReadBuffer.readLong();
-                        HoloProjectorDrawData drawData = projectorMap.get(indexAndOrientation);
-                        if(drawData == null) {
-                            drawData = createNewDrawData(indexAndOrientation);
-                            projectorMap.put(indexAndOrientation, drawData);
-                        }
-                        drawData.onTagDeserialize(packetReadBuffer);
+                        HoloProjectorDrawData drawData = new HoloProjectorDrawData(packetReadBuffer);
+                        drawData.indexAndOrientation = indexAndOrientation;
+                        projectorMap.remove(indexAndOrientation);
+                        projectorMap.put(indexAndOrientation, drawData);
                     } catch(Exception exception1) {
-                        exception1.printStackTrace();
+                        LogManager.logException("Something went wrong while trying to deserialize holo projector data", exception1);
                     }
                     count --;
                 }
