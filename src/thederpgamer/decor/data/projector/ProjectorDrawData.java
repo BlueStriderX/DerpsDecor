@@ -8,7 +8,6 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import thederpgamer.decor.utils.SegmentPieceUtils;
-
 import java.io.IOException;
 
 /**
@@ -55,7 +54,6 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
 
     @Override
     public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        indexAndOrientation = packetReadBuffer.readLong();
         offset = packetReadBuffer.readVector();
         rotation = packetReadBuffer.readVector();
         scale = packetReadBuffer.readInt();

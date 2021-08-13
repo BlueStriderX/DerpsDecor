@@ -11,6 +11,7 @@ import thederpgamer.decor.data.projector.ProjectorDrawData;
  */
 public interface ProjectorInterface {
 
+    void updateToServer();
     short getProjectorId();
     ProjectorDrawData getDrawData(long indexAndOrientation);
     ProjectorDrawData getDrawData(SegmentPiece segmentPiece);

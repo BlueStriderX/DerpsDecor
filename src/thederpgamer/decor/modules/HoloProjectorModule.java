@@ -104,12 +104,12 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         syncToNearbyClients();
     }
 
+    @Override
     public void updateToServer() {
         try {
             PacketWriteBuffer packetWriteBuffer = openCSBuffer();
             onTagSerialize(packetWriteBuffer);
             sendBufferToServer();
-            syncToNearbyClients();
         } catch(IOException exception) {
             LogManager.logException("Something went wrong while trying to send holo projector data to server", exception);
         }
@@ -209,6 +209,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
         SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);
         HoloProjectorDrawData drawData = new HoloProjectorDrawData(segmentPiece);
+        drawData.indexAndOrientation = indexAndOrientation;
         projectorMap.put(indexAndOrientation, drawData);
         updateToServer();
         return drawData;
