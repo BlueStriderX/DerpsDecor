@@ -4,8 +4,8 @@ import com.bulletphysics.linearmath.Transform;
 import org.schema.common.FastMath;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.Element;
+
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Vector3f;
 
 /**
  * <Description>
@@ -14,15 +14,6 @@ import javax.vecmath.Vector3f;
  * @since 08/10/2021
  */
 public class SegmentPieceUtils {
-
-    //Orientation Helpers
-    private static Vector3f forward = new Vector3f(0, 0, 1);
-    private static Vector3f backward = new Vector3f(0, 0, -1);
-    private static Vector3f left = new Vector3f(-1, 0, 0);
-    private static Vector3f right = new Vector3f(1, 0, 0);
-    private static Vector3f down = new Vector3f(0, -1, 0);
-    private static Vector3f up = new Vector3f(0, 1, 0);
-    private static Vector3f unknown = new Vector3f(0, 0, 0);
 
     //Rotation Helpers
     private static final Matrix3f mY = new Matrix3f();
@@ -55,7 +46,6 @@ public class SegmentPieceUtils {
      */
     public static Transform getFullPieceTransform(SegmentPiece segmentPiece) {
         Transform transform = new Transform();
-        transform.setIdentity();
         segmentPiece.getTransform(transform);
 
         float sNormalDir = 0.51f - 1.0f;
@@ -102,24 +92,5 @@ public class SegmentPieceUtils {
                 break;
         }
         return transform;
-    }
-
-    public static Vector3f getDirFromOrientation(byte b) {
-        switch(b) {
-            case 0:
-                return forward;
-            case 1:
-                return backward;
-            case 2:
-                return up;
-            case 3:
-                return down;
-            case 4:
-                return left;
-            case 5:
-                return right;
-            default:
-                return unknown;
-        }
     }
 }

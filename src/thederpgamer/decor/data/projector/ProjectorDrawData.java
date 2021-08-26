@@ -24,7 +24,7 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
     public Vector3i rotation;
     public int scale;
     public boolean changed;
-    private transient Transform transform;
+    public transient Transform transform;
 
     public ProjectorDrawData(SegmentPiece segmentPiece) {
         if(segmentPiece != null) {
@@ -56,10 +56,5 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
         rotation = packetReadBuffer.readVector();
         scale = packetReadBuffer.readInt();
         changed = packetReadBuffer.readBoolean();
-    }
-
-    public final Transform getTransform(SegmentPiece segmentPiece) {
-        if(transform == null) transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
-        return transform;
     }
 }
