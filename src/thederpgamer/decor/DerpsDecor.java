@@ -4,13 +4,17 @@ import api.common.GameClient;
 import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
+import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
-import api.network.packets.PacketUtil;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
+import thederpgamer.decor.data.projector.HoloProjectorDrawData;
+import thederpgamer.decor.data.projector.ProjectorDrawData;
+import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
@@ -22,11 +26,11 @@ import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.modules.HoloProjectorModule;
 import thederpgamer.decor.modules.TextProjectorModule;
-import thederpgamer.decor.network.client.RequestProjectorDataPacket;
-import thederpgamer.decor.network.client.SendProjectorDataToServerPacket;
-import thederpgamer.decor.network.server.UpdateProjectorDataPacket;
 import thederpgamer.decor.utils.ClipboardUtils;
+import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
+
+import java.util.ArrayList;
 
 /**
  * Main class for DerpsDecor mod.
@@ -62,7 +66,6 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
         SegmentPieceUtils.initialize();
         registerListeners();
-        //registerPackets();
     }
 
     @Override
@@ -114,11 +117,45 @@ public class DerpsDecor extends StarMod {
                 }
             }
         }, this);
-    }
 
-    private void registerPackets() {
-        PacketUtil.registerPacket(RequestProjectorDataPacket.class);
-        PacketUtil.registerPacket(SendProjectorDataToServerPacket.class);
-        PacketUtil.registerPacket(UpdateProjectorDataPacket.class);
+        StarLoader.registerListener(SegmentPieceActivateEvent.class, new Listener<SegmentPieceActivateEvent>() {
+            @Override
+            public void onEvent(SegmentPieceActivateEvent event) {
+                if(event.isServer()) {
+                    if((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) && event.getSegmentPiece().isActive()) {
+                        SegmentPiece adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+                        if(adjacent != null) {
+                            HoloProjectorDrawData adjacentDrawData = (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+                            ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+                            if(!controlling.isEmpty() && adjacentDrawData != null) {
+                                for(SegmentPiece segmentPiece : controlling) {
+                                    ProjectorDrawData drawData = ProjectorUtils.getDrawData(segmentPiece);
+                                    if(drawData instanceof HoloProjectorDrawData) {
+                                        ((HoloProjectorDrawData) drawData).src = adjacentDrawData.src;
+                                        drawData.changed = true;
+                                    }
+                                }
+                            }
+                        } else {
+                            adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
+                            if(adjacent != null) {
+                                TextProjectorDrawData adjacentDrawData = (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+                                ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
+                                if(!controlling.isEmpty() && adjacentDrawData != null) {
+                                    for(SegmentPiece segmentPiece : controlling) {
+                                        ProjectorDrawData drawData = ProjectorUtils.getDrawData(segmentPiece);
+                                        if(drawData instanceof TextProjectorDrawData) {
+                                            ((TextProjectorDrawData) drawData).text = adjacentDrawData.text;
+                                            ((TextProjectorDrawData) drawData).color = adjacentDrawData.color;
+                                            drawData.changed = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, this);
     }
 }

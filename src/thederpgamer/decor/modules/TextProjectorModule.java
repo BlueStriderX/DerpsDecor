@@ -55,18 +55,20 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
                 if(drawData.changed || drawData.textOverlay == null) {
                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                     textOverlay.onInit();
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale * 5, Color.decode("0x" + drawData.color)));
-                    textOverlay.setScale(-drawData.scale / 100.0f, -drawData.scale / 100.0f, -drawData.scale / 100.0f);
+                    int trueSize = drawData.scale + 10;
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize * 10, Color.decode("0x" + drawData.color)));
+                    textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
                     textOverlay.setTextSimple(drawData.text);
                     textOverlay.setBlend(true);
                     textOverlay.doDepthTest = true;
+                    drawData.textOverlay = textOverlay;
                 }
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
-                        if(drawData.changed) {
-                            drawData.transform.set(SegmentPieceUtils.getFullPieceTransform(segmentPiece));
+                        if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
+                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
                             Quat4f currentRot = new Quat4f();
                             drawData.transform.getRotation(currentRot);
                             Quat4f addRot = new Quat4f();
@@ -76,10 +78,9 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
                             drawData.transform.setRotation(currentRot);
                             drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                             MathUtils.roundVector(drawData.transform.origin);
-                            drawData.transform.set(drawData.transform);
                             drawData.changed = false;
                         }
-                        getProjectorDrawer().queueDraw(drawData);
+                        getProjectorDrawer().addDraw(segmentPiece, drawData);
                     }
                 }
             }
@@ -89,13 +90,13 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void handlePlace(long abs, byte orientation) {
         super.handlePlace(abs, orientation);
-        projectorMap.remove(abs);
         createNewDrawData(abs);
-        /*
-        if(!GameCommon.isOnSinglePlayer() && !isOnServer()) {
-            PacketUtil.sendPacketToServer(new RequestProjectorDataPacket((ManagedUsableSegmentController<?>) getManagerContainer().getSegmentController(), abs, DerpsDecor.TEXT_PROJECTOR));
-        }
-         */
+    }
+
+    @Override
+    public void handleRemove(long abs) {
+        super.handleRemove(abs);
+        projectorMap.remove(abs);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         try {
             if(!projectorMap.isEmpty()) {
-                packetWriteBuffer.writeInt(projectorMap.size());
+                packetWriteBuffer.writeInt(getSize());
                 for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
                     try {
                         entry.getValue().onTagSerialize(packetWriteBuffer);
@@ -143,7 +144,6 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
                         long indexAndOrientation = packetReadBuffer.readLong();
                         TextProjectorDrawData drawData = new TextProjectorDrawData(packetReadBuffer);
                         drawData.indexAndOrientation = indexAndOrientation;
-                        projectorMap.remove(indexAndOrientation);
                         projectorMap.put(indexAndOrientation, drawData);
                     } catch(Exception exception1) {
                         LogManager.logException("Something went wrong while trying to deserialize text projector data", exception1);

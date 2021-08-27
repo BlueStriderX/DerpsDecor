@@ -130,7 +130,9 @@ public class ResourceManager {
             unicodeFont.addAsciiGlyphs();
             unicodeFont.loadGlyphs();
             return unicodeFont;
-        } catch(Exception ignored) { }
+        } catch(Exception exception) {
+            exception.printStackTrace();
+        }
         return null;
     }
 }

@@ -1,11 +1,20 @@
 package thederpgamer.decor.utils;
 
 import com.bulletphysics.linearmath.Transform;
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.schema.common.FastMath;
+import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.PositionControl;
+import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.ControlElementMapper;
 import org.schema.game.common.data.element.Element;
+import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.world.SegmentData;
+import org.schema.game.common.util.FastCopyLongOpenHashSet;
 
 import javax.vecmath.Matrix3f;
+import java.util.ArrayList;
 
 /**
  * <Description>
@@ -46,11 +55,16 @@ public class SegmentPieceUtils {
      */
     public static Transform getFullPieceTransform(SegmentPiece segmentPiece) {
         Transform transform = new Transform();
-        segmentPiece.getTransform(transform);
+        transform.setIdentity();
+        transform.basis.set(segmentPiece.getSegmentController().getWorldTransform().basis);
+        ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
+        transform.origin.x -= SegmentData.SEG_HALF;
+        transform.origin.y -= SegmentData.SEG_HALF;
+        transform.origin.z -= SegmentData.SEG_HALF;
 
-        float sNormalDir = 0.51f - 1.0f;
+        float sNormalDir = 0.51f;
         float sVertical = 0.51f;
-        float sHorizontal = 0.51f;
+        float sHorizontal = 0.49f;
         
         int orientation = segmentPiece.getOrientation();
         switch(orientation) { 
@@ -91,6 +105,73 @@ public class SegmentPieceUtils {
                 transform.origin.z += sHorizontal;
                 break;
         }
+        segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
         return transform;
+    }
+
+    public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
+        ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
+        PositionControl control = segmentPiece.getSegmentController().getControlElementMap().getDirectControlledElements(type, segmentPiece.getAbsolutePos(new Vector3i()));
+        if(control != null) {
+            for(long l : control.getControlMap().toLongArray()) {
+                SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
+                if(p != null && p.getType() == type) controlledPieces.add(p);
+            }
+        }
+        return controlledPieces;
+    }
+
+    public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
+        ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
+        ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
+        if(controlElementMapper.containsKey(segmentPiece.getAbsoluteIndex())) {
+            for(FastCopyLongOpenHashSet longs : controlElementMapper.get(segmentPiece.getAbsoluteIndex()).values()) {
+                LongIterator longIterator = longs.iterator();
+                while(longIterator.hasNext()) {
+                    try {
+                        controlledPieces.add(segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(longIterator.nextLong()));
+                    } catch(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
+        }
+        return controlledPieces;
+    }
+
+    public static ArrayList<SegmentPiece> getControllingPieces(SegmentPiece segmentPiece) { //Todo
+        ArrayList<SegmentPiece> controllingPieces = new ArrayList<>();
+        return controllingPieces;
+    }
+
+    public static SegmentPiece getFirstMatchingAdjacent(SegmentPiece segmentPiece, short type) {
+        ArrayList<SegmentPiece> matching = getMatchingAdjacent(segmentPiece, type);
+        if(matching.isEmpty()) return null;
+        else return matching.get(0);
+    }
+
+    public static ArrayList<SegmentPiece> getMatchingAdjacent(SegmentPiece segmentPiece, short type) {
+        ArrayList<SegmentPiece> matchingAdjacent = new ArrayList<>();
+        SegmentBufferInterface buffer = segmentPiece.getSegmentController().getSegmentBuffer();
+        Vector3i pos = new Vector3i(segmentPiece.getAbsolutePos(new Vector3i()));
+        Vector3i[] offsets = getAdjacencyOffsets(pos);
+        for(Vector3i offset : offsets) {
+            if(buffer.existsPointUnsave(offset)) {
+                SegmentPiece piece = buffer.getPointUnsave(offset);
+                if(piece.getType() == type) matchingAdjacent.add(piece);
+            }
+        }
+        return matchingAdjacent;
+    }
+
+    private static Vector3i[] getAdjacencyOffsets(Vector3i absPos) {
+        return new Vector3i[] {
+                new Vector3i(absPos.x - 1, absPos.y, absPos.z),
+                new Vector3i(absPos.x + 1, absPos.y, absPos.z),
+                new Vector3i(absPos.x, absPos.y - 1, absPos.z),
+                new Vector3i(absPos.x, absPos.y + 1, absPos.z),
+                new Vector3i(absPos.x, absPos.y, absPos.z - 1),
+                new Vector3i(absPos.x, absPos.y, absPos.z + 1)
+        };
     }
 }

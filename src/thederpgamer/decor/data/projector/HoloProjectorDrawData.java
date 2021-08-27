@@ -16,13 +16,12 @@ import java.io.IOException;
  */
 public class HoloProjectorDrawData extends ProjectorDrawData {
 
-    public String src;
+    public String src = "";
     public transient Sprite image;
     public transient float[] dimensions;
 
     public HoloProjectorDrawData(SegmentPiece segmentPiece) {
         super(segmentPiece);
-        src = "";
     }
 
     public HoloProjectorDrawData(PacketReadBuffer packetReadBuffer) {
@@ -31,7 +30,6 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
             onTagDeserialize(packetReadBuffer);
         } catch(IOException exception) {
             LogManager.logException("Using default values because something went wrong while trying to deserialize holo projector data", exception);
-            src = "";
             scale = 1;
             offset = new Vector3i();
             rotation = new Vector3i();

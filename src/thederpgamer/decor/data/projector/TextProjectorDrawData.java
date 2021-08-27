@@ -16,14 +16,12 @@ import java.io.IOException;
  */
 public class TextProjectorDrawData extends ProjectorDrawData {
 
-    public String text;
-    public String color;
+    public String text = "";
+    public String color = "FFFFFF";
     public transient GUITextOverlay textOverlay;
 
     public TextProjectorDrawData(SegmentPiece segmentPiece) {
         super(segmentPiece);
-        text = "";
-        color = "FFFFFF";
     }
 
     public TextProjectorDrawData(PacketReadBuffer packetReadBuffer) {
@@ -32,8 +30,6 @@ public class TextProjectorDrawData extends ProjectorDrawData {
             onTagDeserialize(packetReadBuffer);
         } catch(IOException exception) {
             LogManager.logException("Using default values because something went wrong while trying to deserialize text projector data", exception);
-            text = "";
-            color = "";
             scale = 1;
             offset = new Vector3i();
             rotation = new Vector3i();
