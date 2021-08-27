@@ -12,10 +12,8 @@ import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SegmentData;
 import org.schema.game.common.util.FastCopyLongOpenHashSet;
-import thederpgamer.decor.data.projector.ProjectorDrawData;
 
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Vector2f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 
@@ -58,10 +56,14 @@ public class SegmentPieceUtils {
      * @return The position of the specified face
      */
     public static Vector3f getPieceFacePos(SegmentPiece segmentPiece, int face) {
-        Vector3f piecePos = segmentPiece.getAbsolutePos(new Vector3f());
+        Vector3f piecePos = new Vector3f();
+        ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), piecePos);
+        piecePos.x -= SegmentData.SEG_HALF;
+        piecePos.y -= SegmentData.SEG_HALF;
+        piecePos.z -= SegmentData.SEG_HALF;
+        segmentPiece.getSegmentController().getWorldTransform().transform(piecePos);
         Vector3f forward = new Vector3f();
         Element.getRelativeForward(segmentPiece.getOrientation(), face, forward);
-        forward.scale(0.5f);
         forward.add(piecePos);
         return forward;
     }
@@ -71,7 +73,7 @@ public class SegmentPieceUtils {
      * @param segmentPiece The SegmentPiece to get the transform of
      * @return The full transform of the SegmentPiece
      */
-    public static Transform getFullPieceTransform(SegmentPiece segmentPiece, ProjectorDrawData drawData) {
+    public static Transform getFullPieceTransform(SegmentPiece segmentPiece) {
         Transform transform = new Transform();
         transform.setIdentity();
         transform.basis.set(segmentPiece.getSegmentController().getWorldTransform().basis);
@@ -80,10 +82,9 @@ public class SegmentPieceUtils {
         transform.origin.y -= SegmentData.SEG_HALF;
         transform.origin.z -= SegmentData.SEG_HALF;
 
-        Vector2f scaleOffset = new Vector2f(drawData.getContentWidth() / 100.0f, drawData.getContentHeight() / 100.0f);
         float sNormalDir = 0.51f;
-        float sVertical = (scaleOffset.y * (drawData.scale / 100.0f)) / 2.0f;
-        float sHorizontal = (scaleOffset.x * (drawData.scale / 100.0f)) / 2.0f;
+        float sVertical = 0.5f;
+        float sHorizontal = 0.5f;
         
         int orientation = segmentPiece.getOrientation();
         switch(orientation) { 

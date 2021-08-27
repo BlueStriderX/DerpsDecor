@@ -47,28 +47,4 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
         super.onTagDeserialize(packetReadBuffer);
         src = packetReadBuffer.readString();
     }
-
-    @Override
-    public float getContentWidth() {
-        if(image != null) {
-            try {
-                return image.getMaterial().getTexture().getWidth() * image.getScale().x;
-            } catch(Exception exception) {
-                exception.printStackTrace();
-            }
-            return image.getWidth();
-        } else return 0;
-    }
-
-    @Override
-    public float getContentHeight() {
-        if(image != null) {
-            try {
-                return image.getMaterial().getTexture().getHeight() * image.getScale().y;
-            } catch(Exception exception) {
-                exception.printStackTrace();
-            }
-            return image.getHeight();
-        } else return 0;
-    }
 }

@@ -38,6 +38,9 @@ public class DebugDrawData {
         this.posOverlay.onInit();
         this.posOverlay.setFont(FontLibrary.FontSize.SMALL.getFont());
         this.posOverlay.setTransform(drawData.transform);
+        this.posOverlay.setScale(-10 / 1000.0f, -10 / 1000.0f, -10 / 1000.0f);
+        this.posOverlay.setBlend(true);
+        this.posOverlay.doDepthTest = true;
     }
 
     public void update() {

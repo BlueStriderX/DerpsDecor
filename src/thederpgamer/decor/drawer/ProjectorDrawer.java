@@ -1,10 +1,8 @@
 package thederpgamer.decor.drawer;
 
 import api.utils.draw.ModWorldDrawer;
-import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.input.Keyboard;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.Element;
 import org.schema.schine.graphicsengine.core.*;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.shader.Shader;
@@ -17,9 +15,7 @@ import thederpgamer.decor.data.projector.ProjectorDrawData;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.utils.SegmentPieceUtils;
 
-import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -92,8 +88,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                             debugMap.get(segmentPiece).posOverlay.draw();
                         } else {
                             debugMap.remove(segmentPiece);
-                            Vector3f faceCenter = SegmentPieceUtils.getPieceFacePos(segmentPiece, Element.FRONT);
-                            moveToCenter(drawData.transform, faceCenter);
                             if(drawData instanceof HoloProjectorDrawData) {
                                 HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
                                 Sprite image = holoProjectorDrawData.image;
@@ -117,17 +111,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
             }
             ShaderLibrary.scanlineShader.unload();
         }
-    }
-
-    private void moveToCenter(Transform transform, Vector3f center) {
-        Vector3f origin = transform.origin;
-        if(center.x < 0) center.x -= 0.01f;
-        else if(center.x > 0) center.x += 0.01f;
-        if(origin.y < center.y) origin.y += Math.abs(center.y - origin.y);
-        else if(origin.y > center.y) origin.y -= Math.abs(center.y - origin.y);
-        if(origin.z < center.z) origin.z += Math.abs(center.z - origin.z);
-        else if(origin.z > center.z) origin.z -= Math.abs(center.z - origin.z);
-        transform.origin.set(origin);
     }
 
     public void addDraw(SegmentPiece segmentPiece, ProjectorDrawData drawData) {

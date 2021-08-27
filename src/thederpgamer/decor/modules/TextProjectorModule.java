@@ -68,7 +68,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
-                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece, drawData);
+                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
                             Quat4f currentRot = new Quat4f();
                             drawData.transform.getRotation(currentRot);
                             Quat4f addRot = new Quat4f();
