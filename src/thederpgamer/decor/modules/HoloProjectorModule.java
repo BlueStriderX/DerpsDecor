@@ -23,6 +23,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,12 +95,14 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
+        if(!isOnServer()) return;
         onTagDeserialize(packetReadBuffer);
         syncToNearbyClients();
     }
 
     @Override
     public void updateToServer() {
+        if(isOnServer()) return;
         try {
             PacketWriteBuffer packetWriteBuffer = openCSBuffer();
             onTagSerialize(packetWriteBuffer);
@@ -112,6 +115,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         try {
+            removeInvalidEntries();
             if(!projectorMap.isEmpty()) {
                 packetWriteBuffer.writeInt(getSize());
                 for(Map.Entry<Long, HoloProjectorDrawData> entry : projectorMap.entrySet()) {
@@ -185,6 +189,19 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         projectorMap.remove(indexAndOrientation);
         projectorMap.put(indexAndOrientation, (HoloProjectorDrawData) drawData);
         updateToServer();
+    }
+
+    private void removeInvalidEntries() {
+        short projectorId = getProjectorId();
+        ArrayList<Long> toRemove = new ArrayList<>();
+        for(Long absIndex : blocks.keySet()) {
+            if(!segmentController.getSegmentBuffer().existsPointUnsave(absIndex) || segmentController.getSegmentBuffer().getPointUnsave(absIndex).getType() != projectorId) toRemove.add(absIndex);
+        }
+
+        for(Long entry : toRemove) {
+            projectorMap.remove(ElementCollection.getPosIndexFrom4(entry));
+            blocks.remove(entry);
+        }
     }
 
     private boolean canDraw(SegmentPiece segmentPiece) {

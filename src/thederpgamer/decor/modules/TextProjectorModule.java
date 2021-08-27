@@ -1,7 +1,6 @@
 package thederpgamer.decor.modules;
 
 import api.common.GameClient;
-import api.common.GameCommon;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.utils.game.module.ModManagerContainerModule;
@@ -26,6 +25,7 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,7 +45,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void handle(Timer timer) {
-        if(!((GameCommon.isOnSinglePlayer() && isOnServer()) || (!GameCommon.isOnSinglePlayer() && !isOnServer()))) return;
+        if(isOnServer()) return;
         for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
             long indexAndOrientation = entry.getKey();
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
@@ -56,7 +56,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                     textOverlay.onInit();
                     int trueSize = drawData.scale + 10;
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize * 10, Color.decode("0x" + drawData.color)));
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.decode("0x" + drawData.color)));
                     textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
                     textOverlay.setTextSimple(drawData.text);
                     textOverlay.setBlend(true);
@@ -101,12 +101,14 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
+        if(!isOnServer()) return;
         onTagDeserialize(packetReadBuffer);
         syncToNearbyClients();
     }
 
     @Override
     public void updateToServer() {
+        if(isOnServer()) return;
         try {
             PacketWriteBuffer packetWriteBuffer = openCSBuffer();
             onTagSerialize(packetWriteBuffer);
@@ -119,6 +121,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         try {
+            removeInvalidEntries();
             if(!projectorMap.isEmpty()) {
                 packetWriteBuffer.writeInt(getSize());
                 for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
@@ -178,8 +181,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public ProjectorDrawData getDrawData(long indexAndOrientation) {
-        if(projectorMap.containsKey(indexAndOrientation)) return projectorMap.get(indexAndOrientation);
-        else return createNewDrawData(indexAndOrientation);
+        return projectorMap.get(indexAndOrientation);
     }
 
     @Override
@@ -192,6 +194,19 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
         projectorMap.remove(indexAndOrientation);
         projectorMap.put(indexAndOrientation, (TextProjectorDrawData) drawData);
         updateToServer();
+    }
+
+    private void removeInvalidEntries() {
+        short projectorId = getProjectorId();
+        ArrayList<Long> toRemove = new ArrayList<>();
+        for(Long absIndex : blocks.keySet()) {
+            if(!segmentController.getSegmentBuffer().existsPointUnsave(absIndex) || segmentController.getSegmentBuffer().getPointUnsave(absIndex).getType() != projectorId) toRemove.add(absIndex);
+        }
+
+        for(Long entry : toRemove) {
+            projectorMap.remove(ElementCollection.getPosIndexFrom4(entry));
+            blocks.remove(entry);
+        }
     }
 
     private boolean canDraw(SegmentPiece segmentPiece) {
