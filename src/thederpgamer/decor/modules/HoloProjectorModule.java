@@ -50,19 +50,16 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
             HoloProjectorDrawData drawData = entry.getValue();
 
             if(!drawData.src.isEmpty()) {
-                if(drawData.changed || drawData.image == null || drawData.dimensions == null) {
+                if(drawData.changed || drawData.image == null) {
                     Sprite image = ImageManager.getImage(drawData.src);
-                    if(image != null) {
-                        drawData.image = image;
-                        drawData.dimensions = new float[] {drawData.image.getWidth(), drawData.image.getHeight()};
-                    }
+                    if(image != null) drawData.image = image;
                 }
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
-                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece, drawData);
                             Quat4f currentRot = new Quat4f();
                             drawData.transform.getRotation(currentRot);
                             Quat4f addRot = new Quat4f();

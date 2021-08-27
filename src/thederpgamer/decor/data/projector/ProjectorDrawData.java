@@ -29,7 +29,7 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
     public ProjectorDrawData(SegmentPiece segmentPiece) {
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-            transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+            transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece, this);
         }
         scale = 1;
         offset = new Vector3i();
@@ -57,4 +57,7 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
         scale = packetReadBuffer.readInt();
         changed = packetReadBuffer.readBoolean();
     }
+
+    public abstract float getContentWidth();
+    public abstract float getContentHeight();
 }

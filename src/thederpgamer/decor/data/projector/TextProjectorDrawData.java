@@ -50,4 +50,22 @@ public class TextProjectorDrawData extends ProjectorDrawData {
         text = packetReadBuffer.readString();
         color = packetReadBuffer.readString();
     }
+
+    @Override
+    public float getContentWidth() {
+        if(textOverlay != null) {
+            textOverlay.updateTextSize();
+            return textOverlay.getMaxLineWidth();
+        }
+        else return 0;
+    }
+
+    @Override
+    public float getContentHeight() {
+        if(textOverlay != null) {
+            textOverlay.updateTextSize();
+            return textOverlay.getTextHeight();
+        }
+        else return 0;
+    }
 }

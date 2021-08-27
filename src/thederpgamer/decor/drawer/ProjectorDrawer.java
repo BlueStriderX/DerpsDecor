@@ -1,18 +1,25 @@
 package thederpgamer.decor.drawer;
 
 import api.utils.draw.ModWorldDrawer;
+import com.bulletphysics.linearmath.Transform;
+import org.lwjgl.input.Keyboard;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.Element;
 import org.schema.schine.graphicsengine.core.*;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
+import thederpgamer.decor.data.projector.DebugDrawData;
 import thederpgamer.decor.data.projector.HoloProjectorDrawData;
 import thederpgamer.decor.data.projector.ProjectorDrawData;
 import thederpgamer.decor.data.projector.TextProjectorDrawData;
+import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.SegmentPieceUtils;
 
+import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +34,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
     private float time;
     private final ConcurrentHashMap<SegmentPiece, ProjectorDrawData> drawMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<SegmentPiece, DebugDrawData> debugMap = new ConcurrentHashMap<>();
 
     @Override
     public void onInit() {
@@ -68,39 +76,58 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
     @Override
     public void draw() {
         if(!drawMap.isEmpty()) {
+            ShaderLibrary.scanlineShader.setShaderInterface(this);
+            ShaderLibrary.scanlineShader.load();
             for(Map.Entry<SegmentPiece, ProjectorDrawData> entry : drawMap.entrySet()) {
                 SegmentPiece segmentPiece = entry.getKey();
                 if(!segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) || segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() != segmentPiece.getType() || segmentPiece.isActive() || !segmentPiece.getSegmentController().isFullyLoaded()) drawMap.remove(segmentPiece);
                 else {
                     ProjectorDrawData drawData = entry.getValue();
                     if(drawData.transform != null) {
-                        if(drawData instanceof HoloProjectorDrawData) {
-                            HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
-                            Sprite image = holoProjectorDrawData.image;
-                            if(image != null) {
-                                ShaderLibrary.scanlineShader.setShaderInterface(this);
-                                ShaderLibrary.scanlineShader.load();
-                                float maxDim = Math.max(image.getWidth(), image.getHeight());
-                                ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / maxDim) * -1, drawData.transform)};
-                                image.setTransform(drawData.transform);
-                                Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
-                                ShaderLibrary.scanlineShader.unload();
-                            }
-                        } else if(drawData instanceof TextProjectorDrawData) {
-                            TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
-                            if(textProjectorDrawData.textOverlay != null) {
-                                ShaderLibrary.scanlineShader.setShaderInterface(this);
-                                ShaderLibrary.scanlineShader.load();
-                                if(textProjectorDrawData.textOverlay.getFont() == null) textProjectorDrawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + textProjectorDrawData.color)));
-                                textProjectorDrawData.textOverlay.setTransform(drawData.transform);
-                                textProjectorDrawData.textOverlay.draw();
-                                ShaderLibrary.scanlineShader.unload();
+                        if(ConfigManager.getMainConfig().getBoolean("debug-mode") && Keyboard.isKeyDown(Keyboard.KEY_LMENU)) {
+                            if(!debugMap.containsKey(segmentPiece)) debugMap.put(segmentPiece, new DebugDrawData(segmentPiece, drawData));
+                            debugMap.get(segmentPiece).update();
+                            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / 256) * -1, drawData.transform)};
+                            Sprite.draw3D(debugMap.get(segmentPiece).debugGrid, subSprite, 1, Controller.getCamera());
+                            debugMap.get(segmentPiece).posOverlay.draw();
+                        } else {
+                            debugMap.remove(segmentPiece);
+                            Vector3f faceCenter = SegmentPieceUtils.getPieceFacePos(segmentPiece, Element.FRONT);
+                            moveToCenter(drawData.transform, faceCenter);
+                            if(drawData instanceof HoloProjectorDrawData) {
+                                HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
+                                Sprite image = holoProjectorDrawData.image;
+                                if(image != null) {
+                                    float maxDim = Math.max(image.getWidth(), image.getHeight());
+                                    ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / maxDim) * -1, drawData.transform)};
+                                    image.setTransform(drawData.transform);
+                                    Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
+                                }
+                            } else if(drawData instanceof TextProjectorDrawData) {
+                                TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
+                                if(textProjectorDrawData.textOverlay != null) {
+                                    if(textProjectorDrawData.textOverlay.getFont() == null) textProjectorDrawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + textProjectorDrawData.color)));
+                                    textProjectorDrawData.textOverlay.setTransform(drawData.transform);
+                                    textProjectorDrawData.textOverlay.draw();
+                                }
                             }
                         }
                     }
                 }
             }
+            ShaderLibrary.scanlineShader.unload();
         }
+    }
+
+    private void moveToCenter(Transform transform, Vector3f center) {
+        Vector3f origin = transform.origin;
+        if(center.x < 0) center.x -= 0.01f;
+        else if(center.x > 0) center.x += 0.01f;
+        if(origin.y < center.y) origin.y += Math.abs(center.y - origin.y);
+        else if(origin.y > center.y) origin.y -= Math.abs(center.y - origin.y);
+        if(origin.z < center.z) origin.z += Math.abs(center.z - origin.z);
+        else if(origin.z > center.z) origin.z -= Math.abs(center.z - origin.z);
+        transform.origin.set(origin);
     }
 
     public void addDraw(SegmentPiece segmentPiece, ProjectorDrawData drawData) {

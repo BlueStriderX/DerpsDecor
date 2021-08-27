@@ -30,7 +30,8 @@ public class ResourceManager {
     };
 
     private static final String[] spriteNames = {
-            "transparent"
+            "transparent",
+            "projector-debug-grid"
     };
 
     private static final String[] modelNames = {
@@ -68,7 +69,7 @@ public class ResourceManager {
                 for(String spriteName : spriteNames) {
                     try {
                         Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("thederpgamer/decor/resources/sprites/" + spriteName + ".png"), instance, spriteName);
-                        sprite.setPositionCenter(true);
+                        sprite.setPositionCenter(false);
                         sprite.setName(spriteName);
                         spriteMap.put(spriteName, sprite);
                     } catch(Exception exception) {
