@@ -9,10 +9,10 @@ import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
-import thederpgamer.decor.data.projector.DebugDrawData;
-import thederpgamer.decor.data.projector.HoloProjectorDrawData;
-import thederpgamer.decor.data.projector.ProjectorDrawData;
-import thederpgamer.decor.data.projector.TextProjectorDrawData;
+import thederpgamer.decor.data.drawdata.DebugDrawData;
+import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorDrawData;
+import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ResourceManager;
 

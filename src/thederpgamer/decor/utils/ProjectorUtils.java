@@ -7,7 +7,7 @@ import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
-import thederpgamer.decor.data.projector.ProjectorDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.modules.HoloProjectorModule;
 import thederpgamer.decor.modules.ProjectorInterface;
 import thederpgamer.decor.modules.TextProjectorModule;

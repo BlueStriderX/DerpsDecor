@@ -13,7 +13,7 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
-import thederpgamer.decor.data.projector.HoloProjectorDrawData;
+import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.modules.HoloProjectorModule;
 

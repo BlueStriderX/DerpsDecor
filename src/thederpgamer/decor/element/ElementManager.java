@@ -7,6 +7,7 @@ import org.schema.game.common.data.element.ElementCategory;
 import org.schema.game.common.data.element.ElementInformation;
 import org.schema.game.common.data.element.ElementKeyMap;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.element.blocks.BlockGroup;
 import thederpgamer.decor.element.blocks.Factory;
 import thederpgamer.decor.element.items.Item;
 import java.util.ArrayList;
@@ -77,6 +78,11 @@ public class ElementManager {
             if(item.getItemInfo().getName().equalsIgnoreCase(itemName)) return item;
         }
         return null;
+    }
+
+    public static void addBlockGroup(BlockGroup blockGroup) {
+        Block[] blocks = blockGroup.getBlocks();
+        for(Block block : blocks) addBlock(block);
     }
 
     public static void addBlock(Block block) {

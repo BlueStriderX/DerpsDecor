@@ -1,9 +1,15 @@
 package thederpgamer.decor.utils;
 
+import api.common.GameClient;
 import api.common.GameServer;
+import api.utils.StarRunnable;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.common.util.linAlg.Vector3fTools;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.player.PlayerState;
+import org.schema.game.common.data.player.inventory.InventorySlot;
+import thederpgamer.decor.DerpsDecor;
+
 import javax.vecmath.Vector3f;
 import java.util.HashMap;
 
@@ -15,10 +21,28 @@ import java.util.HashMap;
  */
 public class PlayerUtils {
 
-    public static Transform getPlayerTransform(PlayerState playerState) {
-        Transform transform = new Transform();
-        playerState.getWordTransform(transform);
-        return transform;
+    public static final int NONE = 0;
+    public static final int FIRST = 1;
+    public static final int SECOND = 2;
+
+    public static int connectingStrut = NONE;
+    public static long currentConnectionIndex = 0;
+
+    public static void startConnectionRunner() {
+        connectingStrut = FIRST;
+        new StarRunnable() {
+            @Override
+            public void run() {
+                if(connectingStrut == SECOND || !GameClient.getClientState().isInAnyStructureBuildMode() || PlayerUtils.getSelectedSlot().isEmpty() || !ElementKeyMap.getInfo(PlayerUtils.getSelectedSlot().getType()).getName().toLowerCase().contains("paint")) {
+                    PlayerUtils.connectingStrut = PlayerUtils.NONE;
+                    cancel();
+                }
+            }
+        }.runTimer(DerpsDecor.getInstance(), 30);
+    }
+
+    public static InventorySlot getSelectedSlot() {
+        return GameClient.getClientPlayerState().getInventory().getSlot(GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().getSelectedSlot());
     }
 
     public static HashMap<PlayerState, Float> getPlayersInRange(Transform transform, float maxDistance) {

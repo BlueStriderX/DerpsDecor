@@ -1,7 +1,7 @@
 package thederpgamer.decor.modules;
 
 import org.schema.game.common.data.SegmentPiece;
-import thederpgamer.decor.data.projector.ProjectorDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 
 /**
  * <Description>

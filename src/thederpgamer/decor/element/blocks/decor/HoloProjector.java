@@ -5,7 +5,6 @@ import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
 import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 
 /**
@@ -23,13 +22,9 @@ public class HoloProjector extends Block {
     @Override
     public void initialize() {
         if(GraphicsContext.initialized) {
-            try {
-                blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-                blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
-                blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
-            } catch(Exception exception) {
-                LogManager.logException("Encountered an exception while trying to load textures for Holo Projector! This will result in missing textures in-game!", exception);
-            }
+           blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
+           blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
+           blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
         }
         blockInfo.setDescription("A block used to project an image at a specified location, scale, and rotation.");
         blockInfo.setInRecipe(true);

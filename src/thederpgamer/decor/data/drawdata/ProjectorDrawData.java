@@ -1,4 +1,4 @@
-package thederpgamer.decor.data.projector;
+package thederpgamer.decor.data.drawdata;
 
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;

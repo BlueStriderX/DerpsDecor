@@ -1,4 +1,4 @@
-package thederpgamer.decor.data.projector;
+package thederpgamer.decor.data.drawdata;
 
 import api.common.GameClient;
 import org.schema.game.common.data.SegmentPiece;

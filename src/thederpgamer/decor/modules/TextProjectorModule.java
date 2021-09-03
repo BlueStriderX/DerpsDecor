@@ -5,6 +5,7 @@ import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.utils.game.module.ModManagerContainerModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
+import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -12,8 +13,9 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import thederpgamer.decor.DerpsDecor;
-import thederpgamer.decor.data.projector.ProjectorDrawData;
-import thederpgamer.decor.data.projector.TextProjectorDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorDrawData;
+import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
+import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.LogManager;
@@ -123,7 +125,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
         try {
             removeInvalidEntries();
             if(!projectorMap.isEmpty()) {
-                packetWriteBuffer.writeInt(getSize());
+                packetWriteBuffer.writeInt(projectorMap.size());
                 for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
                     try {
                         entry.getValue().onTagSerialize(packetWriteBuffer);
@@ -139,23 +141,23 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        try {
-            int count = packetReadBuffer.readInt();
-            if(count > 0) {
-                while(count > 0) {
-                    try {
-                        long indexAndOrientation = packetReadBuffer.readLong();
-                        TextProjectorDrawData drawData = new TextProjectorDrawData(packetReadBuffer);
-                        drawData.indexAndOrientation = indexAndOrientation;
-                        projectorMap.put(indexAndOrientation, drawData);
-                    } catch(Exception exception1) {
-                        LogManager.logException("Something went wrong while trying to deserialize text projector data", exception1);
-                    }
-                    count --;
+        SegmentBufferInterface segmentBuffer = getManagerContainer().getSegmentController().getSegmentBuffer();
+        int size = packetReadBuffer.readInt();
+        for(int i = 0; i < size; i ++) {
+            long indexAndOrientation = packetReadBuffer.readLong();
+            long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
+            SegmentPiece projectorPiece = segmentBuffer.getPointUnsave(absIndex);
+            if(projectorPiece != null && projectorPiece.getType() == getBlockId()) {
+                try {
+                    TextProjectorDrawData drawData = new TextProjectorDrawData(packetReadBuffer);
+                    drawData.indexAndOrientation = indexAndOrientation;
+                    projectorMap.put(indexAndOrientation, drawData);
+                    continue;
+                } catch(Exception exception) {
+                    LogManager.logException("Something went wrong while trying to deserialize text projector data", exception);
                 }
             }
-        } catch(Exception exception2) {
-            exception2.printStackTrace();
+            size--; //Skip invalid entry
         }
     }
 
@@ -228,6 +230,6 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     }
 
     private ProjectorDrawer getProjectorDrawer() {
-        return DerpsDecor.getInstance().projectorDrawer;
+        return GlobalDrawManager.getProjectorDrawer();
     }
 }
