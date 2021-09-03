@@ -40,6 +40,7 @@ public class ResourceManager {
 
     private static final String[] modelNames = {
             "strut_connector",
+            "strut_tube",
             "display_screen",
             "holo_table"
     };
@@ -51,6 +52,7 @@ public class ResourceManager {
 
     private static final HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
     private static final HashMap<String, Sprite> spriteMap = new HashMap<>();
+    private static final HashMap<String, Mesh> meshMap = new HashMap<>();
     private static final HashMap<String, Font> fontMap = new HashMap<>();
 
     public static void loadResources(final DerpsDecor instance, final ResourceLoader loader) {
@@ -87,7 +89,6 @@ public class ResourceManager {
                 for(String modelName : modelNames) {
                     try {
                         Vector3f offset = new Vector3f();
-                        Mesh mesh;
                         if(modelName.contains("~")) {
                             String meshName = modelName.substring(0, modelName.indexOf('~'));
                             String offsetString = modelName.substring(modelName.indexOf('(') + 1, modelName.lastIndexOf(')'));
@@ -97,13 +98,16 @@ public class ResourceManager {
                             offset.y = Float.parseFloat(values[1]);
                             offset.z = Float.parseFloat(values[2]);
                             loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("thederpgamer/decor/resources/models/" + meshName + ".zip"), null);
-                            mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
+                            Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
+                            mesh.getTransform().origin.add(offset);
+                            meshMap.put(meshName, mesh);
                         } else {
                             loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
-                            mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+                            Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+                            mesh.setFirstDraw(true);
+                            meshMap.put(modelName, mesh);
                         }
-                        mesh.getTransform().origin.add(offset);
-                        mesh.setFirstDraw(true);
+
                     } catch(ResourceException | IOException exception) {
                         LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
                     }
@@ -127,6 +131,11 @@ public class ResourceManager {
 
     public static Sprite getSprite(String name) {
         return spriteMap.get(name);
+    }
+
+    public static Mesh getMesh(String name) {
+        if(meshMap.containsKey(name)) return (Mesh) meshMap.get(name).getChilds().get(0);
+        else return null;
     }
 
     public static UnicodeFont getFont(String fontName, int size, Color color, Color outlineColor, int outlineSize) {

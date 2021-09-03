@@ -14,7 +14,7 @@ import java.math.RoundingMode;
  */
 public class MathUtils {
 
-    public static RoundingMode roundingMode;
+    public static final RoundingMode roundingMode = RoundingMode.HALF_EVEN;
 
     /**
      * Rounds a Quat4f for use in matrix rotation.

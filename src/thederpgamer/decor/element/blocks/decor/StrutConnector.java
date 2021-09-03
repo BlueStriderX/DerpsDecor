@@ -26,15 +26,15 @@ public class StrutConnector extends Block {
             blockInfo.setBuildIconNum(ResourceManager.getTexture("strut-connector-icon").getTextureId());
         }
         blockInfo.setDescription("Place two of these down and activate each while holding paint to create a colored strut in-between them.");
+        blockInfo.setCanActivate(true);
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
-        blockInfo.setIndividualSides(ElementKeyMap.getInfo(976).individualSides);
-        blockInfo.setBlockStyle(ElementKeyMap.getInfo(976).blockStyle.id);
+        blockInfo.setIndividualSides(6);
+        blockInfo.setBlockStyle(ElementKeyMap.getInfo(1137).blockStyle.id);
         blockInfo.lodShapeStyle = 1;
-        blockInfo.setCanActivate(true);
-        blockInfo.sideTexturesPointToOrientation = ElementKeyMap.getInfo(976).sideTexturesPointToOrientation;
+        blockInfo.sideTexturesPointToOrientation = false;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                               new FactoryResource(1, (short) 941),

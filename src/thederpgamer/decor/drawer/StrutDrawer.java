@@ -1,5 +1,6 @@
 package thederpgamer.decor.drawer;
 
+import api.common.GameCommon;
 import api.utils.draw.ModWorldDrawer;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.SegmentPiece;
@@ -14,6 +15,7 @@ import thederpgamer.decor.modules.StrutConnectorModule;
 import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,11 +38,17 @@ public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable 
     public void draw() {
         for(Map.Entry<SegmentPiece[], StrutDrawData> entry : drawMap.entrySet()) {
             if(checkDraw(entry.getValue(), entry.getKey()[0].getSegmentController())) {
-                if(entry.getKey()[0].getSegmentController().isInClientRange()) entry.getValue().draw();
-                else drawMap.remove(entry.getKey());
+                if(GameCommon.isOnSinglePlayer()) { //Dumb network bullshit >:U
+                    if(entry.getKey()[0].getSegmentController().isFullyLoaded()) entry.getValue().draw();
+                    else drawMap.remove(entry.getKey());
+                } else if(GameCommon.isClientConnectedToServer()) {
+                    if(entry.getKey()[0].getSegmentController().isInClientRange()) entry.getValue().draw();
+                    else drawMap.remove(entry.getKey());
+                }
             } else {
-                StrutConnectorModule module = (StrutConnectorModule) ServerUtils.getManagerContainer(entry.getKey()[0].getSegmentController()).getModMCModule(strutId);
+                StrutConnectorModule module = getModule(entry.getKey()[0]);
                 module.blockMap.remove(entry.getKey());
+                module.updateToServer();
                 drawMap.remove(entry.getKey());
             }
         }
@@ -78,5 +86,9 @@ public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable 
 
     private boolean checkDraw(StrutDrawData drawData, SegmentController segmentController) {
         return segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceAIndex) && segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceBIndex);
+    }
+
+    private StrutConnectorModule getModule(SegmentPiece segmentPiece) {
+        return (StrutConnectorModule) Objects.requireNonNull(ServerUtils.getManagerContainer(segmentPiece.getSegmentController())).getModMCModule(strutId);
     }
 }

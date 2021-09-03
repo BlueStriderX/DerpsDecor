@@ -17,9 +17,11 @@ public enum PaintColor {
     BROWN(241, new Vector3f(Color.decode("0x915C23").getColorComponents(new float[3]))),
     GREEN(242, new Vector3f(Color.decode("0x2CA128").getColorComponents(new float[3]))),
     YELLOW(243, new Vector3f(Color.decode("0xE3C82D").getColorComponents(new float[3]))),
-    BLACK(244, new Vector3f(Color.decode("0x000000").getColorComponents(new float[3]))),
-    WHITE(245, new Vector3f(Color.decode("0xFFFFFF").getColorComponents(new float[3]))),
+    BLACK(244, new Vector3f(Color.decode("0x101010").getColorComponents(new float[3]))),
+    WHITE(245, new Vector3f(Color.decode("0xE7E7E7").getColorComponents(new float[3]))),
     BLUE(246, new Vector3f(Color.decode("0x2871A8").getColorComponents(new float[3])));
+    //GREY(?, new Vector3f(Color.decode("0xA1A1A1").getColorComponents(new float[3]))),
+    //DARK_GREY(?, new Vector3f(Color.decode("0x484848").getColorComponents(new float[3])));
 
     public short id;
     public Vector4f color;

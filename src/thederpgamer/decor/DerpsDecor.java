@@ -153,19 +153,25 @@ public class DerpsDecor extends StarMod {
                                                 } else if(connectionsB > maxConnections) {
                                                     api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut B cannot have more connections than the server limit (" + maxConnections + ").");
                                                 } else {
-                                                    SegmentPiece[] key = {otherPiece, event.getSegmentPiece()};
-                                                    module.blockMap.remove(key);
-                                                    module.blockMap.put(key, new StrutDrawData(PaintColor.fromId(selectedSlot.getType()).color, otherPiece, event.getSegmentPiece()));
-                                                    InventoryUtils.consumeItems(GameClient.getClientPlayerState().getInventory(), PlayerUtils.getSelectedSlot().getType(), requiredAmount);
-                                                    api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Created new strut.");
+                                                    if(otherPiece.equals(event.getSegmentPiece())) {
+                                                        api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut A cannot be connected to itself!");
+                                                    } else {
+                                                        SegmentPiece[] key = {otherPiece, event.getSegmentPiece()};
+                                                        module.blockMap.remove(key);
+                                                        module.blockMap.put(key, new StrutDrawData(PaintColor.fromId(selectedSlot.getType()), otherPiece, event.getSegmentPiece()));
+                                                        module.updateToServer();
+                                                        InventoryUtils.consumeItems(GameClient.getClientPlayerState().getInventory(), PlayerUtils.getSelectedSlot().getType(), requiredAmount);
+                                                        api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Set Point B.");
+                                                        api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Created new strut.");
+                                                    }
                                                 }
                                             } else {
                                                 String blockName = ElementKeyMap.getInfo(PlayerUtils.getSelectedSlot().getType()).getName();
                                                 api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Not enough " + blockName + " blocks. Need " + (requiredAmount - currentAmount) + "more.");
                                             }
                                             PlayerUtils.currentConnectionIndex = 0;
-                                            return;
-                                        }
+                                        } else api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "The angle between both struts must be less than or equal to 90 degrees.");
+                                        return;
                                     }
                                 }
                                 LogManager.logWarning("Player \"" + GameClient.getClientPlayerState().getName() + "\" attempted to create a strut on an invalid entity.", null);

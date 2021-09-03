@@ -1,5 +1,6 @@
 package thederpgamer.decor.modules;
 
+import api.common.GameCommon;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.utils.game.module.ModManagerContainerModule;
@@ -12,8 +13,10 @@ import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.drawdata.StrutDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.manager.LogManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,9 +37,53 @@ public class StrutConnectorModule extends ModManagerContainerModule {
     @Override
     public void handle(Timer timer) {
         for(Map.Entry<SegmentPiece[], StrutDrawData> entry : blockMap.entrySet()) {
-            if(entry.getKey()[0].getSegmentController().isInClientRange() && ! getDrawMap().containsKey(entry.getKey())) {
-                getDrawMap().put(entry.getKey(), entry.getValue());
+            if(GameCommon.isOnSinglePlayer()) { //Dumb network bullshit >:U
+                if(entry.getKey()[0].getSegmentController().isFullyLoaded() && ! getDrawMap().containsKey(entry.getKey())) getDrawMap().put(entry.getKey(), entry.getValue());
+            } else if(GameCommon.isClientConnectedToServer()) {
+                if(entry.getKey()[0].getSegmentController().isInClientRange() && ! getDrawMap().containsKey(entry.getKey())) getDrawMap().put(entry.getKey(), entry.getValue());
             }
+        }
+    }
+
+    @Override
+    public void handlePlace(long absIndex, byte orientation) {
+        super.handlePlace(absIndex, orientation);
+    }
+
+    @Override
+    public void handleRemove(long absIndex) {
+        super.handleRemove(absIndex);
+        removeInvalidEntries();
+    }
+
+
+    @Override
+    public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
+        if(!isOnServer()) return;
+        onTagDeserialize(packetReadBuffer);
+        syncToNearbyClients();
+    }
+
+    public void removeInvalidEntries() {
+        for(Map.Entry<SegmentPiece[], StrutDrawData> entry : blockMap.entrySet()) {
+            SegmentPiece pieceA = entry.getKey()[0];
+            SegmentPiece pieceB = entry.getKey()[0];
+            SegmentBufferInterface segmentBuffer =  pieceA.getSegmentController().getSegmentBuffer();
+            if(!segmentBuffer.existsPointUnsave(pieceA.getAbsoluteIndex()) || segmentBuffer.getPointUnsave(pieceA.getAbsoluteIndex()).getType() != getBlockId() || !segmentBuffer.existsPointUnsave(pieceB.getAbsoluteIndex()) || segmentBuffer.getPointUnsave(pieceB.getAbsoluteIndex()).getType() != getBlockId()) {
+                blockMap.remove(entry.getKey());
+            }
+        }
+        updateToServer();
+    }
+
+    public void updateToServer() {
+        if(isOnServer()) return;
+        try {
+            PacketWriteBuffer packetWriteBuffer = openCSBuffer();
+            onTagSerialize(packetWriteBuffer);
+            sendBufferToServer();
+        } catch(IOException exception) {
+            LogManager.logException("Something went wrong while trying to send strut data to server", exception);
         }
     }
 
@@ -82,11 +129,15 @@ public class StrutConnectorModule extends ModManagerContainerModule {
     }
 
     public int getConnectionCount(SegmentPiece segmentPiece) {
-        int count = 0;
+        return getConnections(segmentPiece).size();
+    }
+
+    public ArrayList<SegmentPiece> getConnections(SegmentPiece segmentPiece) {
+        ArrayList<SegmentPiece> connections = new ArrayList<>();
         for(SegmentPiece[] segmentPieces : blockMap.keySet()) {
-            if(segmentPieces[0].equals(segmentPiece)) count ++;
-            if(segmentPieces[1].equals(segmentPiece)) count ++;
+            if(segmentPieces[0].equals(segmentPiece) && !segmentPieces[1].equals(segmentPiece)) connections.add(segmentPieces[1]);
+            else if(segmentPieces[1].equals(segmentPiece) && !segmentPieces[0].equals(segmentPiece)) connections.add(segmentPieces[0]);
         }
-        return count;
+        return connections;
     }
 }
