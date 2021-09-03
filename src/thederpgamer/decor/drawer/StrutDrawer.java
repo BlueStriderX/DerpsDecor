@@ -9,6 +9,9 @@ import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.decor.data.drawdata.StrutDrawData;
+import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.modules.StrutConnectorModule;
+import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,17 +25,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable {
 
     public final ConcurrentHashMap<SegmentPiece[], StrutDrawData> drawMap = new ConcurrentHashMap<>();
+    private short strutId;
 
     @Override
     public void onInit() {
-
+        strutId = ElementManager.getBlock("Strut Connector").getId();
     }
 
     @Override
     public void draw() {
         for(Map.Entry<SegmentPiece[], StrutDrawData> entry : drawMap.entrySet()) {
-            if(checkDraw(entry.getValue(), entry.getKey()[0].getSegmentController())) entry.getValue().draw();
-            else drawMap.remove(entry.getKey());
+            if(checkDraw(entry.getValue(), entry.getKey()[0].getSegmentController())) {
+                if(entry.getKey()[0].getSegmentController().isInClientRange()) entry.getValue().draw();
+                else drawMap.remove(entry.getKey());
+            } else {
+                StrutConnectorModule module = (StrutConnectorModule) ServerUtils.getManagerContainer(entry.getKey()[0].getSegmentController()).getModMCModule(strutId);
+                module.blockMap.remove(entry.getKey());
+                drawMap.remove(entry.getKey());
+            }
         }
     }
 
@@ -67,6 +77,6 @@ public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable 
     }
 
     private boolean checkDraw(StrutDrawData drawData, SegmentController segmentController) {
-        return segmentController.isInClientRange() && segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceAIndex) && segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceBIndex);
+        return segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceAIndex) && segmentController.getSegmentBuffer().existsPointUnsave(drawData.pieceBIndex);
     }
 }

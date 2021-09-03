@@ -39,7 +39,7 @@ import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.modules.HoloProjectorModule;
-import thederpgamer.decor.modules.StrutCornerModule;
+import thederpgamer.decor.modules.StrutConnectorModule;
 import thederpgamer.decor.modules.TextProjectorModule;
 import thederpgamer.decor.utils.*;
 
@@ -103,7 +103,7 @@ public class DerpsDecor extends StarMod {
             public void onEvent(ManagerContainerRegisterEvent event) {
                 event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
                 event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-                event.addModMCModule(new StrutCornerModule(event.getSegmentController(), event.getContainer()));
+                event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
             }
         }, this);
 
@@ -130,29 +130,40 @@ public class DerpsDecor extends StarMod {
                             case PlayerUtils.NONE:
                                 PlayerUtils.currentConnectionIndex = event.getSegmentPiece().getAbsoluteIndex();
                                 PlayerUtils.startConnectionRunner();
-                                api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Set first point.");
-                                //Todo: Draw some sort of indication
+                                api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Set point A.");
                                 break;
                             case PlayerUtils.FIRST:
                                 PlayerUtils.connectingStrut = PlayerUtils.SECOND;
                                 ManagerContainer<?> managerContainer = ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController());
                                 if(managerContainer != null) {
-                                    StrutCornerModule module = (StrutCornerModule) managerContainer.getModMCModule(ElementManager.getBlock("Strut Connector").getId());
+                                    StrutConnectorModule module = (StrutConnectorModule) managerContainer.getModMCModule(ElementManager.getBlock("Strut Connector").getId());
                                     if(module != null) {
                                         SegmentPiece otherPiece = managerContainer.getSegmentController().getSegmentBuffer().getPointUnsave(PlayerUtils.currentConnectionIndex);
                                         if(SegmentPieceUtils.withinSameAxisAndAngle(otherPiece, event.getSegmentPiece(), 90.0f)) {
                                             int requiredAmount = SegmentPieceUtils.getDistance(otherPiece, event.getSegmentPiece());
                                             int currentAmount = InventoryUtils.getItemAmount(GameClient.getClientPlayerState().getInventory(), PlayerUtils.getSelectedSlot().getType());
-                                            if(currentAmount >= requiredAmount || GameClient.getClientPlayerState().isUseCreativeMode()) {
-                                                SegmentPiece[] key = {otherPiece, event.getSegmentPiece()};
-                                                module.blockMap.remove(key);
-                                                module.blockMap.put(key, new StrutDrawData(PaintColor.fromId(selectedSlot.getType()).color, otherPiece, event.getSegmentPiece()));
-                                                InventoryUtils.consumeItems(GameClient.getClientPlayerState().getInventory(), PlayerUtils.getSelectedSlot().getType(), requiredAmount);
-                                                api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Created new strut.");
+                                            if(requiredAmount > ConfigManager.getMainConfig().getInt("max-strut-length")) {
+                                                api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut cannot be longer than the server limit (" +  ConfigManager.getMainConfig().getInt("max-strut-length") + ").");
+                                            } else if(currentAmount >= requiredAmount || GameClient.getClientPlayerState().isUseCreativeMode()) {
+                                                int maxConnections = ConfigManager.getMainConfig().getInt("max-strut-connections");
+                                                int connectionsA = module.getConnectionCount(otherPiece);
+                                                int connectionsB = module.getConnectionCount(event.getSegmentPiece());
+                                                if(connectionsA > maxConnections) {
+                                                    api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut A cannot have more connections than the server limit (" + maxConnections + ").");
+                                                } else if(connectionsB > maxConnections) {
+                                                    api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut B cannot have more connections than the server limit (" + maxConnections + ").");
+                                                } else {
+                                                    SegmentPiece[] key = {otherPiece, event.getSegmentPiece()};
+                                                    module.blockMap.remove(key);
+                                                    module.blockMap.put(key, new StrutDrawData(PaintColor.fromId(selectedSlot.getType()).color, otherPiece, event.getSegmentPiece()));
+                                                    InventoryUtils.consumeItems(GameClient.getClientPlayerState().getInventory(), PlayerUtils.getSelectedSlot().getType(), requiredAmount);
+                                                    api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Created new strut.");
+                                                }
                                             } else {
                                                 String blockName = ElementKeyMap.getInfo(PlayerUtils.getSelectedSlot().getType()).getName();
                                                 api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Not enough " + blockName + " blocks. Need " + (requiredAmount - currentAmount) + "more.");
                                             }
+                                            PlayerUtils.currentConnectionIndex = 0;
                                             return;
                                         }
                                     }

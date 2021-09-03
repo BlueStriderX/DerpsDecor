@@ -23,11 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @since 09/02/2021
  */
-public class StrutCornerModule extends ModManagerContainerModule {
+public class StrutConnectorModule extends ModManagerContainerModule {
 
     public final ConcurrentHashMap<SegmentPiece[], StrutDrawData> blockMap = new ConcurrentHashMap<>();
 
-    public StrutCornerModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
+    public StrutConnectorModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
         super(segmentController, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Strut Connector").getId());
     }
 
@@ -74,10 +74,19 @@ public class StrutCornerModule extends ModManagerContainerModule {
 
     @Override
     public String getName() {
-        return "Strut Connector Drawer";
+        return "Strut Connector";
     }
 
     private ConcurrentHashMap<SegmentPiece[], StrutDrawData> getDrawMap() {
         return GlobalDrawManager.getStrutDrawer().drawMap;
+    }
+
+    public int getConnectionCount(SegmentPiece segmentPiece) {
+        int count = 0;
+        for(SegmentPiece[] segmentPieces : blockMap.keySet()) {
+            if(segmentPieces[0].equals(segmentPiece)) count ++;
+            if(segmentPieces[1].equals(segmentPiece)) count ++;
+        }
+        return count;
     }
 }

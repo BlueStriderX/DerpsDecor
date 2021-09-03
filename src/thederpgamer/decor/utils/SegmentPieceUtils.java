@@ -13,6 +13,7 @@ import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SegmentData;
 import org.schema.game.common.util.FastCopyLongOpenHashSet;
+import org.schema.schine.graphicsengine.core.GlUtil;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
@@ -55,20 +56,29 @@ public class SegmentPieceUtils {
     }
 
     public static boolean withinSameAxisAndAngle(SegmentPiece pieceA, SegmentPiece pieceB, float maxAngle) {
+        Transform pieceATransform = new Transform();
+        pieceA.getTransform(pieceATransform);
+
+        Transform pieceBTransform = new Transform();
+        pieceB.getTransform(pieceBTransform);
+
         Vector3f pieceAForward = new Vector3f();
         Vector3f pieceBForward = new Vector3f();
-        Element.getRelativeForward(pieceA.getOrientation(), Element.FRONT, pieceAForward);
-        Element.getRelativeForward(pieceB.getOrientation(), Element.FRONT, pieceBForward);
+
+        Vector3f pieceAUp = new Vector3f();
+        Vector3f pieceBUp = new Vector3f();
+
+        GlUtil.getForwardVector(pieceAForward, pieceATransform);
+        GlUtil.getForwardVector(pieceBForward, pieceBTransform);
+
+        GlUtil.getUpVector(pieceAUp, pieceATransform);
+        GlUtil.getUpVector(pieceBUp, pieceBTransform);
 
         if(pieceAForward.y - pieceBForward.y == 0 && pieceAForward.x - pieceBForward.x == 0) {
-            Vector3f pieceAUp = new Vector3f();
-            Vector3f pieceBUp = new Vector3f();
-            Element.getRelativeForward(pieceA.getOrientation(), Element.TOP, pieceAUp);
-            Element.getRelativeForward(pieceB.getOrientation(), Element.TOP, pieceBUp);
             float max = Math.max(pieceAUp.z, pieceBUp.z);
             float min = Math.min(pieceAUp.z, pieceBUp.z);
             if(max - min >= 0) {
-                float angle = Math.abs(pieceAUp.angle(pieceBUp));
+                float angle = (float) Math.abs(Math.toDegrees(pieceAUp.angle(pieceBUp)));
                 return angle <= maxAngle;
             }
         }

@@ -26,14 +26,14 @@ public class DisplayScreen extends Block {
             blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
         }
         blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
-        blockInfo.setInRecipe(true);
         blockInfo.setCanActivate(true);
-        blockInfo.setShoppable(true);
+        blockInfo.setInRecipe(false); //Todo: Fix orientation bug
+        blockInfo.setShoppable(false);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
         blockInfo.setIndividualSides(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getIndividualSides());
         blockInfo.setBlockStyle(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getBlockStyle().id);
-        blockInfo.lodShapeStyle = 2;
+        blockInfo.lodShapeStyle = 1;
         blockInfo.sideTexturesPointToOrientation = false;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),

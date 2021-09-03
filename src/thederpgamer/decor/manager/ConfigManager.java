@@ -23,6 +23,8 @@ public class ConfigManager {
             "max-projector-offset: 30",
             "image-filter-mode: blacklist",
             "image-filter: porn,hentai,sex,nsfw,r34",
+            "max-strut-length: 20",
+            "max-strut-connections: 5",
             "rounding-mode: HALF_EVEN"
     };
 

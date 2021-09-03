@@ -34,7 +34,7 @@ public class HoloTable extends Block {
         blockInfo.setOrientatable(true);
         blockInfo.setIndividualSides(6);
         blockInfo.setBlockStyle(BlockStyle.NORMAL.id);
-        blockInfo.lodShapeStyle = 2;
+        blockInfo.lodShapeStyle = 1;
         blockInfo.sideTexturesPointToOrientation = false;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),

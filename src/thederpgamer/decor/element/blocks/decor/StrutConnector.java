@@ -1,7 +1,6 @@
 package thederpgamer.decor.element.blocks.decor;
 
 import api.config.BlockConfig;
-import org.schema.game.client.view.cubes.shapes.BlockStyle;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
 import org.schema.schine.graphicsengine.core.GraphicsContext;
@@ -31,11 +30,11 @@ public class StrutConnector extends Block {
         blockInfo.setShoppable(true);
         blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
         blockInfo.setOrientatable(true);
-        blockInfo.setIndividualSides(24);
-        blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
-        blockInfo.lodShapeStyle = 2;
+        blockInfo.setIndividualSides(ElementKeyMap.getInfo(976).individualSides);
+        blockInfo.setBlockStyle(ElementKeyMap.getInfo(976).blockStyle.id);
+        blockInfo.lodShapeStyle = 1;
         blockInfo.setCanActivate(true);
-        blockInfo.sideTexturesPointToOrientation = false;
+        blockInfo.sideTexturesPointToOrientation = ElementKeyMap.getInfo(976).sideTexturesPointToOrientation;
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                               new FactoryResource(1, (short) 941),
