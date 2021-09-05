@@ -15,7 +15,7 @@ import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.modules.TextProjectorModule;
+import thederpgamer.decor.systems.modules.TextProjectorModule;
 
 /**
  * <Description>

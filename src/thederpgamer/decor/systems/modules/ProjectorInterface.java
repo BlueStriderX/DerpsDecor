@@ -1,4 +1,4 @@
-package thederpgamer.decor.modules;
+package thederpgamer.decor.systems.modules;
 
 import org.schema.game.common.data.SegmentPiece;
 import thederpgamer.decor.data.drawdata.ProjectorDrawData;

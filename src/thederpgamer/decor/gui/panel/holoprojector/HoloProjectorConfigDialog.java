@@ -15,7 +15,7 @@ import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.modules.HoloProjectorModule;
+import thederpgamer.decor.systems.modules.HoloProjectorModule;
 
 /**
  * <Description>

@@ -11,7 +11,7 @@ import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.decor.data.drawdata.StrutDrawData;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.modules.StrutConnectorModule;
+import thederpgamer.decor.systems.modules.StrutConnectorModule;
 import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.Map;

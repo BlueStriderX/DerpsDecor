@@ -1,4 +1,4 @@
-package thederpgamer.decor.modules;
+package thederpgamer.decor.systems.modules;
 
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;

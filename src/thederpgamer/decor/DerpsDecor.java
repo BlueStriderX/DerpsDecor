@@ -1,50 +1,35 @@
 package thederpgamer.decor;
 
-import api.common.GameClient;
 import api.config.BlockConfig;
 import api.listener.Listener;
-import api.listener.events.block.*;
+import api.listener.events.block.SegmentPieceActivateByPlayer;
+import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
-import api.utils.game.inventory.InventoryUtils;
-import org.schema.game.client.controller.PlayerTextAreaInput;
-import org.schema.game.client.controller.element.world.ClientSegmentProvider;
-import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
-import org.schema.game.common.controller.SendableSegmentProvider;
-import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.SendableGameState;
-import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementKeyMap;
-import org.schema.game.common.data.player.inventory.InventorySlot;
-import org.schema.game.common.data.world.Segment;
-import org.schema.game.network.objects.remote.RemoteTextBlockPair;
-import org.schema.game.network.objects.remote.TextBlockPair;
-import org.schema.schine.common.TextCallback;
-import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
-import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.data.drawdata.ProjectorDrawData;
-import thederpgamer.decor.data.drawdata.StrutDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.element.blocks.ActivationInterface;
+import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.element.blocks.decor.*;
-import thederpgamer.decor.gui.panel.holoprojector.HoloProjectorConfigDialog;
-import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.modules.HoloProjectorModule;
-import thederpgamer.decor.modules.StrutConnectorModule;
-import thederpgamer.decor.modules.TextProjectorModule;
-import thederpgamer.decor.utils.*;
+import thederpgamer.decor.systems.modules.HoloProjectorModule;
+import thederpgamer.decor.systems.modules.StrutConnectorModule;
+import thederpgamer.decor.systems.modules.TextProjectorModule;
+import thederpgamer.decor.utils.ClipboardUtils;
+import thederpgamer.decor.utils.ProjectorUtils;
+import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Main class for DerpsDecor mod.
@@ -84,8 +69,8 @@ public class DerpsDecor extends StarMod {
     public void onBlockConfigLoad(BlockConfig config) {
         ElementManager.addBlock(new HoloProjector());
         ElementManager.addBlock(new TextProjector());
-        ElementManager.addBlock(new StrutConnector());
-        ElementManager.addBlock(new DisplayScreen());
+        //ElementManager.addBlock(new StrutConnector());
+        //ElementManager.addBlock(new DisplayScreen());
         ElementManager.addBlock(new HoloTable());
         ElementManager.initialize();
     }
@@ -109,21 +94,16 @@ public class DerpsDecor extends StarMod {
 
         StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
             @Override
-            public void onEvent(final SegmentPieceActivateByPlayer event) {
+            public void onEvent(SegmentPieceActivateByPlayer event) {
+                for(Block block : ElementManager.getAllBlocks()) {
+                    if(block instanceof ActivationInterface && block.getId() == event.getSegmentPiece().getType()) {
+                        ((ActivationInterface) block).onPlayerActivation(event);
+                        return;
+                    }
+                }
+                /*
                 final SegmentPiece piece = event.getSegmentPiece();
-                if(ElementManager.getBlock("Holo Projector") != null && piece.getType() == ElementManager.getBlock("Holo Projector").getId()) {
-                    HoloProjectorConfigDialog configDialog = new HoloProjectorConfigDialog();
-                    configDialog.setSegmentPiece(piece);
-                    configDialog.activate();
-                    piece.setActive(!piece.isActive());
-                    if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
-                } else if(ElementManager.getBlock("Text Projector") != null && piece.getType() == ElementManager.getBlock("Text Projector").getId()) {
-                    TextProjectorConfigDialog configDialog = new TextProjectorConfigDialog();
-                    configDialog.setSegmentPiece(piece);
-                    configDialog.activate();
-                    piece.setActive(!piece.isActive());
-                    if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
-                } else if(event.getSegmentPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Strut Connector")).getId())  {
+                if(event.getSegmentPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Strut Connector")).getId())  {
                     InventorySlot selectedSlot = PlayerUtils.getSelectedSlot();
                     if(!selectedSlot.isEmpty() && ElementKeyMap.getInfo(selectedSlot.getType()).getName().toLowerCase().contains("paint")) {
                         switch(PlayerUtils.connectingStrut) {
@@ -228,12 +208,20 @@ public class DerpsDecor extends StarMod {
                     t.getInputPanel().onInit();
                     t.activate();
                 }
+                 */
             }
         }, this);
 
         StarLoader.registerListener(SegmentPieceActivateEvent.class, new Listener<SegmentPieceActivateEvent>() {
             @Override
             public void onEvent(SegmentPieceActivateEvent event) {
+                for(Block block : ElementManager.getAllBlocks()) {
+                    if(block instanceof ActivationInterface && block.getId() == event.getSegmentPiece().getType()) {
+                        ((ActivationInterface) block).onLogicActivation(event);
+                        break;
+                    }
+                }
+
                 if(event.isServer()) {
                     if((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) && event.getSegmentPiece().isActive()) {
                         SegmentPiece adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
@@ -271,6 +259,7 @@ public class DerpsDecor extends StarMod {
             }
         }, this);
 
+        /* Todo: Fix display screen orientation
         StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
             @Override
             public void onEvent(SegmentPieceAddEvent event) {
@@ -302,5 +291,6 @@ public class DerpsDecor extends StarMod {
                 }
             }
         }, this);
+         */
     }
 }

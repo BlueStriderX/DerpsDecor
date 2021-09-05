@@ -1,10 +1,15 @@
 package thederpgamer.decor.element.blocks.decor;
 
+import api.common.GameClient;
 import api.config.BlockConfig;
+import api.listener.events.block.SegmentPieceActivateByPlayer;
+import api.listener.events.block.SegmentPieceActivateEvent;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
 import org.schema.schine.graphicsengine.core.GraphicsContext;
+import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
 import thederpgamer.decor.manager.ResourceManager;
 
 /**
@@ -13,7 +18,7 @@ import thederpgamer.decor.manager.ResourceManager;
  * @author TheDerpGamer
  * @since 07/15/2021
  */
-public class TextProjector  extends Block {
+public class TextProjector extends Block implements ActivationInterface {
 
     public TextProjector() {
         super("Text Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
@@ -48,5 +53,19 @@ public class TextProjector  extends Block {
                 new FactoryResource(50, (short) 440)
         );
         BlockConfig.add(blockInfo);
+    }
+
+    @Override
+    public void onPlayerActivation(SegmentPieceActivateByPlayer event) {
+        TextProjectorConfigDialog configDialog = new TextProjectorConfigDialog();
+        configDialog.setSegmentPiece(event.getSegmentPiece());
+        configDialog.activate();
+        event.getSegmentPiece().setActive(!event.getSegmentPiece().isActive());
+        if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
+    }
+
+    @Override
+    public void onLogicActivation(SegmentPieceActivateEvent event) {
+
     }
 }
