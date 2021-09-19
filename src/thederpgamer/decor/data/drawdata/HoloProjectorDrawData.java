@@ -29,6 +29,7 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
             onTagDeserialize(packetReadBuffer);
         } catch(IOException exception) {
             LogManager.logException("Using default values because something went wrong while trying to deserialize holo projector data", exception);
+            src = "";
             scale = 1;
             offset = new Vector3i();
             rotation = new Vector3i();
@@ -39,6 +40,7 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         //super.onTagSerialize(packetWriteBuffer);
+        if(src == null) src = "";
         packetWriteBuffer.writeLong(indexAndOrientation);
         packetWriteBuffer.writeVector(offset);
         packetWriteBuffer.writeVector(rotation);

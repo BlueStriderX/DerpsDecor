@@ -34,12 +34,16 @@ public class TextProjectorDrawData extends ProjectorDrawData {
             offset = new Vector3i();
             rotation = new Vector3i();
             changed = true;
+            text = "";
+            color = "FFFFFF";
         }
     }
 
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         //super.onTagSerialize(packetWriteBuffer);
+        if(text == null) text = "";
+        if(color == null) color = "FFFFFF";
         packetWriteBuffer.writeLong(indexAndOrientation);
         packetWriteBuffer.writeVector(offset);
         packetWriteBuffer.writeVector(rotation);

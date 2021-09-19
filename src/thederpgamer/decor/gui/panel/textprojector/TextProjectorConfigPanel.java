@@ -322,12 +322,13 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     }
 
     public String getColor() {
-        if(colorInput.getText() == null) return "";
+        if(colorInput.getText() == null) return "FFFFFF";
         else return colorInput.getText();
     }
 
     public void setColor(String color) {
-        colorInput.setTextWithoutCallback(color);
+        if(color != null) textInput.setTextWithoutCallback(color);
+        else textInput.setTextWithoutCallback("FFFFFF");
     }
 
     public String getText() {
@@ -336,7 +337,8 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     }
 
     public void setText(String text) {
-        textInput.setTextWithoutCallback(text);
+        if(text != null) textInput.setTextWithoutCallback(text);
+        else textInput.setTextWithoutCallback("");
     }
 
     public String getValues() {

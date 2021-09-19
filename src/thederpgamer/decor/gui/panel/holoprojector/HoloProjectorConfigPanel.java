@@ -293,7 +293,8 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
     }
 
     public void setText(String text) {
-        textInput.setTextWithoutCallback(text);
+        if(text != null) textInput.setTextWithoutCallback(text);
+        else textInput.setTextWithoutCallback("");
     }
 
     public String getValues() {

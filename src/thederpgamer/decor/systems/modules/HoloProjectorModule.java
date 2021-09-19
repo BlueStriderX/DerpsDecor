@@ -51,7 +51,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
             HoloProjectorDrawData drawData = entry.getValue();
 
-            if(!drawData.src.isEmpty()) {
+            if(drawData.src != null) {
                 if(drawData.changed || drawData.image == null) {
                     Sprite image = ImageManager.getImage(drawData.src);
                     if(image != null) drawData.image = image;

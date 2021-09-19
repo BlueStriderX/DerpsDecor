@@ -53,7 +53,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
             TextProjectorDrawData drawData = entry.getValue();
 
-            if(!drawData.text.isEmpty()) {
+            if(drawData.text != null && drawData.color != null) {
                 if(drawData.changed || drawData.textOverlay == null) {
                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                     textOverlay.onInit();
