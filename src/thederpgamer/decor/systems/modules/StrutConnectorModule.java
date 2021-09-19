@@ -110,18 +110,8 @@ public class StrutConnectorModule extends ModManagerContainerModule {
     }
 
     @Override
-    public double getPowerConsumedPerSecondResting() {
-        return 0;
-    }
-
-    @Override
-    public double getPowerConsumedPerSecondCharging() {
-        return 0;
-    }
-
-    @Override
     public String getName() {
-        return "Strut Connector";
+        return "StrutConnector_ManagerModule";
     }
 
     private ConcurrentHashMap<SegmentPiece[], StrutDrawData> getDrawMap() {

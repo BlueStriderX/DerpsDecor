@@ -72,7 +72,6 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         deactivate();
                         break;
                 }
-                //PacketUtil.sendPacketToServer(new SendProjectorDataToServerPacket((ManagedUsableSegmentController<?>) getModule().getManagerContainer().getSegmentController(), getModule().getDrawData(segmentPiece)));
             }
         }
     }

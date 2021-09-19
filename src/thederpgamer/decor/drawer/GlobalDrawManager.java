@@ -13,11 +13,11 @@ import java.util.Arrays;
  */
 public class GlobalDrawManager  {
 
-    private static final ModWorldDrawer[] worldDrawers = new ModWorldDrawer[2];
+    private static final ModWorldDrawer[] worldDrawers = new ModWorldDrawer[1];
 
     public static void initialize(RegisterWorldDrawersEvent event) {
         worldDrawers[0] = new ProjectorDrawer();
-        worldDrawers[1] = new StrutDrawer();
+        //worldDrawers[1] = new StrutDrawer();
         event.getModDrawables().addAll(Arrays.asList(worldDrawers));
     }
 

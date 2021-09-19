@@ -123,7 +123,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         try {
-            removeInvalidEntries();
+            //removeInvalidEntries();
             if(!projectorMap.isEmpty()) {
                 packetWriteBuffer.writeInt(projectorMap.size());
                 for(Map.Entry<Long, TextProjectorDrawData> entry : projectorMap.entrySet()) {
@@ -143,7 +143,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
     public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
         SegmentBufferInterface segmentBuffer = getManagerContainer().getSegmentController().getSegmentBuffer();
         int size = packetReadBuffer.readInt();
-        for(int i = 0; i < size; i ++) {
+        for(int i = 0; i < size; i++) {
             long indexAndOrientation = packetReadBuffer.readLong();
             long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
             SegmentPiece projectorPiece = segmentBuffer.getPointUnsave(absIndex);
@@ -173,7 +173,7 @@ public class TextProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public String getName() {
-        return "TextProjector";
+        return "TextProjector_ManagerModule";
     }
 
     @Override

@@ -18,12 +18,13 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.element.blocks.decor.*;
+import thederpgamer.decor.element.blocks.decor.HoloProjector;
+import thederpgamer.decor.element.blocks.decor.HoloTable;
+import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
-import thederpgamer.decor.systems.modules.StrutConnectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.ProjectorUtils;
@@ -88,7 +89,7 @@ public class DerpsDecor extends StarMod {
             public void onEvent(ManagerContainerRegisterEvent event) {
                 event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
                 event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-                event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
+                //event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
             }
         }, this);
 

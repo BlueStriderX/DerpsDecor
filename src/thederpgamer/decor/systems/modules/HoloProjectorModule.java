@@ -114,7 +114,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     @Override
     public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         try {
-            removeInvalidEntries();
+            //removeInvalidEntries();
             if(!projectorMap.isEmpty()) {
                 packetWriteBuffer.writeInt(projectorMap.size());
                 for(Map.Entry<Long, HoloProjectorDrawData> entry : projectorMap.entrySet()) {
@@ -164,7 +164,7 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public String getName() {
-        return "HoloProjector";
+        return "HoloProjector_ManagerModule";
     }
 
     @Override

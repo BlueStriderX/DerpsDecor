@@ -7,7 +7,6 @@ import thederpgamer.decor.DerpsDecor;
  * Manages mod config files and values.
  *
  * @author TheDerpGamer
- * @since 06/07/2021
  */
 public class ConfigManager {
 

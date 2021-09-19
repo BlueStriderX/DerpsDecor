@@ -41,20 +41,6 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
 
     }
 
-    @Override
-    public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
-        packetWriteBuffer.writeLong(indexAndOrientation);
-        packetWriteBuffer.writeVector(offset);
-        packetWriteBuffer.writeVector(rotation);
-        packetWriteBuffer.writeInt(scale);
-        packetWriteBuffer.writeBoolean(changed);
-    }
-
-    @Override
-    public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        offset = packetReadBuffer.readVector();
-        rotation = packetReadBuffer.readVector();
-        scale = packetReadBuffer.readInt();
-        changed = packetReadBuffer.readBoolean();
-    }
+    public abstract void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException;
+    public abstract void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException;
 }

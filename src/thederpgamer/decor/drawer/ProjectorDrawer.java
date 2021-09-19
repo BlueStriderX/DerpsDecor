@@ -15,6 +15,7 @@ import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import java.awt.*;
 import java.util.Map;
@@ -83,9 +84,9 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                         if(ConfigManager.getMainConfig().getBoolean("debug-mode") && Keyboard.isKeyDown(Keyboard.KEY_LMENU)) {
                             if(!debugMap.containsKey(segmentPiece)) debugMap.put(segmentPiece, new DebugDrawData(segmentPiece, drawData));
                             debugMap.get(segmentPiece).update();
+                            drawData.transform.set(SegmentPieceUtils.getFullPieceTransform(segmentPiece));
                             ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / 256) * -1, drawData.transform)};
                             Sprite.draw3D(debugMap.get(segmentPiece).debugGrid, subSprite, 1, Controller.getCamera());
-                            debugMap.get(segmentPiece).posOverlay.draw();
                         } else {
                             debugMap.remove(segmentPiece);
                             if(drawData instanceof HoloProjectorDrawData) {
@@ -94,6 +95,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                                 if(image != null) {
                                     float maxDim = Math.max(image.getWidth(), image.getHeight());
                                     ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[]{new ScalableImageSubSprite(((float) drawData.scale / maxDim) * -1, drawData.transform)};
+                                    drawData.transform.set(SegmentPieceUtils.getFullPieceTransform(segmentPiece));
                                     image.setTransform(drawData.transform);
                                     Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
                                 }
@@ -101,6 +103,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                                 TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
                                 if(textProjectorDrawData.textOverlay != null) {
                                     if(textProjectorDrawData.textOverlay.getFont() == null) textProjectorDrawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + textProjectorDrawData.color)));
+                                    drawData.transform.set(SegmentPieceUtils.getFullPieceTransform(segmentPiece));
                                     textProjectorDrawData.textOverlay.setTransform(drawData.transform);
                                     textProjectorDrawData.textOverlay.draw();
                                 }
