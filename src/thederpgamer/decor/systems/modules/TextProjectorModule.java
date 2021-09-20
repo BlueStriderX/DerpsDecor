@@ -10,6 +10,7 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.data.drawdata.DrawDataMap;
 import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
@@ -22,7 +23,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
-import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -34,7 +35,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
-        if(!(data instanceof LinkedHashMap)) data = new LinkedHashMap<>();
+        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
     }
 
     @Override
@@ -104,8 +105,8 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     }
 
     @Override
-    public LinkedHashMap<Long, ProjectorDrawData> getProjectorMap() {
-        return (LinkedHashMap<Long, ProjectorDrawData>) data;
+    public ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap() {
+        return ((DrawDataMap) data).map;
     }
 
     @Override

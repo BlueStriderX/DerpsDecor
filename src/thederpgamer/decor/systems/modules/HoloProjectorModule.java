@@ -9,6 +9,7 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.data.drawdata.DrawDataMap;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
@@ -20,7 +21,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -32,7 +33,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     public HoloProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Holo Projector").getId());
-        if(!(data instanceof LinkedHashMap)) data = new LinkedHashMap<>();
+        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
     }
 
     @Override
@@ -95,8 +96,8 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule implements Pr
     }
 
     @Override
-    public LinkedHashMap<Long, ProjectorDrawData> getProjectorMap() {
-        return (LinkedHashMap<Long, ProjectorDrawData>) data;
+    public ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap() {
+        return ((DrawDataMap) data).map;
     }
 
     @Override
