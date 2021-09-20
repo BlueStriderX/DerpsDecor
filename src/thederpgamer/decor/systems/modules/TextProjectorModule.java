@@ -106,6 +106,8 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     @Override
     public ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap() {
+        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
+        if(((DrawDataMap) data).map == null) ((DrawDataMap) data).map = new ConcurrentHashMap<>();
         return ((DrawDataMap) data).map;
     }
 

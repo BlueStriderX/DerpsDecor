@@ -13,7 +13,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @author TheDerpGamer
  * @since 07/19/2021
  */
-public class HoloProjectorDrawData implements ProjectorDrawData {
+public class HoloProjectorDrawData extends ProjectorDrawData {
 
     public long indexAndOrientation;
     public Vector3i offset;

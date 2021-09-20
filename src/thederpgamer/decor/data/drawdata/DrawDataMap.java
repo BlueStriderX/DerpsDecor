@@ -8,5 +8,14 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  */
 public class DrawDataMap {
-    public final ConcurrentHashMap<Long, ProjectorDrawData> map = new ConcurrentHashMap<>();
+
+    public ConcurrentHashMap<Long, ProjectorDrawData> map;
+
+    public DrawDataMap() {
+        map = new ConcurrentHashMap<>();
+    }
+
+    public DrawDataMap(ConcurrentHashMap<Long, ProjectorDrawData> map) {
+        this.map = map;
+    }
 }

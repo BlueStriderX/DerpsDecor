@@ -9,25 +9,29 @@ import org.schema.common.util.linAlg.Vector3i;
  * @author TheDerpGamer
  * @since 07/19/2021
  */
-public interface ProjectorDrawData {
+public abstract class ProjectorDrawData {
 
-    long getIndexAndOrientation();
-    void setIndexAndOrientation(long indexAndOrientation);
+    public ProjectorDrawData() {
+        
+    }
 
-    Vector3i getOffset();
-    void setOffset(Vector3i offset);
+    public abstract long getIndexAndOrientation();
+    public abstract void setIndexAndOrientation(long indexAndOrientation);
 
-    Vector3i getRotation();
-    void setRotation(Vector3i rotation);
+    public abstract Vector3i getOffset();
+    public abstract void setOffset(Vector3i offset);
 
-    int getScale();
-    void setScale(int scale);
+    public abstract Vector3i getRotation();
+    public abstract void setRotation(Vector3i rotation);
 
-    boolean isChanged();
-    void setChanged(boolean changed);
+    public abstract  int getScale();
+    public abstract  void setScale(int scale);
 
-    Transform getTransform();
-    void setTransform(Transform transform);
+    public abstract boolean isChanged();
+    public abstract void setChanged(boolean changed);
+
+    public abstract Transform getTransform();
+    public abstract void setTransform(Transform transform);
 
     /*
     public long indexAndOrientation;

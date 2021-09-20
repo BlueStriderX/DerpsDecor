@@ -13,7 +13,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @author TheDerpGamer
  * @since 08/06/2021
  */
-public class TextProjectorDrawData implements ProjectorDrawData {
+public class TextProjectorDrawData extends ProjectorDrawData {
 
     public long indexAndOrientation;
     public Vector3i offset;
