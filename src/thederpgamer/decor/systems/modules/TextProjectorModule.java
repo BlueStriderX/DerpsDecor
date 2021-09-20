@@ -22,7 +22,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * <Description>
@@ -34,13 +34,13 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
-        if(!(data instanceof ArrayList)) data = new ArrayList<>();
+        if(!(data instanceof LinkedHashMap)) data = new LinkedHashMap<>();
     }
 
     @Override
     public void handle(Timer timer) {
         if(isOnServer()) return;
-        for(ProjectorDrawData projectorData : getProjectorList()) {
+        for(ProjectorDrawData projectorData : getProjectorMap().values()) {
             long indexAndOrientation = projectorData.getIndexAndOrientation();
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
             TextProjectorDrawData drawData = (TextProjectorDrawData) projectorData;
@@ -104,8 +104,8 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     }
 
     @Override
-    public ArrayList<ProjectorDrawData> getProjectorList() {
-        return (ArrayList<ProjectorDrawData>) data;
+    public LinkedHashMap<Long, ProjectorDrawData> getProjectorMap() {
+        return (LinkedHashMap<Long, ProjectorDrawData>) data;
     }
 
     @Override
@@ -115,16 +115,12 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     @Override
     public void removeDrawData(long indexAndOrientation) {
-        ArrayList<ProjectorDrawData> toRemove = new ArrayList<>();
-        for(ProjectorDrawData projectorData : getProjectorList()) {
-            if(projectorData.getIndexAndOrientation() == indexAndOrientation) toRemove.add(projectorData);
-        }
-        for(ProjectorDrawData projectorData : toRemove) getProjectorList().remove(projectorData);
+        getProjectorMap().remove(indexAndOrientation);
     }
 
     @Override
     public ProjectorDrawData getDrawData(long indexAndOrientation) {
-        for(ProjectorDrawData drawData : getProjectorList()) if(drawData.getIndexAndOrientation() == indexAndOrientation) return drawData;
+        if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
         return createNewDrawData(indexAndOrientation);
     }
 
@@ -136,7 +132,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     @Override
     public void setDrawData(long indexAndOrientation, ProjectorDrawData drawData) {
         removeDrawData(indexAndOrientation);
-        getProjectorList().add(drawData);
+        getProjectorMap().put(indexAndOrientation, drawData);
         flagUpdatedData();
     }
 
@@ -153,7 +149,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
         SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);
         TextProjectorDrawData drawData = new TextProjectorDrawData(segmentPiece);
         drawData.indexAndOrientation = indexAndOrientation;
-        getProjectorList().add(drawData);
+        getProjectorMap().put(indexAndOrientation, drawData);
         flagUpdatedData();
         return drawData;
     }
