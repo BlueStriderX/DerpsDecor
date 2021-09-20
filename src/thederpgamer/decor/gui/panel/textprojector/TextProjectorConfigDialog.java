@@ -37,6 +37,9 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
             assert realModule != getModule() : "Uh oh";
             drawData = (TextProjectorDrawData) realModule.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
         } else drawData = (TextProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        if(drawData.text == null) drawData.text = "Text";
+        if(drawData.color == null) drawData.color = "FFFFFF";
+
         getConfigPanel().setText(drawData.text);
         getConfigPanel().setColor(drawData.color);
         getConfigPanel().setXOffset(drawData.offset.x);
@@ -74,7 +77,6 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
                         deactivate();
                         break;
                 }
-                //PacketUtil.sendPacketToServer(new SendProjectorDataToServerPacket((ManagedUsableSegmentController<?>) getModule().getManagerContainer().getSegmentController(), ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), DerpsDecor.TEXT_PROJECTOR));
             }
         }
     }

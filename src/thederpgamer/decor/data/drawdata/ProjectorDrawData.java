@@ -1,15 +1,7 @@
 package thederpgamer.decor.data.drawdata;
 
-import api.network.PacketReadBuffer;
-import api.network.PacketWriteBuffer;
-import api.utils.game.module.ByteArrayTagSerializable;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementCollection;
-import thederpgamer.decor.utils.SegmentPieceUtils;
-
-import java.io.IOException;
 
 /**
  * <Description>
@@ -17,8 +9,27 @@ import java.io.IOException;
  * @author TheDerpGamer
  * @since 07/19/2021
  */
-public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
+public interface ProjectorDrawData {
 
+    long getIndexAndOrientation();
+    void setIndexAndOrientation(long indexAndOrientation);
+
+    Vector3i getOffset();
+    void setOffset(Vector3i offset);
+
+    Vector3i getRotation();
+    void setRotation(Vector3i rotation);
+
+    int getScale();
+    void setScale(int scale);
+
+    boolean isChanged();
+    void setChanged(boolean changed);
+
+    Transform getTransform();
+    void setTransform(Transform transform);
+
+    /*
     public long indexAndOrientation;
     public Vector3i offset;
     public Vector3i rotation;
@@ -43,4 +54,6 @@ public abstract class ProjectorDrawData implements ByteArrayTagSerializable {
 
     public abstract void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException;
     public abstract void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException;
+
+     */
 }

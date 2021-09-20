@@ -1,10 +1,7 @@
 package thederpgamer.decor.systems.modules;
 
-import api.network.PacketReadBuffer;
-import api.network.PacketWriteBuffer;
-import api.utils.game.module.ModManagerContainerModule;
+import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
-import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -18,15 +15,11 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
-import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.utils.MathUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,21 +28,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @since 08/05/2021
  */
-public class HoloProjectorModule extends ModManagerContainerModule implements ProjectorInterface {
-
-    public final ConcurrentHashMap<Long, HoloProjectorDrawData> projectorMap = new ConcurrentHashMap<>();
+public class HoloProjectorModule extends SimpleDataStorageMCModule implements ProjectorInterface {
 
     public HoloProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Holo Projector").getId());
+        if(!(data instanceof ConcurrentHashMap)) data = new ConcurrentHashMap<>();
     }
 
     @Override
     public void handle(Timer timer) {
         if(isOnServer()) return;
-        for(Map.Entry<Long, HoloProjectorDrawData> entry : projectorMap.entrySet()) {
-            long indexAndOrientation = entry.getKey();
+        ConcurrentHashMap<Long, ProjectorDrawData> map = getProjectorMap();
+        for(ProjectorDrawData projectorData : map.values()) {
+            long indexAndOrientation = projectorData.getIndexAndOrientation();
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
-            HoloProjectorDrawData drawData = entry.getValue();
+            HoloProjectorDrawData drawData = (HoloProjectorDrawData) projectorData;
 
             if(drawData.src != null) {
                 if(drawData.changed || drawData.image == null) {
@@ -81,75 +74,10 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     }
 
     @Override
-    public void handlePlace(long abs, byte orientation) {
-        super.handlePlace(abs, orientation);
-        createNewDrawData(abs);
-    }
-
-    @Override
     public void handleRemove(long abs) {
         super.handleRemove(abs);
-        projectorMap.remove(abs);
-    }
-
-    @Override
-    public void onReceiveDataServer(PacketReadBuffer packetReadBuffer) throws IOException {
-        if(!isOnServer()) return;
-        onTagDeserialize(packetReadBuffer);
-        syncToNearbyClients();
-    }
-
-    @Override
-    public void updateToServer() {
-        if(isOnServer()) return;
-        try {
-            PacketWriteBuffer packetWriteBuffer = openCSBuffer();
-            onTagSerialize(packetWriteBuffer);
-            sendBufferToServer();
-        } catch(IOException exception) {
-            LogManager.logException("Something went wrong while trying to send holo projector data to server", exception);
-        }
-    }
-
-    @Override
-    public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
-        try {
-            //removeInvalidEntries();
-            if(!projectorMap.isEmpty()) {
-                packetWriteBuffer.writeInt(projectorMap.size());
-                for(Map.Entry<Long, HoloProjectorDrawData> entry : projectorMap.entrySet()) {
-                    try {
-                        entry.getValue().onTagSerialize(packetWriteBuffer);
-                    } catch(Exception exception1) {
-                        LogManager.logException("Something went wrong while trying to serialize holo projector data", exception1);
-                    }
-                }
-            } else packetWriteBuffer.writeInt(0);
-        } catch(Exception exception2) {
-            exception2.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        SegmentBufferInterface segmentBuffer = getManagerContainer().getSegmentController().getSegmentBuffer();
-        int size = packetReadBuffer.readInt();
-        for(int i = 0; i < size; i ++) {
-            long indexAndOrientation = packetReadBuffer.readLong();
-            long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
-            SegmentPiece projectorPiece = segmentBuffer.getPointUnsave(absIndex);
-            if(projectorPiece != null && projectorPiece.getType() == getBlockId()) {
-                try {
-                    HoloProjectorDrawData drawData = new HoloProjectorDrawData(packetReadBuffer);
-                    drawData.indexAndOrientation = indexAndOrientation;
-                    projectorMap.put(indexAndOrientation, drawData);
-                    continue;
-                } catch(Exception exception) {
-                    LogManager.logException("Something went wrong while trying to deserialize holo projector data", exception);
-                }
-            }
-            size--; //Skip invalid entry
-        }
+        getProjectorMap().remove(abs);
+        flagUpdatedData();
     }
 
     @Override
@@ -168,13 +96,18 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
     }
 
     @Override
+    public ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap() {
+        return (ConcurrentHashMap<Long, ProjectorDrawData>) data;
+    }
+
+    @Override
     public short getProjectorId() {
         return ElementManager.getBlock("Holo Projector").getId();
     }
 
     @Override
     public ProjectorDrawData getDrawData(long indexAndOrientation) {
-        if(projectorMap.containsKey(indexAndOrientation)) return projectorMap.get(indexAndOrientation);
+        if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
         else return createNewDrawData(indexAndOrientation);
     }
 
@@ -185,22 +118,9 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
 
     @Override
     public void setDrawData(long indexAndOrientation, ProjectorDrawData drawData) {
-        projectorMap.remove(indexAndOrientation);
-        projectorMap.put(indexAndOrientation, (HoloProjectorDrawData) drawData);
-        updateToServer();
-    }
-
-    private void removeInvalidEntries() {
-        short projectorId = getProjectorId();
-        ArrayList<Long> toRemove = new ArrayList<>();
-        for(Long absIndex : blocks.keySet()) {
-            if(!segmentController.getSegmentBuffer().existsPointUnsave(absIndex) || segmentController.getSegmentBuffer().getPointUnsave(absIndex).getType() != projectorId) toRemove.add(absIndex);
-        }
-
-        for(Long entry : toRemove) {
-            projectorMap.remove(ElementCollection.getPosIndexFrom4(entry));
-            blocks.remove(entry);
-        }
+        getProjectorMap().remove(indexAndOrientation);
+        getProjectorMap().put(indexAndOrientation, drawData);
+        flagUpdatedData();
     }
 
     private boolean canDraw(SegmentPiece segmentPiece) {
@@ -211,14 +131,13 @@ public class HoloProjectorModule extends ModManagerContainerModule implements Pr
         return false;
     }
 
-
     private HoloProjectorDrawData createNewDrawData(long indexAndOrientation) {
         long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
         SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);
         HoloProjectorDrawData drawData = new HoloProjectorDrawData(segmentPiece);
         drawData.indexAndOrientation = indexAndOrientation;
-        projectorMap.put(indexAndOrientation, drawData);
-        updateToServer();
+        getProjectorMap().put(indexAndOrientation, drawData);
+        flagUpdatedData();
         return drawData;
     }
 

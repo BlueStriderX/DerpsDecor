@@ -234,7 +234,7 @@ public class DerpsDecor extends StarMod {
                                     ProjectorDrawData drawData = ProjectorUtils.getDrawData(segmentPiece);
                                     if(drawData instanceof HoloProjectorDrawData) {
                                         ((HoloProjectorDrawData) drawData).src = adjacentDrawData.src;
-                                        drawData.changed = true;
+                                        drawData.setChanged(true);
                                     }
                                 }
                             }
@@ -249,7 +249,7 @@ public class DerpsDecor extends StarMod {
                                         if(drawData instanceof TextProjectorDrawData) {
                                             ((TextProjectorDrawData) drawData).text = adjacentDrawData.text;
                                             ((TextProjectorDrawData) drawData).color = adjacentDrawData.color;
-                                            drawData.changed = true;
+                                            drawData.setChanged(true);
                                         }
                                     }
                                 }

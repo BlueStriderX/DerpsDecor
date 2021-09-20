@@ -37,6 +37,8 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
             assert realModule != getModule() : "Uh oh";
             drawData = (HoloProjectorDrawData) realModule.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
         } else drawData = (HoloProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        if(drawData.src == null) drawData.src = "Image";
+
         getConfigPanel().setText(drawData.src);
         getConfigPanel().setXOffset(drawData.offset.x);
         getConfigPanel().setYOffset(drawData.offset.y);

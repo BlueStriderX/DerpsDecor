@@ -110,6 +110,16 @@ public class StrutConnectorModule extends ModManagerContainerModule {
     }
 
     @Override
+    public double getPowerConsumedPerSecondResting() {
+        return 0;
+    }
+
+    @Override
+    public double getPowerConsumedPerSecondCharging() {
+        return 0;
+    }
+
+    @Override
     public String getName() {
         return "StrutConnector_ManagerModule";
     }

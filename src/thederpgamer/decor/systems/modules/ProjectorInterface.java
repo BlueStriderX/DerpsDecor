@@ -3,6 +3,8 @@ package thederpgamer.decor.systems.modules;
 import org.schema.game.common.data.SegmentPiece;
 import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * <Description>
  *
@@ -11,7 +13,7 @@ import thederpgamer.decor.data.drawdata.ProjectorDrawData;
  */
 public interface ProjectorInterface {
 
-    void updateToServer();
+    ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap();
     short getProjectorId();
     ProjectorDrawData getDrawData(long indexAndOrientation);
     ProjectorDrawData getDrawData(SegmentPiece segmentPiece);
