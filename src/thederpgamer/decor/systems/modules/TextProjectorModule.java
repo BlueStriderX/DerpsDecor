@@ -23,7 +23,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -35,7 +34,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
 
     public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
-        if(!(data instanceof ConcurrentHashMap)) data = new ConcurrentHashMap<>();
+        if(!(data instanceof ArrayList)) data = new ArrayList<>();
     }
 
     @Override
