@@ -12,7 +12,6 @@ import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
-import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
@@ -231,10 +230,10 @@ public class DerpsDecor extends StarMod {
                             ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
                             if(!controlling.isEmpty() && adjacentDrawData != null) {
                                 for(SegmentPiece segmentPiece : controlling) {
-                                    ProjectorDrawData drawData = ProjectorUtils.getDrawData(segmentPiece);
+                                    Object drawData = ProjectorUtils.getDrawData(segmentPiece);
                                     if(drawData instanceof HoloProjectorDrawData) {
                                         ((HoloProjectorDrawData) drawData).src = adjacentDrawData.src;
-                                        drawData.setChanged(true);
+                                        ((HoloProjectorDrawData) drawData).changed = true;
                                     }
                                 }
                             }
@@ -245,11 +244,11 @@ public class DerpsDecor extends StarMod {
                                 ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
                                 if(!controlling.isEmpty() && adjacentDrawData != null) {
                                     for(SegmentPiece segmentPiece : controlling) {
-                                        ProjectorDrawData drawData = ProjectorUtils.getDrawData(segmentPiece);
+                                        Object drawData = ProjectorUtils.getDrawData(segmentPiece);
                                         if(drawData instanceof TextProjectorDrawData) {
                                             ((TextProjectorDrawData) drawData).text = adjacentDrawData.text;
                                             ((TextProjectorDrawData) drawData).color = adjacentDrawData.color;
-                                            drawData.setChanged(true);
+                                            ((TextProjectorDrawData) drawData).changed = true;
                                         }
                                     }
                                 }

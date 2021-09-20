@@ -7,7 +7,6 @@ import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
-import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.ProjectorInterface;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
@@ -20,7 +19,7 @@ import thederpgamer.decor.systems.modules.TextProjectorModule;
  */
 public class ProjectorUtils {
 
-    public static ProjectorDrawData getDrawData(SegmentPiece segmentPiece) {
+    public static Object getDrawData(SegmentPiece segmentPiece) {
         SegmentController segmentController = segmentPiece.getSegmentController();
         ManagerContainer<?> managerContainer = null;
         if(segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) managerContainer = ((Ship) segmentController).getManagerContainer();

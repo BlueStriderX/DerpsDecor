@@ -11,7 +11,6 @@ import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.drawdata.DrawDataMap;
-import thederpgamer.decor.data.drawdata.ProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
@@ -41,10 +40,10 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     @Override
     public void handle(Timer timer) {
         if(isOnServer()) return;
-        for(ProjectorDrawData projectorData : getProjectorMap().values()) {
-            long indexAndOrientation = projectorData.getIndexAndOrientation();
+        for(Object obj : getProjectorMap().values()) {
+            TextProjectorDrawData drawData = (TextProjectorDrawData) obj;
+            long indexAndOrientation = drawData.indexAndOrientation;
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
-            TextProjectorDrawData drawData = (TextProjectorDrawData) projectorData;
 
             if(drawData.text != null && drawData.color != null) {
                 if(drawData.changed || drawData.textOverlay == null) {
@@ -105,7 +104,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     }
 
     @Override
-    public ConcurrentHashMap<Long, ProjectorDrawData> getProjectorMap() {
+    public ConcurrentHashMap<Long, Object> getProjectorMap() {
         if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
         if(((DrawDataMap) data).map == null) ((DrawDataMap) data).map = new ConcurrentHashMap<>();
         return ((DrawDataMap) data).map;
@@ -122,18 +121,18 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
     }
 
     @Override
-    public ProjectorDrawData getDrawData(long indexAndOrientation) {
+    public Object getDrawData(long indexAndOrientation) {
         if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
         return createNewDrawData(indexAndOrientation);
     }
 
     @Override
-    public ProjectorDrawData getDrawData(SegmentPiece segmentPiece) {
+    public Object getDrawData(SegmentPiece segmentPiece) {
         return getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
     }
 
     @Override
-    public void setDrawData(long indexAndOrientation, ProjectorDrawData drawData) {
+    public void setDrawData(long indexAndOrientation, Object drawData) {
         removeDrawData(indexAndOrientation);
         getProjectorMap().put(indexAndOrientation, drawData);
         flagUpdatedData();

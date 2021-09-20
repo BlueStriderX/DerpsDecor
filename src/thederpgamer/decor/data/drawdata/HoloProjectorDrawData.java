@@ -13,7 +13,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @author TheDerpGamer
  * @since 07/19/2021
  */
-public class HoloProjectorDrawData extends ProjectorDrawData {
+public class HoloProjectorDrawData {
 
     public long indexAndOrientation;
     public Vector3i offset;
@@ -25,8 +25,14 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
     public transient Transform transform;
     public transient Sprite image;
 
-    public HoloProjectorDrawData() {
-
+    public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, boolean changed, String src) {
+        this.indexAndOrientation = indexAndOrientation;
+        this.offset = offset;
+        this.rotation = rotation;
+        this.scale = scale;
+        this.changed = changed;
+        this.src = src;
+        this.transform = new Transform();
     }
 
     public HoloProjectorDrawData(SegmentPiece segmentPiece) {
@@ -39,65 +45,5 @@ public class HoloProjectorDrawData extends ProjectorDrawData {
         rotation = new Vector3i();
         changed = true;
         src = "Image";
-    }
-
-    @Override
-    public long getIndexAndOrientation() {
-        return indexAndOrientation;
-    }
-
-    @Override
-    public void setIndexAndOrientation(long indexAndOrientation) {
-        this.indexAndOrientation = indexAndOrientation;
-    }
-
-    @Override
-    public Vector3i getOffset() {
-        return offset;
-    }
-
-    @Override
-    public void setOffset(Vector3i offset) {
-        this.offset = offset;
-    }
-
-    @Override
-    public Vector3i getRotation() {
-        return rotation;
-    }
-
-    @Override
-    public void setRotation(Vector3i rotation) {
-        this.rotation = rotation;
-    }
-
-    @Override
-    public int getScale() {
-        return scale;
-    }
-
-    @Override
-    public void setScale(int scale) {
-        this.scale = scale;
-    }
-
-    @Override
-    public boolean isChanged() {
-        return changed;
-    }
-
-    @Override
-    public void setChanged(boolean changed) {
-        this.changed = changed;
-    }
-
-    @Override
-    public Transform getTransform() {
-        return transform;
-    }
-
-    @Override
-    public void setTransform(Transform transform) {
-        this.transform = transform;
     }
 }
