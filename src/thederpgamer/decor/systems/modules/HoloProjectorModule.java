@@ -53,15 +53,13 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
-                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
+                            drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
                             Quat4f currentRot = new Quat4f();
-                            drawData.transform.basis.normalize();
                             drawData.transform.getRotation(currentRot);
                             Quat4f addRot = new Quat4f();
                             QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
                             currentRot.mul(addRot);
-                            currentRot.normalize();
-                            //MathUtils.roundQuat(currentRot);
+                            MathUtils.roundQuat(currentRot);
                             drawData.transform.setRotation(currentRot);
                             drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                             MathUtils.roundVector(drawData.transform.origin);

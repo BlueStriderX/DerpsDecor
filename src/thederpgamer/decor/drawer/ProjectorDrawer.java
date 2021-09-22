@@ -1,7 +1,6 @@
 package thederpgamer.decor.drawer;
 
 import api.utils.draw.ModWorldDrawer;
-import com.bulletphysics.linearmath.QuaternionUtil;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.graphicsengine.core.*;
 import org.schema.schine.graphicsengine.forms.Sprite;
@@ -12,11 +11,8 @@ import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.utils.MathUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,9 +62,8 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                         Sprite image = drawData.image;
                         if(image != null) {
                             float maxDim = Math.max(image.getWidth(), image.getHeight());
-                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
-                            doOffsetAndRotation(drawData);
-                            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / maxDim) * -1, drawData.transform)};
+                            drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
+                            ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
                             image.setTransform(drawData.transform);
                             Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
                         }
@@ -76,8 +71,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                         TextProjectorDrawData drawData = (TextProjectorDrawData) entry.getValue();
                         if(drawData.textOverlay != null) {
                             if(drawData.textOverlay.getFont() == null) drawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + drawData.color)));
-                            drawData.transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
-                            doOffsetAndRotation(drawData);
+                            drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
                             drawData.textOverlay.setTransform(drawData.transform);
                             drawData.textOverlay.draw();
                         }
@@ -86,34 +80,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
             }
             ShaderLibrary.scanlineShader.unload();
         }
-    }
-
-    private void doOffsetAndRotation(HoloProjectorDrawData drawData) {
-        Quat4f currentRot = new Quat4f();
-        drawData.transform.basis.normalize();
-        drawData.transform.getRotation(currentRot);
-        Quat4f addRot = new Quat4f();
-        QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
-        currentRot.mul(addRot);
-        //MathUtils.roundQuat(currentRot);
-        currentRot.normalize();
-        drawData.transform.setRotation(currentRot);
-        drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-        MathUtils.roundVector(drawData.transform.origin);
-    }
-
-    private void doOffsetAndRotation(TextProjectorDrawData drawData) {
-        Quat4f currentRot = new Quat4f();
-        drawData.transform.basis.normalize();
-        drawData.transform.getRotation(currentRot);
-        Quat4f addRot = new Quat4f();
-        QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
-        currentRot.mul(addRot);
-        currentRot.normalize();
-        //MathUtils.roundQuat(currentRot);
-        drawData.transform.setRotation(currentRot);
-        drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-        MathUtils.roundVector(drawData.transform.origin);
     }
 
     @Override

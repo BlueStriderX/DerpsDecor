@@ -1,5 +1,6 @@
 package thederpgamer.decor.utils;
 
+import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.schema.common.FastMath;
@@ -15,6 +16,7 @@ import org.schema.game.common.data.world.SegmentData;
 import org.schema.game.common.util.FastCopyLongOpenHashSet;
 
 import javax.vecmath.Matrix3f;
+import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
 
@@ -90,15 +92,14 @@ public class SegmentPieceUtils {
     }
 
     /**
-     * Gets the full Transform of a SegmentPiece, including both it's position and rotation.
-     * @param segmentPiece The SegmentPiece to get the transform of
-     * @return The full transform of the SegmentPiece
+     * Gets the full Transform of a Projector.
+     * @param segmentPiece The SegmentPiece
+     * @return The full transform of the Projector
      */
-    public static Transform getFullPieceTransform(SegmentPiece segmentPiece) {
+    public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
         Transform transform = new Transform();
         transform.setIdentity();
-        transform.basis.set(segmentPiece.getSegmentController().getWorldTransform().basis);
-        transform.basis.normalize();
+        segmentPiece.getTransform(transform);
         ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
         transform.origin.x -= SegmentData.SEG_HALF;
         transform.origin.y -= SegmentData.SEG_HALF;
@@ -107,6 +108,15 @@ public class SegmentPieceUtils {
         float sNormalDir = 0.51f;
         float sVertical = 0.5f;
         float sHorizontal = 0.5f;
+
+        transform.origin.add(offset.toVector3f());
+        Quat4f currentRot = new Quat4f();
+        transform.getRotation(currentRot);
+        Quat4f addRot = new Quat4f();
+        QuaternionUtil.setEuler(addRot, rotation.y / 100.0f, rotation.z / 100.0f, rotation.x / 100.0f);
+        currentRot.mul(addRot);
+        MathUtils.roundQuat(currentRot);
+        transform.setRotation(currentRot);
         
         int orientation = segmentPiece.getOrientation();
         switch(orientation) { 

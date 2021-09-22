@@ -38,15 +38,15 @@ public class TextProjectorDrawData {
     }
 
     public TextProjectorDrawData(SegmentPiece segmentPiece) {
-        if(segmentPiece != null) {
-            indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-            transform = SegmentPieceUtils.getFullPieceTransform(segmentPiece);
-        }
         scale = 1;
         offset = new Vector3i();
         rotation = new Vector3i();
         changed = true;
         text = "";
         color = "FFFFFF";
+        if(segmentPiece != null) {
+            indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
+            transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation);
+        }
     }
 }
