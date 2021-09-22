@@ -90,11 +90,13 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
     private void doOffsetAndRotation(HoloProjectorDrawData drawData) {
         Quat4f currentRot = new Quat4f();
+        drawData.transform.basis.normalize();
         drawData.transform.getRotation(currentRot);
         Quat4f addRot = new Quat4f();
         QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
         currentRot.mul(addRot);
-        MathUtils.roundQuat(currentRot);
+        //MathUtils.roundQuat(currentRot);
+        currentRot.normalize();
         drawData.transform.setRotation(currentRot);
         drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
         MathUtils.roundVector(drawData.transform.origin);
@@ -102,11 +104,13 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
     private void doOffsetAndRotation(TextProjectorDrawData drawData) {
         Quat4f currentRot = new Quat4f();
+        drawData.transform.basis.normalize();
         drawData.transform.getRotation(currentRot);
         Quat4f addRot = new Quat4f();
         QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
         currentRot.mul(addRot);
-        MathUtils.roundQuat(currentRot);
+        currentRot.normalize();
+        //MathUtils.roundQuat(currentRot);
         drawData.transform.setRotation(currentRot);
         drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
         MathUtils.roundVector(drawData.transform.origin);

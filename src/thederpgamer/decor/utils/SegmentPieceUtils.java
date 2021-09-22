@@ -98,6 +98,7 @@ public class SegmentPieceUtils {
         Transform transform = new Transform();
         transform.setIdentity();
         transform.basis.set(segmentPiece.getSegmentController().getWorldTransform().basis);
+        transform.basis.normalize();
         ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
         transform.origin.x -= SegmentData.SEG_HALF;
         transform.origin.y -= SegmentData.SEG_HALF;

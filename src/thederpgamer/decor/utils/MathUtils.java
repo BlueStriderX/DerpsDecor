@@ -1,5 +1,6 @@
 package thederpgamer.decor.utils;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.math.BigDecimal;
@@ -35,5 +36,10 @@ public class MathUtils {
         BigDecimal bdY = new BigDecimal(out.y);
         BigDecimal bdZ = new BigDecimal(out.z);
         out.set(bdX.round(context).floatValue(), bdY.round(context).floatValue(), bdZ.round(context).floatValue());
+    }
+
+    public static void roundMatrix(Matrix3f out) {
+        MathContext context = new MathContext(0, roundingMode);
+        out.normalize();
     }
 }
