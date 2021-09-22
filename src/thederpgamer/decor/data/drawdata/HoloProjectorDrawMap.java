@@ -7,15 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author TheDerpGamer
  */
-public class DrawDataMap {
+public class HoloProjectorDrawMap {
 
-    public ConcurrentHashMap<Long, Object> map;
+    public ConcurrentHashMap<Long, HoloProjectorDrawData> map;
 
-    public DrawDataMap() {
+    public HoloProjectorDrawMap() {
         map = new ConcurrentHashMap<>();
     }
 
-    public DrawDataMap(ConcurrentHashMap<Long, Object> map) {
+    public HoloProjectorDrawMap(ConcurrentHashMap<Long, HoloProjectorDrawData> map) {
         this.map = map;
     }
 }

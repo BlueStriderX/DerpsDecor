@@ -9,7 +9,7 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import thederpgamer.decor.DerpsDecor;
-import thederpgamer.decor.data.drawdata.DrawDataMap;
+import thederpgamer.decor.data.drawdata.HoloProjectorDrawMap;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
@@ -28,11 +28,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @since 08/05/2021
  */
-public class HoloProjectorModule extends SimpleDataStorageMCModule implements ProjectorInterface {
+public class HoloProjectorModule extends SimpleDataStorageMCModule {
 
     public HoloProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Holo Projector").getId());
-        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
+        if(!(data instanceof HoloProjectorDrawMap)) data = new HoloProjectorDrawMap();
     }
 
     @Override
@@ -94,36 +94,30 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule implements Pr
         return "HoloProjector_ManagerModule";
     }
 
-    @Override
-    public ConcurrentHashMap<Long, Object> getProjectorMap() {
-        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
-        if(((DrawDataMap) data).map == null) ((DrawDataMap) data).map = new ConcurrentHashMap<>();
-        return ((DrawDataMap) data).map;
+    public ConcurrentHashMap<Long, HoloProjectorDrawData> getProjectorMap() {
+        if(!(data instanceof HoloProjectorDrawMap)) data = new HoloProjectorDrawMap();
+        if(((HoloProjectorDrawMap) data).map == null) ((HoloProjectorDrawMap) data).map = new ConcurrentHashMap<>();
+        return ((HoloProjectorDrawMap) data).map;
     }
 
-    @Override
     public short getProjectorId() {
         return ElementManager.getBlock("Holo Projector").getId();
     }
 
-    @Override
     public void removeDrawData(long indexAndOrientation) {
         getProjectorMap().remove(indexAndOrientation);
     }
 
-    @Override
     public Object getDrawData(long indexAndOrientation) {
         if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
         return createNewDrawData(indexAndOrientation);
     }
 
-    @Override
     public Object getDrawData(SegmentPiece segmentPiece) {
         return getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
     }
 
-    @Override
-    public void setDrawData(long indexAndOrientation, Object drawData) {
+    public void setDrawData(long indexAndOrientation, HoloProjectorDrawData drawData) {
         removeDrawData(indexAndOrientation);
         getProjectorMap().put(indexAndOrientation, drawData);
         flagUpdatedData();

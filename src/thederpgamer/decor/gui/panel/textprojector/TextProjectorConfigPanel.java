@@ -327,8 +327,8 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     }
 
     public void setColor(String color) {
-        if(color != null) textInput.setTextWithoutCallback(color);
-        else textInput.setTextWithoutCallback("FFFFFF");
+        if(color != null) colorInput.setTextWithoutCallback(color);
+        else colorInput.setTextWithoutCallback("FFFFFF");
     }
 
     public String getText() {

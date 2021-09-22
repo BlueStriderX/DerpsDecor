@@ -46,7 +46,7 @@ public class TextProjectorDrawData {
         offset = new Vector3i();
         rotation = new Vector3i();
         changed = true;
-        text = "Text";
+        text = "";
         color = "FFFFFF";
     }
 }

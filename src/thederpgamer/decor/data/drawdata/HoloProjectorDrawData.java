@@ -44,6 +44,6 @@ public class HoloProjectorDrawData {
         offset = new Vector3i();
         rotation = new Vector3i();
         changed = true;
-        src = "Image";
+        src = "";
     }
 }

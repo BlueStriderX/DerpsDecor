@@ -10,8 +10,8 @@ import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import thederpgamer.decor.DerpsDecor;
-import thederpgamer.decor.data.drawdata.DrawDataMap;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
+import thederpgamer.decor.data.drawdata.TextProjectorDrawMap;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
@@ -30,11 +30,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @since 07/18/2021
  */
-public class TextProjectorModule extends SimpleDataStorageMCModule implements ProjectorInterface {
+public class TextProjectorModule extends SimpleDataStorageMCModule {
 
     public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
         super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
-        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
+        if(!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
     }
 
     @Override
@@ -50,7 +50,12 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                     textOverlay.onInit();
                     int trueSize = drawData.scale + 10;
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.decode("0x" + drawData.color)));
+                    try {
+                        textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.decode("0x" + drawData.color)));
+                    } catch(Exception exception) {
+                        textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.white));
+                        drawData.color = "FFFFFF";
+                    }
                     textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
                     textOverlay.setTextSimple(drawData.text);
                     textOverlay.setBlend(true);
@@ -103,36 +108,30 @@ public class TextProjectorModule extends SimpleDataStorageMCModule implements Pr
         return "TextProjector_ManagerModule";
     }
 
-    @Override
-    public ConcurrentHashMap<Long, Object> getProjectorMap() {
-        if(!(data instanceof DrawDataMap)) data = new DrawDataMap();
-        if(((DrawDataMap) data).map == null) ((DrawDataMap) data).map = new ConcurrentHashMap<>();
-        return ((DrawDataMap) data).map;
+    public ConcurrentHashMap<Long, TextProjectorDrawData> getProjectorMap() {
+        if(!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
+        if(((TextProjectorDrawMap) data).map == null) ((TextProjectorDrawMap) data).map = new ConcurrentHashMap<>();
+        return ((TextProjectorDrawMap) data).map;
     }
 
-    @Override
     public short getProjectorId() {
         return ElementManager.getBlock("Text Projector").getId();
     }
 
-    @Override
     public void removeDrawData(long indexAndOrientation) {
         getProjectorMap().remove(indexAndOrientation);
     }
 
-    @Override
     public Object getDrawData(long indexAndOrientation) {
         if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
         return createNewDrawData(indexAndOrientation);
     }
 
-    @Override
     public Object getDrawData(SegmentPiece segmentPiece) {
         return getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
     }
 
-    @Override
-    public void setDrawData(long indexAndOrientation, Object drawData) {
+    public void setDrawData(long indexAndOrientation, TextProjectorDrawData drawData) {
         removeDrawData(indexAndOrientation);
         getProjectorMap().put(indexAndOrientation, drawData);
         flagUpdatedData();
