@@ -59,7 +59,11 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                 else {
                     if(entry.getValue() instanceof HoloProjectorDrawData) {
                         HoloProjectorDrawData drawData = (HoloProjectorDrawData) entry.getValue();
-                        Sprite image = drawData.image;
+                        Sprite image;
+                        if(drawData.src.endsWith(".gif")) {
+                            drawData.nextFrame();
+                            image = drawData.getCurrentFrame();
+                        } else image = drawData.image;
                         if(image != null) {
                             float maxDim = Math.max(image.getWidth(), image.getHeight());
                             drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);

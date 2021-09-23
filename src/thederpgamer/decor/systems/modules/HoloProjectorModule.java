@@ -7,10 +7,9 @@ import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.Timer;
-import org.schema.schine.graphicsengine.forms.Sprite;
 import thederpgamer.decor.DerpsDecor;
-import thederpgamer.decor.data.drawdata.HoloProjectorDrawMap;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
+import thederpgamer.decor.data.drawdata.HoloProjectorDrawMap;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
@@ -44,9 +43,9 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
             if(drawData.src != null) {
-                if(drawData.changed || drawData.image == null) {
-                    Sprite image = ImageManager.getImage(drawData.src);
-                    if(image != null) drawData.image = image;
+                if(drawData.changed || (drawData.image == null && !drawData.src.endsWith(".gif")) || (drawData.frames == null && drawData.src.endsWith(".gif"))) {
+                    if(drawData.src.endsWith(".gif")) drawData.frames = ImageManager.getAnimatedImage(drawData.src);
+                    else drawData.image = ImageManager.getImage(drawData.src);
                 }
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {

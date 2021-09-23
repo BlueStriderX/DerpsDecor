@@ -5,6 +5,7 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.forms.Sprite;
+import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 /**
@@ -25,6 +26,9 @@ public class HoloProjectorDrawData {
     public transient Transform transform;
     public transient Sprite image;
 
+    public transient Sprite[] frames;
+    public transient int currentFrame;
+
     public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, boolean changed, String src) {
         this.indexAndOrientation = indexAndOrientation;
         this.offset = offset;
@@ -44,6 +48,26 @@ public class HoloProjectorDrawData {
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
             transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation);
+        }
+    }
+
+    public void nextFrame() {
+        if(!src.endsWith(".gif") || frames == null) currentFrame = 0;
+        else {
+            if(currentFrame < frames.length) currentFrame ++;
+            else currentFrame = 0;
+        }
+    }
+
+    public Sprite getCurrentFrame() {
+        if(!src.endsWith(".gif")) return image;
+        else {
+            if(frames == null) frames = ImageManager.getAnimatedImage(src);
+            if(frames == null) return image;
+            else {
+                if(currentFrame < frames.length) return frames[currentFrame];
+                else return frames[frames.length - 1];
+            }
         }
     }
 }
