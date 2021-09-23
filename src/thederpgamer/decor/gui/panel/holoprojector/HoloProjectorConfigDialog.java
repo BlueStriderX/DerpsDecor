@@ -1,7 +1,6 @@
 package thederpgamer.decor.gui.panel.holoprojector;
 
 import api.common.GameClient;
-import api.common.GameCommon;
 import api.utils.gui.GUIInputDialog;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.common.util.linAlg.Vector3i;
@@ -30,14 +29,10 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
     public void setSegmentPiece(SegmentPiece segmentPiece) {
         this.segmentPiece = segmentPiece;
 
-        HoloProjectorDrawData drawData;
-        if(GameCommon.isOnSinglePlayer()) {
-            ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) GameCommon.getGameObject(getModule().getManagerContainer().getSegmentController().getId());
-            HoloProjectorModule realModule = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-            assert realModule != getModule() : "Uh oh";
-            drawData = (HoloProjectorDrawData) realModule.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-        } else drawData = (HoloProjectorDrawData) getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-        if(drawData.src == null) drawData.src = "";
+        ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
+        HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
+        HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+        setDefaults(drawData);
 
         getConfigPanel().setText(drawData.src);
         getConfigPanel().setXOffset(drawData.offset.x);
@@ -47,6 +42,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
         getConfigPanel().setYRot(drawData.rotation.y);
         getConfigPanel().setZRot(drawData.rotation.z);
         getConfigPanel().setScaleSetting(drawData.scale);
+        getConfigPanel().setHolographic(drawData.holographic);
     }
 
     @Override
@@ -69,6 +65,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
                         drawData.offset = new Vector3i(getConfigPanel().getXOffset(), getConfigPanel().getYOffset(), getConfigPanel().getZOffset());
                         drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
                         drawData.scale = getConfigPanel().getScaleSetting();
+                        drawData.holographic = getConfigPanel().getHolographic();
                         drawData.changed = true;
                         getModule().setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
                         deactivate();
@@ -94,5 +91,11 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
         } else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
             return (HoloProjectorModule) ((SpaceStation) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
         } else return null;
+    }
+
+    private void setDefaults(HoloProjectorDrawData drawData) {
+        if(drawData.offset == null) drawData.offset = new Vector3i();
+        if(drawData.rotation == null) drawData.rotation = new Vector3i();
+        if(drawData.src == null) drawData.src = "";
     }
 }

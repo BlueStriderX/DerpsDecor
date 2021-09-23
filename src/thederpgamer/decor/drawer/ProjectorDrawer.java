@@ -51,8 +51,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
     @Override
     public void draw() {
         if(!drawMap.isEmpty()) {
-            ShaderLibrary.scanlineShader.setShaderInterface(this);
-            ShaderLibrary.scanlineShader.load();
             for(Map.Entry<SegmentPiece, Object> entry : drawMap.entrySet()) {
                 SegmentPiece segmentPiece = entry.getKey();
                 if(!segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) || segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() != segmentPiece.getType() || segmentPiece.isActive() || !segmentPiece.getSegmentController().isFullyLoaded()) drawMap.remove(segmentPiece);
@@ -65,24 +63,33 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                             image = drawData.getCurrentFrame();
                         } else image = drawData.image;
                         if(image != null) {
+                            if(drawData.holographic) {
+                                ShaderLibrary.scanlineShader.setShaderInterface(this);
+                                ShaderLibrary.scanlineShader.load();
+                            }
                             float maxDim = Math.max(image.getWidth(), image.getHeight());
                             drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
                             ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
                             image.setTransform(drawData.transform);
                             Sprite.draw3D(image, subSprite, 1, Controller.getCamera());
+                            if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
                         }
                     } else if(entry.getValue() instanceof TextProjectorDrawData) {
                         TextProjectorDrawData drawData = (TextProjectorDrawData) entry.getValue();
                         if(drawData.textOverlay != null) {
+                            if(drawData.holographic) {
+                                ShaderLibrary.scanlineShader.setShaderInterface(this);
+                                ShaderLibrary.scanlineShader.load();
+                            }
                             if(drawData.textOverlay.getFont() == null) drawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + drawData.color)));
                             drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
                             drawData.textOverlay.setTransform(drawData.transform);
                             drawData.textOverlay.draw();
+                            if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
                         }
                     }
                 }
             }
-            ShaderLibrary.scanlineShader.unload();
         }
     }
 

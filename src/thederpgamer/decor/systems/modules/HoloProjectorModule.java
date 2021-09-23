@@ -143,4 +143,13 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
     private ProjectorDrawer getProjectorDrawer() {
         return GlobalDrawManager.getProjectorDrawer();
     }
+
+    public void resetAllProjectors() {
+        try {
+            getProjectorMap().clear();
+            flagUpdatedData();
+        } catch(Exception exception) {
+            exception.printStackTrace();
+        }
+    }
 }

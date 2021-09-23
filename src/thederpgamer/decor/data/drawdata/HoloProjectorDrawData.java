@@ -20,22 +20,24 @@ public class HoloProjectorDrawData {
     public Vector3i offset;
     public Vector3i rotation;
     public int scale;
-    public boolean changed;
     public String src;
+    public boolean holographic;
+    public boolean changed;
 
     public transient Transform transform;
     public transient Sprite image;
 
-    public transient Sprite[] frames;
     public transient int currentFrame;
+    public transient Sprite[] frames;
 
-    public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, boolean changed, String src) {
+    public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, String src, boolean holographic, boolean changed) {
         this.indexAndOrientation = indexAndOrientation;
         this.offset = offset;
         this.rotation = rotation;
         this.scale = scale;
-        this.changed = changed;
         this.src = src;
+        this.changed = changed;
+        this.holographic = holographic;
         this.transform = new Transform();
     }
 
@@ -43,8 +45,9 @@ public class HoloProjectorDrawData {
         scale = 1;
         offset = new Vector3i();
         rotation = new Vector3i();
-        changed = true;
         src = "";
+        holographic = true;
+        changed = true;
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
             transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation);

@@ -1,15 +1,15 @@
 package thederpgamer.decor.gui.panel.holoprojector;
 
 import api.utils.gui.GUIInputDialogPanel;
+import org.schema.game.client.view.gui.advanced.tools.CheckboxCallback;
+import org.schema.game.client.view.gui.advanced.tools.CheckboxResult;
+import org.schema.game.client.view.gui.advanced.tools.GUIAdvCheckbox;
 import org.schema.game.client.view.gui.buildtools.GUIBuildToolSettingSelector;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
-import org.schema.schine.graphicsengine.forms.gui.GUICallback;
-import org.schema.schine.graphicsengine.forms.gui.GUIElement;
-import org.schema.schine.graphicsengine.forms.gui.GUITextButton;
-import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
+import org.schema.schine.graphicsengine.forms.gui.*;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIActivatableTextBar;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIContentPane;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUIDialogWindow;
@@ -34,9 +34,10 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
     private GUIMinMaxSetting yRotSetting;
     private GUIMinMaxSetting zRotSetting;
     private GUIMinMaxSetting scaleSetting;
+    private boolean holographic;
 
     public HoloProjectorConfigPanel(InputState inputState, GUICallback guiCallback) {
-        super(inputState, "holoprojectorconfigpanel", "Holo Projector Configuration", "", 500, 500, guiCallback);
+        super(inputState, "holoprojectorconfigpanel", "Holo Projector Configuration", "", 500, 530, guiCallback);
     }
 
     @Override
@@ -123,6 +124,42 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
         scaleSelector.getPos().x = yOffsetSelector.getPos().x;
         scaleSelector.getPos().y += 250;
         contentPane.getContent(0).attach(scaleSelector);
+
+        GUIAdvCheckbox holographicSetting = new GUIAdvCheckbox(getState(), contentPane.getContent(0), new CheckboxResult() {
+            @Override
+            public boolean getCurrentValue() {
+                return holographic;
+            }
+
+            @Override
+            public void setCurrentValue(boolean b) {
+                holographic = b;
+            }
+
+            @Override
+            public boolean getDefault() {
+                return true;
+            }
+
+            @Override
+            public CheckboxCallback initCallback() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return "Holographic";
+            }
+
+            @Override
+            public String getToolTipText() {
+                return "Whether to use the hologram shader.";
+            }
+        });
+        holographicSetting.onInit();
+        holographicSetting.getPos().x = yOffsetSelector.getPos().x;
+        holographicSetting.getPos().y = scaleSelector.getPos().y + 60;
+        contentPane.getContent(0).attach(holographicSetting);
 
         GUITextButton copySettingsButton = new GUITextButton(getState(), 150, 30, GUITextButton.ColorPalette.OK, "COPY SETTINGS", new GUICallback() {
             @Override
@@ -295,6 +332,14 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
     public void setText(String text) {
         if(text != null) textInput.setTextWithoutCallback(text);
         else textInput.setTextWithoutCallback("");
+    }
+
+    public boolean getHolographic() {
+        return holographic;
+    }
+
+    public void setHolographic(boolean holographic) {
+        this.holographic = holographic;
     }
 
     public String getValues() {

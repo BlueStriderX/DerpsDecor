@@ -1,6 +1,9 @@
 package thederpgamer.decor.gui.panel.textprojector;
 
 import api.utils.gui.GUIInputDialogPanel;
+import org.schema.game.client.view.gui.advanced.tools.CheckboxCallback;
+import org.schema.game.client.view.gui.advanced.tools.CheckboxResult;
+import org.schema.game.client.view.gui.advanced.tools.GUIAdvCheckbox;
 import org.schema.game.client.view.gui.buildtools.GUIBuildToolSettingSelector;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.core.MouseEvent;
@@ -17,6 +20,7 @@ import org.schema.schine.input.InputState;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.gui.elements.GUIMinMaxSetting;
 import thederpgamer.decor.manager.ConfigManager;
+
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
@@ -38,9 +42,10 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     private GUIMinMaxSetting yRotSetting;
     private GUIMinMaxSetting zRotSetting;
     private GUIMinMaxSetting scaleSetting;
+    private boolean holographic;
 
     public TextProjectorConfigPanel(InputState inputState, GUICallback guiCallback) {
-        super(inputState, "textprojectorconfigpanel", "Text Projector Configuration", "", 500, 500, guiCallback);
+        super(inputState, "textprojectorconfigpanel", "Text Projector Configuration", "", 500, 530, guiCallback);
     }
 
     @Override
@@ -157,6 +162,42 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
         scaleSelector.getPos().x = yOffsetSelector.getPos().x;
         scaleSelector.getPos().y += 350;
         contentPane.getContent(0).attach(scaleSelector);
+
+        GUIAdvCheckbox holographicSetting = new GUIAdvCheckbox(getState(), contentPane.getContent(0), new CheckboxResult() {
+            @Override
+            public boolean getCurrentValue() {
+                return holographic;
+            }
+
+            @Override
+            public void setCurrentValue(boolean b) {
+                holographic = b;
+            }
+
+            @Override
+            public boolean getDefault() {
+                return true;
+            }
+
+            @Override
+            public CheckboxCallback initCallback() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return "Holographic";
+            }
+
+            @Override
+            public String getToolTipText() {
+                return "Whether to use the hologram shader.";
+            }
+        });
+        holographicSetting.onInit();
+        holographicSetting.getPos().x = yOffsetSelector.getPos().x;
+        holographicSetting.getPos().y = scaleSelector.getPos().y + 60;
+        contentPane.getContent(0).attach(holographicSetting);
 
         GUITextButton copySettingsButton = new GUITextButton(getState(), 150, 30, GUITextButton.ColorPalette.OK, "COPY SETTINGS", new GUICallback() {
             @Override
@@ -339,6 +380,14 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     public void setText(String text) {
         if(text != null) textInput.setTextWithoutCallback(text);
         else textInput.setTextWithoutCallback("");
+    }
+
+    public boolean getHolographic() {
+        return holographic;
+    }
+
+    public void setHolographic(boolean holographic) {
+        this.holographic = holographic;
     }
 
     public String getValues() {

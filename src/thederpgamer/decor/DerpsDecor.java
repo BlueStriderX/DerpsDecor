@@ -11,6 +11,7 @@ import api.mod.StarMod;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
+import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.drawer.GlobalDrawManager;
@@ -58,6 +59,7 @@ public class DerpsDecor extends StarMod {
         LogManager.initialize();
         SegmentPieceUtils.initialize();
         registerListeners();
+        registerCommands();
     }
 
     @Override
@@ -292,5 +294,9 @@ public class DerpsDecor extends StarMod {
             }
         }, this);
          */
+    }
+
+    private void registerCommands() {
+        StarLoader.registerCommand(new ClearProjectorsCommand());
     }
 }
