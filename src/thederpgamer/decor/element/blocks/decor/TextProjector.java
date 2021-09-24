@@ -27,9 +27,12 @@ public class TextProjector extends Block implements ActivationInterface {
     @Override
     public void initialize() {
         if(GraphicsContext.initialized) {
-            blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-            blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
-            blockInfo.setBuildIconNum(ResourceManager.getTexture("text-projector-icon").getTextureId());
+            try {
+                blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
+                blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
+                blockInfo.setBuildIconNum(ResourceManager.getTexture("text-projector-icon").getTextureId());
+
+            } catch(Exception ignored) { }
         }
         blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.");
         blockInfo.setInRecipe(true);

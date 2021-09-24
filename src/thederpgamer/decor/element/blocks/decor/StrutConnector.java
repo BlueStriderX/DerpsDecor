@@ -23,7 +23,9 @@ public class StrutConnector extends Block {
     @Override
     public void initialize() {
         if(GraphicsContext.initialized) {
-            blockInfo.setBuildIconNum(ResourceManager.getTexture("strut-connector-icon").getTextureId());
+            try {
+                blockInfo.setBuildIconNum(ResourceManager.getTexture("strut-connector-icon").getTextureId());
+            } catch(Exception ignored) { }
         }
         blockInfo.setDescription("Place two of these down and activate each while holding paint to create a colored strut in-between them.");
         blockInfo.setCanActivate(true);

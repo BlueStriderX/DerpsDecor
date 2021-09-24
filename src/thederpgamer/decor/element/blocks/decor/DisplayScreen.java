@@ -23,7 +23,9 @@ public class DisplayScreen extends Block {
     @Override
     public void initialize() {
         if(GraphicsContext.initialized) {
-            blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
+            try {
+                blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
+            } catch(Exception ignored) { }
         }
         blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
         blockInfo.setCanActivate(true);

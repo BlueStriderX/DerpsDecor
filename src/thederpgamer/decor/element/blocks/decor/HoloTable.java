@@ -24,7 +24,9 @@ public class HoloTable extends Block {
     @Override
     public void initialize() {
         if(GraphicsContext.initialized) {
-            blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
+            try {
+                blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
+            } catch(Exception ignored) { }
         }
         blockInfo.setDescription("A decorative hologram table.");
         blockInfo.setInRecipe(true);
@@ -39,8 +41,8 @@ public class HoloTable extends Block {
 
         BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
                               new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-                              new FactoryResource(1, (short) 660));
-
+                              new FactoryResource(1, (short) 660)
+        );
         BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_table", null);
         BlockConfig.add(blockInfo);
     }
