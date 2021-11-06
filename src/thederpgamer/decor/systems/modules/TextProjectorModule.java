@@ -45,7 +45,6 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
             long indexAndOrientation = drawData.indexAndOrientation;
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-            if(!drawData.changed || segmentController.getSegmentBuffer().getPointUnsave(index).isActive()) continue;
             if(drawData.text != null && drawData.color != null) {
                 GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                 textOverlay.onInit();
