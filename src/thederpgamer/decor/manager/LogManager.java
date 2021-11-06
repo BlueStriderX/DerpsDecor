@@ -1,5 +1,7 @@
 package thederpgamer.decor.manager;
 
+import api.DebugFile;
+import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.utils.DataUtils;
 import thederpgamer.decor.utils.DateUtils;
 import thederpgamer.decor.utils.MessageType;
@@ -77,7 +79,7 @@ public class LogManager {
             } else {
                 builder.append(message);
             }
-            System.out.println(builder.toString());
+            DebugFile.log(builder.toString(), DerpsDecor.getInstance());
             logWriter.append(builder.toString()).append("\n");
             logWriter.flush();
         } catch(IOException var3) {

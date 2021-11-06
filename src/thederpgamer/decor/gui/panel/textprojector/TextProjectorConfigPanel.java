@@ -391,7 +391,7 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
     }
 
     public String getValues() {
-        return getXOffset() + "~" + getYOffset() + "~" + getZOffset() + "~" + getXRot() + "~" + getYRot() + "~" + getZRot() + "~" + getScaleSetting() + "~" + getColor() + "~" + getText();
+        return getXOffset() + "~" + getYOffset() + "~" + getZOffset() + "~" + getXRot() + "~" + getYRot() + "~" + getZRot() + "~" + getScaleSetting() + "~" + getColor() + "~" + getText() + "~" + getHolographic();
     }
 
     public void setValues(String s) {
@@ -407,6 +407,7 @@ public class TextProjectorConfigPanel extends GUIInputDialogPanel implements Cli
                 setScaleSetting(Integer.parseInt(values[6]));
                 setColor(values[7]);
                 setText(values[8]);
+                setHolographic(Boolean.parseBoolean(values[9]));
             } catch(Exception ignored) { }
         }
     }

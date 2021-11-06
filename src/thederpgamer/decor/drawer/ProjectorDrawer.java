@@ -57,6 +57,10 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                 else {
                     if(entry.getValue() instanceof HoloProjectorDrawData) {
                         HoloProjectorDrawData drawData = (HoloProjectorDrawData) entry.getValue();
+                        if(drawData.changed || segmentPiece.isActive()) {
+                            drawMap.remove(entry.getKey()); //Force an update next frame
+                            continue;
+                        }
                         Sprite image;
                         if(drawData.src.endsWith(".gif")) {
                             drawData.nextFrame();
@@ -76,12 +80,16 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                         }
                     } else if(entry.getValue() instanceof TextProjectorDrawData) {
                         TextProjectorDrawData drawData = (TextProjectorDrawData) entry.getValue();
+                        if(drawData.changed || segmentPiece.isActive()) {
+                            drawMap.remove(entry.getKey()); //Force an update next frame
+                            continue;
+                        }
                         if(drawData.textOverlay != null) {
                             if(drawData.holographic) {
                                 ShaderLibrary.scanlineShader.setShaderInterface(this);
                                 ShaderLibrary.scanlineShader.load();
                             }
-                            if(drawData.textOverlay.getFont() == null) drawData.textOverlay.setFont(ResourceManager.getFont("Monda-Bold", drawData.scale + 10, Color.decode("0x" + drawData.color)));
+                            if(drawData.textOverlay.getFont() == null) drawData.textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", drawData.scale + 10, Color.decode("0x" + drawData.color)));
                             drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
                             drawData.textOverlay.setTransform(drawData.transform);
                             drawData.textOverlay.draw();

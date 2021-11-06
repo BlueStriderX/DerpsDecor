@@ -45,23 +45,22 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
             long indexAndOrientation = drawData.indexAndOrientation;
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
+            if(!drawData.changed || segmentController.getSegmentBuffer().getPointUnsave(index).isActive()) continue;
             if(drawData.text != null && drawData.color != null) {
-                if(drawData.changed || drawData.textOverlay == null) {
-                    GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-                    textOverlay.onInit();
-                    int trueSize = drawData.scale + 10;
-                    try {
-                        textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.decode("0x" + drawData.color)));
-                    } catch(Exception exception) {
-                        textOverlay.setFont(ResourceManager.getFont("Monda-Bold", trueSize, Color.white));
-                        drawData.color = "FFFFFF";
-                    }
-                    textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
-                    textOverlay.setTextSimple(drawData.text);
-                    textOverlay.setBlend(true);
-                    textOverlay.doDepthTest = true;
-                    drawData.textOverlay = textOverlay;
+                GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
+                textOverlay.onInit();
+                int trueSize = drawData.scale + 10;
+                try {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
+                } catch(Exception exception) {
+                    textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
+                    drawData.color = "FFFFFF";
                 }
+                textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
+                textOverlay.setTextSimple(drawData.text);
+                textOverlay.setBlend(true);
+                textOverlay.doDepthTest = true;
+                drawData.textOverlay = textOverlay;
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
@@ -78,8 +77,8 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
                             drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                             MathUtils.roundVector(drawData.transform.origin);
                             drawData.changed = false;
+                            getProjectorDrawer().addDraw(segmentPiece, drawData);
                         }
-                        getProjectorDrawer().addDraw(segmentPiece, drawData);
                     }
                 }
             }

@@ -63,8 +63,8 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
                             drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                             MathUtils.roundVector(drawData.transform.origin);
                             drawData.changed = false;
+                            getProjectorDrawer().addDraw(segmentPiece, drawData);
                         }
-                        getProjectorDrawer().addDraw(segmentPiece, drawData);
                     }
                 }
             }

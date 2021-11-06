@@ -343,7 +343,7 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
     }
 
     public String getValues() {
-        return getXOffset() + "~" + getYOffset() + "~" + getZOffset() + "~" + getXRot() + "~" + getYRot() + "~" + getZRot() + "~" + getScaleSetting() + "~" + getText();
+        return getXOffset() + "~" + getYOffset() + "~" + getZOffset() + "~" + getXRot() + "~" + getYRot() + "~" + getZRot() + "~" + getScaleSetting() + "~" + getText() + "~" + getHolographic();
     }
 
     public void setValues(String s) {
@@ -358,6 +358,7 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
                 setZRot(Integer.parseInt(values[5]));
                 setScaleSetting(Integer.parseInt(values[6]));
                 setText(values[7]);
+                setHolographic(Boolean.parseBoolean(values[8]));
             } catch(Exception ignored) { }
         }
     }

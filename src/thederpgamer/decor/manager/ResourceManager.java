@@ -30,7 +30,8 @@ public class ResourceManager {
             "text-projector-icon",
             "strut-connector-icon",
             "display-screen-icon",
-            "holo-table-icon"
+            "holo-table-icon",
+            "cake-icon"
     };
 
     private static final String[] spriteNames = {
@@ -42,12 +43,13 @@ public class ResourceManager {
             "strut_connector",
             "strut_tube",
             "display_screen",
-            "holo_table"
+            "holo_table",
+            "cake"
     };
 
     private static final String[] fontNames = {
-            "Monda-Regular",
-            "Monda-Bold"
+            "Monda-Extended-Regular",
+            "Monda-Extended-Bold"
     };
 
     private static final HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
@@ -56,6 +58,14 @@ public class ResourceManager {
     private static final HashMap<String, Font> fontMap = new HashMap<>();
 
     public static void loadResources(final DerpsDecor instance, final ResourceLoader loader) {
+        //Load fonts
+        for(String fontName : fontNames) {
+            try {
+                fontMap.put(fontName, Font.createFont(Font.TRUETYPE_FONT, instance.getJarResource("thederpgamer/decor/resources/fonts/" + fontName + ".ttf")));
+            } catch(Exception exception) {
+                LogManager.logException("Failed to load font \"" + fontName + "\"", exception);
+            }
+        }
 
         StarLoaderTexture.runOnGraphicsThread(new Runnable() {
             @Override
@@ -110,15 +120,6 @@ public class ResourceManager {
 
                     } catch(ResourceException | IOException exception) {
                         LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
-                    }
-                }
-
-                //Load fonts
-                for(String fontName : fontNames) {
-                    try {
-                        fontMap.put(fontName, Font.createFont(Font.TRUETYPE_FONT, instance.getJarResource("thederpgamer/decor/resources/fonts/" + fontName + ".ttf")));
-                    } catch(Exception exception) {
-                        LogManager.logException("Failed to load font \"" + fontName + "\"", exception);
                     }
                 }
             }

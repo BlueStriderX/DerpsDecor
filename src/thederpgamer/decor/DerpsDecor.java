@@ -8,6 +8,8 @@ import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
+import api.utils.game.module.util.SimpleDataStorageMCModule;
+import org.apache.commons.io.IOUtils;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
@@ -29,8 +31,13 @@ import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
+import thederpgamer.decor.utils.ServerUtils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Main class for DerpsDecor mod.
@@ -50,6 +57,12 @@ public class DerpsDecor extends StarMod {
 
     //Utils
     public ClipboardUtils clipboard;
+
+    //Other
+    private final String[] overwriteClasses = {
+            "ElementCollection",
+            "ElementCollectionMesh"
+    };
 
     @Override
     public void onEnable() {
@@ -74,8 +87,18 @@ public class DerpsDecor extends StarMod {
         //ElementManager.addBlock(new StrutConnector());
         //ElementManager.addBlock(new DisplayScreen());
         ElementManager.addBlock(new HoloTable());
+        //ElementManager.addBlock(new CakeBlock());
+        ElementManager.doOverwrites();
         ElementManager.initialize();
     }
+
+    /*
+    @Override
+    public byte[] onClassTransform(String className, byte[] byteCode) {
+        for(String name : overwriteClasses) if(className.endsWith(name)) return overwriteClass(className, byteCode);
+        return super.onClassTransform(className, byteCode);
+    }
+     */
 
     private void registerListeners() {
         StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
@@ -103,6 +126,7 @@ public class DerpsDecor extends StarMod {
                         return;
                     }
                 }
+
                 /*
                 final SegmentPiece piece = event.getSegmentPiece();
                 if(event.getSegmentPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Strut Connector")).getId())  {
@@ -231,13 +255,23 @@ public class DerpsDecor extends StarMod {
                             HoloProjectorDrawData adjacentDrawData = (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
                             ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
                             if(!controlling.isEmpty() && adjacentDrawData != null) {
+                                boolean needsUpdate = false;
                                 for(SegmentPiece segmentPiece : controlling) {
                                     Object drawData = ProjectorUtils.getDrawData(segmentPiece);
                                     if(drawData instanceof HoloProjectorDrawData) {
-                                        ((HoloProjectorDrawData) drawData).src = adjacentDrawData.src;
-                                        ((HoloProjectorDrawData) drawData).changed = true;
+                                        HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
+                                        if(!holoProjectorDrawData.changed && !(holoProjectorDrawData.src.equals(adjacentDrawData.src))) {
+                                            holoProjectorDrawData.src = adjacentDrawData.src;
+                                            holoProjectorDrawData.offset.set(adjacentDrawData.offset);
+                                            holoProjectorDrawData.rotation.set(adjacentDrawData.rotation);
+                                            holoProjectorDrawData.scale = adjacentDrawData.scale;
+                                            holoProjectorDrawData.holographic = adjacentDrawData.holographic;
+                                            holoProjectorDrawData.changed = true;
+                                            needsUpdate = true;
+                                        }
                                     }
                                 }
+                                if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Holo Projector").getId())).flagUpdatedData();
                             }
                         } else {
                             adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
@@ -245,14 +279,24 @@ public class DerpsDecor extends StarMod {
                                 TextProjectorDrawData adjacentDrawData = (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
                                 ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
                                 if(!controlling.isEmpty() && adjacentDrawData != null) {
+                                    boolean needsUpdate = false;
                                     for(SegmentPiece segmentPiece : controlling) {
                                         Object drawData = ProjectorUtils.getDrawData(segmentPiece);
                                         if(drawData instanceof TextProjectorDrawData) {
-                                            ((TextProjectorDrawData) drawData).text = adjacentDrawData.text;
-                                            ((TextProjectorDrawData) drawData).color = adjacentDrawData.color;
-                                            ((TextProjectorDrawData) drawData).changed = true;
+                                            TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
+                                            if(!textProjectorDrawData.changed && !(textProjectorDrawData.text.equals(adjacentDrawData.text))) {
+                                                textProjectorDrawData.text = adjacentDrawData.text;
+                                                textProjectorDrawData.color = adjacentDrawData.color;
+                                                textProjectorDrawData.offset.set(adjacentDrawData.offset);
+                                                textProjectorDrawData.rotation.set(adjacentDrawData.rotation);
+                                                textProjectorDrawData.scale = adjacentDrawData.scale;
+                                                textProjectorDrawData.holographic = adjacentDrawData.holographic;
+                                                textProjectorDrawData.changed = true;
+                                                needsUpdate = true;
+                                            }
                                         }
                                     }
+                                    if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Text Projector").getId())).flagUpdatedData();
                                 }
                             }
                         }
@@ -298,5 +342,22 @@ public class DerpsDecor extends StarMod {
 
     private void registerCommands() {
         StarLoader.registerCommand(new ClearProjectorsCommand());
+    }
+
+    private byte[] overwriteClass(String className, byte[] byteCode) {
+        byte[] bytes = null;
+        try {
+            ZipInputStream file = new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
+            while(true) {
+                ZipEntry nextEntry = file.getNextEntry();
+                if(nextEntry == null) break;
+                if(nextEntry.getName().endsWith(className + ".class")) bytes = IOUtils.toByteArray(file);
+            }
+            file.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        if(bytes != null) return bytes;
+        else return byteCode;
     }
 }

@@ -10,6 +10,7 @@ import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.element.blocks.BlockGroup;
 import thederpgamer.decor.element.blocks.Factory;
 import thederpgamer.decor.element.items.Item;
+
 import java.util.ArrayList;
 
 /**
@@ -30,6 +31,23 @@ public class ElementManager {
         for(Block block : blockList) block.initialize();
         for(Factory factory : factoryList) factory.initialize();
         for(Item item : itemList) item.initialize();
+    }
+
+    public static void doOverwrites() {
+        for(ElementInformation info : ElementKeyMap.getInfoArray()) {
+            try {
+                if(info.getName().toLowerCase().contains("console")) {
+                    info.signal = true;
+                    info.canActivate = true;
+
+                    info.controlling.add(ElementKeyMap.LOGIC_BUTTON_NORM);
+                    info.controlling.add(ElementKeyMap.ACTIVAION_BLOCK_ID);
+
+                    ElementKeyMap.getInfo(ElementKeyMap.LOGIC_BUTTON_NORM).controlledBy.add(info.getId());
+                    ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID).controlledBy.add(info.getId());
+                }
+            } catch(NullPointerException ignored) { }
+        }
     }
 
     public static ArrayList<Block> getAllBlocks() {

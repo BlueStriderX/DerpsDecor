@@ -161,6 +161,54 @@ public class SegmentPieceUtils {
         return transform;
     }
 
+    /**
+     * Gets the full Transform of a SegmentPiece.
+     * @param segmentPiece The SegmentPiece
+     * @return The full transform of the SegmentPiece
+     */
+    public static Transform getPieceTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
+        Transform transform = new Transform();
+        transform.setIdentity();
+        segmentPiece.getTransform(transform);
+        ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
+        transform.origin.x -= SegmentData.SEG_HALF;
+        transform.origin.y -= SegmentData.SEG_HALF;
+        transform.origin.z -= SegmentData.SEG_HALF;
+
+        transform.origin.add(offset.toVector3f());
+        Quat4f currentRot = new Quat4f();
+        transform.getRotation(currentRot);
+        Quat4f addRot = new Quat4f();
+        QuaternionUtil.setEuler(addRot, rotation.y / 100.0f, rotation.z / 100.0f, rotation.x / 100.0f);
+        currentRot.mul(addRot);
+        MathUtils.roundQuat(currentRot);
+        transform.setRotation(currentRot);
+
+        int orientation = segmentPiece.getOrientation();
+        switch(orientation) {
+            case(Element.FRONT):
+                transform.basis.mul(mYC);
+                break;
+            case(Element.BACK):
+                break;
+            case(Element.TOP):
+                transform.basis.mul(mX);
+                break;
+            case(Element.BOTTOM):
+                transform.basis.mul(mYC);
+                transform.basis.mul(mXB);
+                break;
+            case(Element.RIGHT):
+                transform.basis.mul(mY);
+                break;
+            case(Element.LEFT):
+                transform.basis.mul(mYB);
+                break;
+        }
+        segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
+        return transform;
+    }
+
     public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
         ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
         PositionControl control = segmentPiece.getSegmentController().getControlElementMap().getDirectControlledElements(type, segmentPiece.getAbsolutePos(new Vector3i()));
