@@ -45,14 +45,15 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
             long indexAndOrientation = drawData.indexAndOrientation;
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-            if(drawData.text != null && drawData.color != null) {
-                if(drawData.changed || drawData.textOverlay == null) {
+            if(drawData.text != null && drawData.color != null && !drawData.text.isEmpty()) {
+                if(drawData.changed || drawData.textOverlay == null || drawData.color.isEmpty()) {
                     GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
                     textOverlay.onInit();
                     int trueSize = drawData.scale + 10;
                     try {
                         textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
                     } catch(Exception exception) {
+                        exception.printStackTrace();
                         textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
                         drawData.color = "FFFFFF";
                     }
@@ -61,6 +62,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
                     textOverlay.setBlend(true);
                     textOverlay.doDepthTest = true;
                     drawData.textOverlay = textOverlay;
+                    drawData.changed = false;
                 }
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {

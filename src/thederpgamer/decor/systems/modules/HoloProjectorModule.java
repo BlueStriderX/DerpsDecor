@@ -42,10 +42,11 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
             long indexAndOrientation = drawData.indexAndOrientation;
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-            if(drawData.src != null) {
+            if(drawData.src != null && !drawData.src.isEmpty()) {
                 if(drawData.changed || (drawData.image == null && !drawData.src.endsWith(".gif")) || (drawData.frames == null && drawData.src.endsWith(".gif"))) {
                     if(drawData.src.endsWith(".gif")) drawData.frames = ImageManager.getAnimatedImage(drawData.src);
                     else drawData.image = ImageManager.getImage(drawData.src);
+                    drawData.changed = false;
                 }
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
