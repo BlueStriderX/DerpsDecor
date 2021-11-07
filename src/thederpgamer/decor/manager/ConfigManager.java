@@ -21,7 +21,10 @@ public class ConfigManager {
             "image-filter-mode: blacklist",
             "image-filter: porn,hentai,sex,nsfw,r34",
             "max-strut-length: 20",
-            "max-strut-connections: 4"
+            "max-strut-connections: 4",
+            "max-png-dim: 1024",
+            "max-gif-dim: 512",
+            "max-gif-frames: 80"
     };
 
     public static void initialize(DerpsDecor instance) {

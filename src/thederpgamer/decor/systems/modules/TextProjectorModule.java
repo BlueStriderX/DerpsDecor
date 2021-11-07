@@ -46,20 +46,22 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
             long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
             if(drawData.text != null && drawData.color != null) {
-                GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-                textOverlay.onInit();
-                int trueSize = drawData.scale + 10;
-                try {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
-                } catch(Exception exception) {
-                    textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
-                    drawData.color = "FFFFFF";
+                if(drawData.changed || drawData.textOverlay == null) {
+                    GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
+                    textOverlay.onInit();
+                    int trueSize = drawData.scale + 10;
+                    try {
+                        textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
+                    } catch(Exception exception) {
+                        textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
+                        drawData.color = "FFFFFF";
+                    }
+                    textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
+                    textOverlay.setTextSimple(drawData.text);
+                    textOverlay.setBlend(true);
+                    textOverlay.doDepthTest = true;
+                    drawData.textOverlay = textOverlay;
                 }
-                textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
-                textOverlay.setTextSimple(drawData.text);
-                textOverlay.setBlend(true);
-                textOverlay.doDepthTest = true;
-                drawData.textOverlay = textOverlay;
 
                 if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);

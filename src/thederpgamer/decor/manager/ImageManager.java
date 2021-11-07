@@ -9,6 +9,7 @@ import thederpgamer.decor.DerpsDecor;
 import javax.annotation.Nullable;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,11 +52,13 @@ public class ImageManager {
         if(!downloadingImages.contains(url)) {
             try {
                 downloadingImages.add(url);
-                final BufferedImage bufferedImage = fromURL(url);
+                final int maxDim = ConfigManager.getMainConfig().getConfigurableInt("max-png-dim", 1024);
+                final BufferedImage temp = fromURL(url);
                 StarLoaderTexture.runOnGraphicsThread(new Runnable() {
                     @Override
                     public void run() {
                         try {
+                            BufferedImage bufferedImage = scaleImage(temp, maxDim);
                             Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + "_" + System.currentTimeMillis());
                             sprite.setPositionCenter(false);
                             imgCache.put(url, sprite);
@@ -71,6 +74,8 @@ public class ImageManager {
         if(!downloadingImages.contains(url)) {
             try {
                 downloadingImages.add(url);
+                final int maxFrames = ConfigManager.getMainConfig().getConfigurableInt("max-gif-frames", 80);
+                final int maxDim = ConfigManager.getMainConfig().getConfigurableInt("max-gif-dim", 512);
                 StarLoaderTexture.runOnGraphicsThread(new Runnable() {
                     @Override
                     public void run() {
@@ -78,11 +83,12 @@ public class ImageManager {
                             final ArrayList<Sprite> frameList = new ArrayList<>();
                             final ImageReader reader = new GIFImageReader(new GIFImageReaderSpi());
                             reader.setInput(ImageIO.createImageInputStream(Objects.requireNonNull(getImageStream(url))));
-                            final int count = Math.min(reader.getNumImages(true), 120);
+                            final int count = Math.min(reader.getNumImages(true), maxFrames);
                             for(int frameIndex = 0; frameIndex < count; frameIndex ++) {
                                 try {
-                                    final BufferedImage bufferedImage = reader.read(frameIndex);
+                                    final BufferedImage temp = reader.read(frameIndex);
                                     try {
+                                        BufferedImage bufferedImage = scaleImage(temp, maxDim);
                                         Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + "_" + frameIndex + "_" + System.currentTimeMillis());
                                         sprite.setPositionCenter(false);
                                         frameList.add(sprite);
@@ -128,5 +134,9 @@ public class ImageManager {
             return urlConnection.getInputStream();
         } catch(IOException ignored) { }
         return null;
+    }
+
+    private static BufferedImage scaleImage(BufferedImage image, int maxDim) {
+        return (BufferedImage) image.getScaledInstance(Math.min(maxDim, image.getWidth()), Math.min(maxDim, image.getHeight()), Image.SCALE_DEFAULT);
     }
 }
