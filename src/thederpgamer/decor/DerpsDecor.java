@@ -43,7 +43,7 @@ import java.util.zip.ZipInputStream;
  * Main class for DerpsDecor mod.
  *
  * @author TheDerpGamer
- * @since 06/15/2021
+ * @version 1.1 - [11/12/2021]
  */
 public class DerpsDecor extends StarMod {
 
@@ -60,8 +60,9 @@ public class DerpsDecor extends StarMod {
 
     //Other
     private final String[] overwriteClasses = {
-            "ElementCollection",
-            "ElementCollectionMesh"
+            "GUIQuickReferencePanel"
+            //"ElementCollection",
+            //"ElementCollectionMesh"
     };
 
     @Override
@@ -73,6 +74,12 @@ public class DerpsDecor extends StarMod {
         SegmentPieceUtils.initialize();
         registerListeners();
         registerCommands();
+    }
+
+    @Override
+    public byte[] onClassTransform(String className, byte[] byteCode) {
+        for(String name : overwriteClasses) if(className.endsWith(name)) return overwriteClass(className, byteCode);
+        return super.onClassTransform(className, byteCode);
     }
 
     @Override

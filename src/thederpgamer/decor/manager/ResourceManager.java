@@ -36,7 +36,8 @@ public class ResourceManager {
 
     private static final String[] spriteNames = {
             "transparent",
-            "projector-debug-grid"
+            "projector-debug-grid",
+            "projectors-infographic"
     };
 
     private static final String[] modelNames = {
