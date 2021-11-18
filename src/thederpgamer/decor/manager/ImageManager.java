@@ -118,16 +118,21 @@ public class ImageManager {
         downloadingImages.remove(url);
     }
 
-    private static BufferedImage fromURL(String u) {
-        BufferedImage image = null;
-        try {
-            URL url = new URL(u);
-            URLConnection urlConnection = url.openConnection();
-            urlConnection.setRequestProperty("User-Agent", "NING/1.0");
-            InputStream stream = urlConnection.getInputStream();
-            image = ImageIO.read(stream);
-        } catch(IOException ignored) { }
-        return image;
+    private static BufferedImage fromURL(final String u) {
+        final BufferedImage[] image = {null};
+        new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(u);
+                    URLConnection urlConnection = url.openConnection();
+                    urlConnection.setRequestProperty("User-Agent", "NING/1.0");
+                    InputStream stream = urlConnection.getInputStream();
+                    image[0] = ImageIO.read(stream);
+                } catch(IOException ignored) { }
+            }
+        };
+        return image[0];
     }
 
     private static InputStream getImageStream(String u) {

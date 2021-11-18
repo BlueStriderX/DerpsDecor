@@ -33,7 +33,7 @@ public class HoloProjector extends Block implements ActivationInterface {
                 blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
             } catch(Exception ignored) { }
         }
-        blockInfo.setDescription("A block used to project an image at a specified location, scale, and rotation.");
+        blockInfo.setDescription("A block used to project an image at a specified location, scale, and rotation.\nCheck the building quick reference menu for a detailed usage guide.");
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setCanActivate(true);

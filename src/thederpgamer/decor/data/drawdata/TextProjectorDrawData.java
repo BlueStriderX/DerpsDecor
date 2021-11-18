@@ -49,7 +49,7 @@ public class TextProjectorDrawData {
         changed = true;
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-            transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation);
+            SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
         }
     }
 }

@@ -69,7 +69,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
-                            drawData.transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation);
+                            SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
                             Quat4f currentRot = new Quat4f();
                             drawData.transform.getRotation(currentRot);
                             Quat4f addRot = new Quat4f();

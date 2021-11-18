@@ -5,6 +5,7 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.forms.Sprite;
+import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
@@ -24,6 +25,7 @@ public class HoloProjectorDrawData {
     public boolean holographic;
     public boolean changed;
 
+    public transient ScalableImageSubSprite[] subSprite;
     public transient Transform transform;
     public transient Sprite image;
 
@@ -50,7 +52,7 @@ public class HoloProjectorDrawData {
         changed = true;
         if(segmentPiece != null) {
             indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-            transform = SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation);
+            SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
         }
     }
 

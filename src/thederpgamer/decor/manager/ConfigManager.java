@@ -24,7 +24,8 @@ public class ConfigManager {
             "max-strut-connections: 4",
             "max-png-dim: 1024",
             "max-gif-dim: 512",
-            "max-gif-frames: 80"
+            "max-gif-frames: 60",
+            "max-projector-draws-per-frame: 30"
     };
 
     public static void initialize(DerpsDecor instance) {

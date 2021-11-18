@@ -34,7 +34,7 @@ public class TextProjector extends Block implements ActivationInterface {
 
             } catch(Exception ignored) { }
         }
-        blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.");
+        blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.\nCheck the building quick reference menu for a detailed usage guide.");
         blockInfo.setInRecipe(true);
         blockInfo.setShoppable(true);
         blockInfo.setCanActivate(true);

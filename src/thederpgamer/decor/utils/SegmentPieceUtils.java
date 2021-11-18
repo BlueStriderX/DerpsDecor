@@ -96,69 +96,69 @@ public class SegmentPieceUtils {
      * @param segmentPiece The SegmentPiece
      * @return The full transform of the Projector
      */
-    public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
-        Transform transform = new Transform();
-        transform.setIdentity();
-        segmentPiece.getTransform(transform);
-        ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
-        transform.origin.x -= SegmentData.SEG_HALF;
-        transform.origin.y -= SegmentData.SEG_HALF;
-        transform.origin.z -= SegmentData.SEG_HALF;
+    public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
+        if(out == null) out = new Transform();
+        out.setIdentity();
+        segmentPiece.getTransform(out);
+        ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), out.origin);
+        out.origin.x -= SegmentData.SEG_HALF;
+        out.origin.y -= SegmentData.SEG_HALF;
+        out.origin.z -= SegmentData.SEG_HALF;
 
         float sNormalDir = 0.51f;
         float sVertical = 0.5f;
         float sHorizontal = 0.5f;
 
-        transform.origin.add(offset.toVector3f());
+        out.origin.add(offset.toVector3f());
         Quat4f currentRot = new Quat4f();
-        transform.getRotation(currentRot);
+        out.getRotation(currentRot);
         Quat4f addRot = new Quat4f();
         QuaternionUtil.setEuler(addRot, rotation.y / 100.0f, rotation.z / 100.0f, rotation.x / 100.0f);
         currentRot.mul(addRot);
         MathUtils.roundQuat(currentRot);
-        transform.setRotation(currentRot);
+        out.setRotation(currentRot);
         
         int orientation = segmentPiece.getOrientation();
         switch(orientation) { 
             case(Element.FRONT):
-                transform.basis.mul(mYC);
-                transform.origin.x -= sHorizontal;
-                transform.origin.y += sVertical;
-                transform.origin.z += sNormalDir;
+                out.basis.mul(mYC);
+                out.origin.x -= sHorizontal;
+                out.origin.y += sVertical;
+                out.origin.z += sNormalDir;
                 break;
             case(Element.BACK):
-                transform.origin.x += sHorizontal;
-                transform.origin.y += sVertical;
-                transform.origin.z -= sNormalDir;
+                out.origin.x += sHorizontal;
+                out.origin.y += sVertical;
+                out.origin.z -= sNormalDir;
                 break;
             case(Element.TOP):
-                transform.basis.mul(mX);
-                transform.origin.x += sHorizontal;
-                transform.origin.y += sNormalDir;
-                transform.origin.z += sVertical;
+                out.basis.mul(mX);
+                out.origin.x += sHorizontal;
+                out.origin.y += sNormalDir;
+                out.origin.z += sVertical;
                 break;
             case(Element.BOTTOM):
-                transform.basis.mul(mYC);
-                transform.basis.mul(mXB);
-                transform.origin.x -= sHorizontal;
-                transform.origin.y -= sNormalDir;
-                transform.origin.z += sVertical;
+                out.basis.mul(mYC);
+                out.basis.mul(mXB);
+                out.origin.x -= sHorizontal;
+                out.origin.y -= sNormalDir;
+                out.origin.z += sVertical;
                 break;
             case(Element.RIGHT):
-                transform.basis.mul(mY);
-                transform.origin.x -= sNormalDir;
-                transform.origin.y += sVertical;
-                transform.origin.z -= sHorizontal;
+                out.basis.mul(mY);
+                out.origin.x -= sNormalDir;
+                out.origin.y += sVertical;
+                out.origin.z -= sHorizontal;
                 break;
             case(Element.LEFT):
-                transform.basis.mul(mYB);
-                transform.origin.x += sNormalDir;
-                transform.origin.y += sVertical;
-                transform.origin.z += sHorizontal;
+                out.basis.mul(mYB);
+                out.origin.x += sNormalDir;
+                out.origin.y += sVertical;
+                out.origin.z += sHorizontal;
                 break;
         }
-        segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
-        return transform;
+        segmentPiece.getSegmentController().getWorldTransform().transform(out.origin);
+        return out;
     }
 
     /**
