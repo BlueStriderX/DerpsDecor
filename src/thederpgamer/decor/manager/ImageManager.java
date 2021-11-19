@@ -58,10 +58,12 @@ public class ImageManager {
                     @Override
                     public void run() {
                         try {
-                            BufferedImage bufferedImage = scaleImage(temp, maxDim);
-                            Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + "_" + System.currentTimeMillis());
-                            sprite.setPositionCenter(false);
-                            imgCache.put(url, sprite);
+                            if(temp != null) {
+                                BufferedImage bufferedImage = scaleImage(temp, maxDim);
+                                Sprite sprite = StarLoaderTexture.newSprite(bufferedImage, DerpsDecor.getInstance(), url + "_" + System.currentTimeMillis());
+                                sprite.setPositionCenter(false);
+                                imgCache.put(url, sprite);
+                            }
                         } catch(Exception exception) {
                             exception.printStackTrace();
                         }
@@ -146,11 +148,14 @@ public class ImageManager {
     }
 
     private static BufferedImage scaleImage(BufferedImage image, int maxDim) {
-        BufferedImage resized = new BufferedImage(Math.min(maxDim, image.getWidth()), Math.min(maxDim, image.getHeight()), image.getType());
-        Graphics2D g = resized.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.drawImage(image, 0, 0, Math.min(maxDim, image.getWidth()), Math.min(maxDim, image.getHeight()), 0, 0, image.getWidth(), image.getHeight(), null);
-        g.dispose();
-        return resized;
+        try {
+            BufferedImage resized = new BufferedImage(Math.min(maxDim, image.getWidth()), Math.min(maxDim, image.getHeight()), image.getType());
+            Graphics2D g = resized.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.drawImage(image, 0, 0, Math.min(maxDim, image.getWidth()), Math.min(maxDim, image.getHeight()), 0, 0, image.getWidth(), image.getHeight(), null);
+            g.dispose();
+            return resized;
+        } catch(Exception ignored) { }
+        return null;
     }
 }

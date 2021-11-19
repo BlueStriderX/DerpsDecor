@@ -2,6 +2,7 @@ package thederpgamer.decor.systems.modules;
 
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
+import com.bulletphysics.linearmath.Transform;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -55,6 +56,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0 || drawData.subSprite == null) {
                             float maxDim = Math.max(drawData.image.getWidth(), drawData.image.getHeight());
+                            if(drawData.transform == null) drawData.transform = new Transform();
                             SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
                             Quat4f currentRot = new Quat4f();
                             drawData.transform.getRotation(currentRot);
