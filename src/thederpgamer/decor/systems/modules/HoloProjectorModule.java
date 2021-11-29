@@ -55,21 +55,23 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
                     if(canDraw(segmentPiece) && !segmentPiece.isActive()) {
                         if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0 || drawData.subSprite == null) {
-                            float maxDim = Math.max(drawData.image.getWidth(), drawData.image.getHeight());
-                            if(drawData.transform == null) drawData.transform = new Transform();
-                            SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
-                            Quat4f currentRot = new Quat4f();
-                            drawData.transform.getRotation(currentRot);
-                            Quat4f addRot = new Quat4f();
-                            QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
-                            currentRot.mul(addRot);
-                            MathUtils.roundQuat(currentRot);
-                            drawData.transform.setRotation(currentRot);
-                            drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-                            MathUtils.roundVector(drawData.transform.origin);
-                            drawData.subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
-                            drawData.changed = false;
-                            getProjectorDrawer().addDraw(segmentPiece, drawData);
+                            if(drawData.image != null) {
+                                float maxDim = Math.max(drawData.image.getWidth(), drawData.image.getHeight());
+                                if(drawData.transform == null) drawData.transform = new Transform();
+                                SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+                                Quat4f currentRot = new Quat4f();
+                                drawData.transform.getRotation(currentRot);
+                                Quat4f addRot = new Quat4f();
+                                QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
+                                currentRot.mul(addRot);
+                                MathUtils.roundQuat(currentRot);
+                                drawData.transform.setRotation(currentRot);
+                                drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
+                                MathUtils.roundVector(drawData.transform.origin);
+                                drawData.subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
+                                drawData.changed = false;
+                                getProjectorDrawer().addDraw(segmentPiece, drawData);
+                            }
                         }
                     }
                 }
