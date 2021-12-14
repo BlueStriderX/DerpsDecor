@@ -131,10 +131,17 @@ public class ImageManager {
                     urlConnection.setRequestProperty("User-Agent", "NING/1.0");
                     InputStream stream = urlConnection.getInputStream();
                     image[0] = ImageIO.read(stream);
-                } catch(IOException ignored) { }
+                } catch(IOException exception) {
+                    exception.printStackTrace();
+                }
             }
-        };
-        return image[0];
+        }.run();
+        int i = 15;
+        while(i > 0) {
+            if(image[0] != null) return image[0];
+            else i --;
+        }
+        return null;
     }
 
     private static InputStream getImageStream(String u) {

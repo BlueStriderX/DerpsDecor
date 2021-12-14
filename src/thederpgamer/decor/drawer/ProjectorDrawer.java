@@ -71,10 +71,10 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
                                 ShaderLibrary.scanlineShader.setShaderInterface(this);
                                 ShaderLibrary.scanlineShader.load();
                             }
-                            float maxDim = Math.max(image.getWidth(), image.getHeight());
                             SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
 
                             //Don't create new objects every frame
+                            //float maxDim = Math.max(image.getWidth(), image.getHeight());
                             //ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
                             image.setTransform(drawData.transform);
                             Sprite.draw3D(image, drawData.subSprite, 1, Controller.getCamera());
