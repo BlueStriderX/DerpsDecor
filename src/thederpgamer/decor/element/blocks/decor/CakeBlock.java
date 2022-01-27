@@ -16,35 +16,38 @@ import thederpgamer.decor.manager.ResourceManager;
  */
 public class CakeBlock extends Block {
 
-    public CakeBlock() {
-        super("Cake", ElementManager.getCategory("Food"));
+  public CakeBlock() {
+    super("Cake", ElementManager.getCategory("Food"));
+  }
+
+  @Override
+  public void initialize() {
+    if (GraphicsContext.initialized) {
+      try {
+        blockInfo.setBuildIconNum(ResourceManager.getTexture("cake-icon").getTextureId());
+      } catch (Exception ignored) {
+      }
     }
 
-    @Override
-    public void initialize() {
-        if(GraphicsContext.initialized) {
-            try {
-                blockInfo.setBuildIconNum(ResourceManager.getTexture("cake-icon").getTextureId());
-            } catch(Exception ignored) { }
-        }
+    blockInfo.setDescription(
+        "A fresh baked cake, just for you. Restores health if interacted with, and tastes"
+            + " delicious!");
+    blockInfo.setCanActivate(true);
+    blockInfo.setInRecipe(true);
+    blockInfo.setShoppable(true);
+    blockInfo.setPrice(500);
+    blockInfo.setOrientatable(true);
+    blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
+    blockInfo.lodShapeStyle = 1;
+    blockInfo.sideTexturesPointToOrientation = false;
 
-        blockInfo.setDescription("A fresh baked cake, just for you. Restores health if interacted with, and tastes delicious!");
-        blockInfo.setCanActivate(true);
-        blockInfo.setInRecipe(true);
-        blockInfo.setShoppable(true);
-        blockInfo.setPrice(500);
-        blockInfo.setOrientatable(true);
-        blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
-        blockInfo.lodShapeStyle = 1;
-        blockInfo.sideTexturesPointToOrientation = false;
+    /*
+    BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
+                          new FactoryResource(1, ));
 
-        /*
-        BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-                              new FactoryResource(1, ));
+     */
 
-         */
-
-        BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "cake", null);
-        BlockConfig.add(blockInfo);
-    }
+    BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "cake", null);
+    BlockConfig.add(blockInfo);
+  }
 }
