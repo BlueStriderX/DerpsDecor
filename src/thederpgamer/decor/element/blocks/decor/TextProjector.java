@@ -20,55 +20,65 @@ import thederpgamer.decor.manager.ResourceManager;
  */
 public class TextProjector extends Block implements ActivationInterface {
 
-    public TextProjector() {
-        super("Text Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+  public TextProjector() {
+    super("Text Projector", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+  }
+
+  @Override
+  public void initialize() {
+    if (GraphicsContext.initialized) {
+      try {
+        blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
+        blockInfo.setTextureId(
+            0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
+        blockInfo.setBuildIconNum(ResourceManager.getTexture("text-projector-icon").getTextureId());
+
+      } catch (Exception ignored) {
+      }
     }
+    blockInfo.setDescription(
+        "A block used to project text at a specified location, scale, and rotation.\n"
+            + "Check the building quick reference menu for a detailed usage guide.");
+    blockInfo.setInRecipe(true);
+    blockInfo.setShoppable(true);
+    blockInfo.setCanActivate(true);
+    blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
+    blockInfo.setOrientatable(true);
 
-    @Override
-    public void initialize() {
-        if(GraphicsContext.initialized) {
-            try {
-                blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-                blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
-                blockInfo.setBuildIconNum(ResourceManager.getTexture("text-projector-icon").getTextureId());
+    blockInfo.controlledBy.add((short) 405);
+    blockInfo.controlledBy.add((short) 993);
+    blockInfo.controlledBy.add((short) 666);
+    blockInfo.controlledBy.add((short) 399);
 
-            } catch(Exception ignored) { }
-        }
-        blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.\nCheck the building quick reference menu for a detailed usage guide.");
-        blockInfo.setInRecipe(true);
-        blockInfo.setShoppable(true);
-        blockInfo.setCanActivate(true);
-        blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
-        blockInfo.setOrientatable(true);
+    ElementKeyMap.getInfo(405).controlling.add(getId());
+    ElementKeyMap.getInfo(993).controlling.add(getId());
+    ElementKeyMap.getInfo(666).controlling.add(getId());
+    ElementKeyMap.getInfo(399).controlling.add(getId());
 
-        blockInfo.controlledBy.add((short) 405);
-        blockInfo.controlledBy.add((short) 993);
-        blockInfo.controlledBy.add((short) 666);
-        blockInfo.controlledBy.add((short) 399);
+    BlockConfig.addRecipe(
+        blockInfo,
+        ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(),
+        (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
+        new FactoryResource(1, ElementKeyMap.TEXT_BOX),
+        new FactoryResource(50, (short) 440));
+    BlockConfig.add(blockInfo);
+  }
 
-        ElementKeyMap.getInfo(405).controlling.add(getId());
-        ElementKeyMap.getInfo(993).controlling.add(getId());
-        ElementKeyMap.getInfo(666).controlling.add(getId());
-        ElementKeyMap.getInfo(399).controlling.add(getId());
+  @Override
+  public void onPlayerActivation(SegmentPieceActivateByPlayer event) {
+    TextProjectorConfigDialog configDialog = new TextProjectorConfigDialog();
+    configDialog.setSegmentPiece(event.getSegmentPiece());
+    configDialog.activate();
+    event.getSegmentPiece().setActive(!event.getSegmentPiece().isActive());
+    if (GameClient.getClientState() != null)
+      GameClient.getClientState()
+          .getGlobalGameControlManager()
+          .getIngameControlManager()
+          .getPlayerGameControlManager()
+          .getPlayerIntercationManager()
+          .suspend(true);
+  }
 
-        BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-                new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-                new FactoryResource(50, (short) 440)
-        );
-        BlockConfig.add(blockInfo);
-    }
-
-    @Override
-    public void onPlayerActivation(SegmentPieceActivateByPlayer event) {
-        TextProjectorConfigDialog configDialog = new TextProjectorConfigDialog();
-        configDialog.setSegmentPiece(event.getSegmentPiece());
-        configDialog.activate();
-        event.getSegmentPiece().setActive(!event.getSegmentPiece().isActive());
-        if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
-    }
-
-    @Override
-    public void onLogicActivation(SegmentPieceActivateEvent event) {
-
-    }
+  @Override
+  public void onLogicActivation(SegmentPieceActivateEvent event) {}
 }

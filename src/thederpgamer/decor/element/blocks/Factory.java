@@ -15,38 +15,38 @@ import thederpgamer.decor.manager.ResourceManager;
  */
 public abstract class Factory {
 
-    protected ElementInformation blockInfo;
+  protected ElementInformation blockInfo;
 
-    public Factory(String name, ElementCategory category, String... sideNames) {
-        short[] textureIds = new short[6];
-        String replace = name.toLowerCase().trim().replace(" ", "-");
-        int i;
-        for(i = 0; i < textureIds.length && i < sideNames.length; i ++) {
-            String sideName = sideNames[i].toLowerCase().trim().replace(" ", "-");
-            String textureName = replace + "-" + sideName;
-            textureIds[i] = (short) ResourceManager.getTexture(textureName).getTextureId();
-        }
-        if(i < 5) {
-            for(int j = 0; i < textureIds.length && j < sideNames.length; i ++) {
-                String sideName = sideNames[j].toLowerCase().trim().replace(" ", "-");
-                String textureName = replace + "-" + sideName;
-                textureIds[i] = (short) ResourceManager.getTexture(textureName).getTextureId();
-                j ++;
-            }
-        }
-
-        blockInfo = BlockConfig.newFactory(DerpsDecor.getInstance(), name, textureIds);
-        BlockConfig.setElementCategory(blockInfo, category);
-        ElementManager.addFactory(this);
+  public Factory(String name, ElementCategory category, String... sideNames) {
+    short[] textureIds = new short[6];
+    String replace = name.toLowerCase().trim().replace(" ", "-");
+    int i;
+    for (i = 0; i < textureIds.length && i < sideNames.length; i++) {
+      String sideName = sideNames[i].toLowerCase().trim().replace(" ", "-");
+      String textureName = replace + "-" + sideName;
+      textureIds[i] = (short) ResourceManager.getTexture(textureName).getTextureId();
+    }
+    if (i < 5) {
+      for (int j = 0; i < textureIds.length && j < sideNames.length; i++) {
+        String sideName = sideNames[j].toLowerCase().trim().replace(" ", "-");
+        String textureName = replace + "-" + sideName;
+        textureIds[i] = (short) ResourceManager.getTexture(textureName).getTextureId();
+        j++;
+      }
     }
 
-    public final ElementInformation getBlockInfo() {
-        return blockInfo;
-    }
+    blockInfo = BlockConfig.newFactory(DerpsDecor.getInstance(), name, textureIds);
+    BlockConfig.setElementCategory(blockInfo, category);
+    ElementManager.addFactory(this);
+  }
 
-    public final short getId() {
-        return blockInfo.getId();
-    }
+  public final ElementInformation getBlockInfo() {
+    return blockInfo;
+  }
 
-    public abstract void initialize();
+  public final short getId() {
+    return blockInfo.getId();
+  }
+
+  public abstract void initialize();
 }

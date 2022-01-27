@@ -18,28 +18,41 @@ import thederpgamer.decor.utils.ServerUtils;
  */
 public abstract class InventoryBlock extends Block implements ActivationInterface {
 
-    public InventoryBlock(String name, ElementCategory category) {
-        super(name, category);
+  public InventoryBlock(String name, ElementCategory category) {
+    super(name, category);
+  }
+
+  @Override
+  public void onPlayerActivation(SegmentPieceActivateByPlayer event) {
+    ManagerContainer<?> managerContainer =
+        ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController());
+    assert managerContainer != null;
+    Inventory inventory = managerContainer.getInventory(event.getSegmentPiece().getAbsoluteIndex());
+    if (inventory == null) {
+      inventory = createInventory(managerContainer, event.getSegmentPiece());
+      inventory
+          .getInventoryHolder()
+          .getInventoryNetworkObject()
+          .getInventoriesChangeBuffer()
+          .add(
+              new RemoteInventory(
+                  inventory,
+                  inventory.getInventoryHolder(),
+                  true,
+                  inventory.getInventoryHolder().getInventoryNetworkObject().isOnServer()));
     }
+    updateInventory(inventory, event.getSegmentPiece());
+    GameClient.getClientState()
+        .getGlobalGameControlManager()
+        .getIngameControlManager()
+        .getPlayerGameControlManager()
+        .inventoryAction(inventory);
+  }
 
-    @Override
-    public void onPlayerActivation(SegmentPieceActivateByPlayer event) {
-        ManagerContainer<?> managerContainer = ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController());
-        assert managerContainer != null;
-        Inventory inventory = managerContainer.getInventory(event.getSegmentPiece().getAbsoluteIndex());
-        if(inventory == null) {
-            inventory = createInventory(managerContainer, event.getSegmentPiece());
-            inventory.getInventoryHolder().getInventoryNetworkObject().getInventoriesChangeBuffer().add(new RemoteInventory(inventory, inventory.getInventoryHolder(), true, inventory.getInventoryHolder().getInventoryNetworkObject().isOnServer()));
-        }
-        updateInventory(inventory, event.getSegmentPiece());
-        GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().inventoryAction(inventory);
-    }
+  @Override
+  public void onLogicActivation(SegmentPieceActivateEvent event) {}
 
-    @Override
-    public void onLogicActivation(SegmentPieceActivateEvent event) {
+  public abstract Inventory createInventory(InventoryHolder holder, SegmentPiece segmentPiece);
 
-    }
-
-    public abstract Inventory createInventory(InventoryHolder holder, SegmentPiece segmentPiece);
-    public abstract void updateInventory(Inventory inventory, SegmentPiece segmentPiece);
+  public abstract void updateInventory(Inventory inventory, SegmentPiece segmentPiece);
 }
