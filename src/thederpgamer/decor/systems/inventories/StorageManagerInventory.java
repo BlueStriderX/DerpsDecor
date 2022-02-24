@@ -11,10 +11,10 @@ import org.schema.game.common.data.player.inventory.StashInventory;
  */
 public class StorageManagerInventory extends StashInventory {
 
-  private final transient SegmentPiece segmentPiece;
+	private final transient SegmentPiece segmentPiece;
 
-  public StorageManagerInventory(InventoryHolder inventoryHolder, SegmentPiece segmentPiece) {
-    super(inventoryHolder, segmentPiece.getAbsoluteIndex());
-    this.segmentPiece = segmentPiece;
-  }
+	public StorageManagerInventory(InventoryHolder inventoryHolder, SegmentPiece segmentPiece) {
+		super(inventoryHolder, segmentPiece.getAbsoluteIndex());
+		this.segmentPiece = segmentPiece;
+	}
 }
