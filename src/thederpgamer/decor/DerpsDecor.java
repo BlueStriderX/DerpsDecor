@@ -9,6 +9,11 @@ import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
@@ -33,12 +38,6 @@ import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 import thederpgamer.decor.utils.ServerUtils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 /**
  * Main class for DerpsDecor mod.
  *
@@ -47,61 +46,60 @@ import java.util.zip.ZipInputStream;
  */
 public class DerpsDecor extends StarMod {
 
-    // Instance
-    private static DerpsDecor instance;
+  // Instance
+  private static DerpsDecor instance;
 
-    public static DerpsDecor getInstance() {
-        return instance;
-    }
+  public static DerpsDecor getInstance() {
+    return instance;
+  }
 
-    public DerpsDecor() {}
+  public DerpsDecor() {}
 
-    public static void main(String[] args) {}
+  public static void main(String[] args) {}
 
-    // Utils
-    public ClipboardUtils clipboard;
+  // Utils
+  public ClipboardUtils clipboard;
 
-    // Other
-    private final String[] overwriteClasses = {
-            "GUIQuickReferencePanel",
-            "Constructing"
-            //"ElementCollection",
-            //"ElementCollectionMesh"
-    };
+  // Other
+  private final String[] overwriteClasses = {"GUIQuickReferencePanel", "Constructing"
+    // "ElementCollection",
+    // "ElementCollectionMesh"
+  };
 
-    @Override
-    public void onEnable() {
-        instance = this;
-        clipboard = new ClipboardUtils();
-        ConfigManager.initialize(this);
-        LogManager.initialize();
-        SegmentPieceUtils.initialize();
-        registerListeners();
-        registerCommands();
-    }
+  @Override
+  public void onEnable() {
+    instance = this;
+    clipboard = new ClipboardUtils();
+    ConfigManager.initialize(this);
+    LogManager.initialize();
+    SegmentPieceUtils.initialize();
+    registerListeners();
+    registerCommands();
+  }
 
-    @Override
-    public byte[] onClassTransform(String className, byte[] byteCode) {
-        for (String name : overwriteClasses) if (className.endsWith(name)) return overwriteClass(className, byteCode);
-        return super.onClassTransform(className, byteCode);
-    }
+  @Override
+  public byte[] onClassTransform(String className, byte[] byteCode) {
+    for (String name : overwriteClasses)
+      if (className.endsWith(name)) return overwriteClass(className, byteCode);
+    return super.onClassTransform(className, byteCode);
+  }
 
-    @Override
-    public void onResourceLoad(ResourceLoader loader) {
-        ResourceManager.loadResources(this, loader);
-    }
+  @Override
+  public void onResourceLoad(ResourceLoader loader) {
+    ResourceManager.loadResources(this, loader);
+  }
 
-    @Override
-    public void onBlockConfigLoad(BlockConfig config) {
-        ElementManager.addBlock(new HoloProjector());
-        ElementManager.addBlock(new TextProjector());
-        // ElementManager.addBlock(new StrutConnector());
-        // ElementManager.addBlock(new DisplayScreen());
-        ElementManager.addBlock(new HoloTable());
-        // ElementManager.addBlock(new CakeBlock());
-        ElementManager.doOverwrites();
-        ElementManager.initialize();
-    }
+  @Override
+  public void onBlockConfigLoad(BlockConfig config) {
+    ElementManager.addBlock(new HoloProjector());
+    ElementManager.addBlock(new TextProjector());
+    // ElementManager.addBlock(new StrutConnector());
+    // ElementManager.addBlock(new DisplayScreen());
+    ElementManager.addBlock(new HoloTable());
+    // ElementManager.addBlock(new CakeBlock());
+    ElementManager.doOverwrites();
+    ElementManager.initialize();
+  }
 
   /*
   @Override
@@ -111,42 +109,44 @@ public class DerpsDecor extends StarMod {
   }
    */
 
-    private void registerListeners() {
-        StarLoader.registerListener(
-                RegisterWorldDrawersEvent.class,
-                new Listener<RegisterWorldDrawersEvent>() {
-                    @Override
-                    public void onEvent(RegisterWorldDrawersEvent event) {
-                        GlobalDrawManager.initialize(event);
-                    }
-                },
-                this);
+  private void registerListeners() {
+    StarLoader.registerListener(
+        RegisterWorldDrawersEvent.class,
+        new Listener<RegisterWorldDrawersEvent>() {
+          @Override
+          public void onEvent(RegisterWorldDrawersEvent event) {
+            GlobalDrawManager.initialize(event);
+          }
+        },
+        this);
 
-        StarLoader.registerListener(
-                ManagerContainerRegisterEvent.class,
-                new Listener<ManagerContainerRegisterEvent>() {
-                    @Override
-                    public void onEvent(ManagerContainerRegisterEvent event) {
-                        event.addModMCModule(
-                                new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
-                        event.addModMCModule(
-                                new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-                        // event.addModMCModule(new StrutConnectorModule(event.getSegmentController(),
-                        // event.getContainer()));
-                    }
-                },
-                this);
+    StarLoader.registerListener(
+        ManagerContainerRegisterEvent.class,
+        new Listener<ManagerContainerRegisterEvent>() {
+          @Override
+          public void onEvent(ManagerContainerRegisterEvent event) {
+            event.addModMCModule(
+                new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
+            event.addModMCModule(
+                new TextProjectorModule(event.getSegmentController(), event.getContainer()));
+            // event.addModMCModule(new StrutConnectorModule(event.getSegmentController(),
+            // event.getContainer()));
+          }
+        },
+        this);
 
-        StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
-                    @Override
-                    public void onEvent(SegmentPieceActivateByPlayer event) {
-                        for (Block block : ElementManager.getAllBlocks()) {
-                            if (block instanceof ActivationInterface
-                                && block.getId() == event.getSegmentPiece().getType()) {
-                                ((ActivationInterface) block).onPlayerActivation(event);
-                                return;
-                            }
-                        }
+    StarLoader.registerListener(
+        SegmentPieceActivateByPlayer.class,
+        new Listener<SegmentPieceActivateByPlayer>() {
+          @Override
+          public void onEvent(SegmentPieceActivateByPlayer event) {
+            for (Block block : ElementManager.getAllBlocks()) {
+              if (block instanceof ActivationInterface
+                  && block.getId() == event.getSegmentPiece().getType()) {
+                ((ActivationInterface) block).onPlayerActivation(event);
+                return;
+              }
+            }
 
             /*
             final SegmentPiece piece = event.getSegmentPiece();
@@ -256,111 +256,111 @@ public class DerpsDecor extends StarMod {
                 t.activate();
             }
              */
-                    }
-                },
-                this);
+          }
+        },
+        this);
 
-        StarLoader.registerListener(
-                SegmentPieceActivateEvent.class,
-                new Listener<SegmentPieceActivateEvent>() {
-                    @Override
-                    public void onEvent(SegmentPieceActivateEvent event) {
-                        for (Block block : ElementManager.getAllBlocks()) {
-                            if (block instanceof ActivationInterface
-                                && block.getId() == event.getSegmentPiece().getType()) {
-                                ((ActivationInterface) block).onLogicActivation(event);
-                                break;
-                            }
-                        }
+    StarLoader.registerListener(
+        SegmentPieceActivateEvent.class,
+        new Listener<SegmentPieceActivateEvent>() {
+          @Override
+          public void onEvent(SegmentPieceActivateEvent event) {
+            for (Block block : ElementManager.getAllBlocks()) {
+              if (block instanceof ActivationInterface
+                  && block.getId() == event.getSegmentPiece().getType()) {
+                ((ActivationInterface) block).onLogicActivation(event);
+                break;
+              }
+            }
 
-                        if (event.isServer()) {
-                            if ((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID
-                                 || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
-                                && event.getSegmentPiece().isActive()) {
-                                SegmentPiece adjacent =
-                                        SegmentPieceUtils.getFirstMatchingAdjacent(
-                                                event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
-                                if (adjacent != null) {
-                                    HoloProjectorDrawData adjacentDrawData =
-                                            (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-                                    ArrayList<SegmentPiece> controlling =
-                                            SegmentPieceUtils.getControlledPiecesMatching(
-                                                    event.getSegmentPiece(),
-                                                    ElementManager.getBlock("Holo Projector").getId());
-                                    if (!controlling.isEmpty() && adjacentDrawData != null) {
-                                        boolean needsUpdate = false;
-                                        for (SegmentPiece segmentPiece : controlling) {
-                                            Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-                                            if (drawData instanceof HoloProjectorDrawData) {
-                                                HoloProjectorDrawData holoProjectorDrawData =
-                                                        (HoloProjectorDrawData) drawData;
-                                                if (!holoProjectorDrawData.changed
-                                                    && !(holoProjectorDrawData.src.equals(adjacentDrawData.src))) {
-                                                    holoProjectorDrawData.src = adjacentDrawData.src;
-                                                    holoProjectorDrawData.offset.set(adjacentDrawData.offset);
-                                                    holoProjectorDrawData.rotation.set(adjacentDrawData.rotation);
-                                                    holoProjectorDrawData.scale = adjacentDrawData.scale;
-                                                    holoProjectorDrawData.holographic = adjacentDrawData.holographic;
-                                                    holoProjectorDrawData.changed = true;
-                                                    needsUpdate = true;
-                                                }
-                                            }
-                                        }
-                                        if (needsUpdate)
-                                            ((SimpleDataStorageMCModule)
-                                                     ServerUtils.getManagerContainer(
-                                                                        event.getSegmentPiece().getSegmentController())
-                                                                .getModMCModule(
-                                                                        ElementManager.getBlock("Holo Projector").getId()))
-                                                    .flagUpdatedData();
-                                    }
-                                } else {
-                                    adjacent =
-                                            SegmentPieceUtils.getFirstMatchingAdjacent(
-                                                    event.getSegmentPiece(),
-                                                    ElementManager.getBlock("Text Projector").getId());
-                                    if (adjacent != null) {
-                                        TextProjectorDrawData adjacentDrawData =
-                                                (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-                                        ArrayList<SegmentPiece> controlling =
-                                                SegmentPieceUtils.getControlledPiecesMatching(
-                                                        event.getSegmentPiece(),
-                                                        ElementManager.getBlock("Text Projector").getId());
-                                        if (!controlling.isEmpty() && adjacentDrawData != null) {
-                                            boolean needsUpdate = false;
-                                            for (SegmentPiece segmentPiece : controlling) {
-                                                Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-                                                if (drawData instanceof TextProjectorDrawData) {
-                                                    TextProjectorDrawData textProjectorDrawData =
-                                                            (TextProjectorDrawData) drawData;
-                                                    if (!textProjectorDrawData.changed
-                                                        && !(textProjectorDrawData.text.equals(adjacentDrawData.text))) {
-                                                        textProjectorDrawData.text = adjacentDrawData.text;
-                                                        textProjectorDrawData.color = adjacentDrawData.color;
-                                                        textProjectorDrawData.offset.set(adjacentDrawData.offset);
-                                                        textProjectorDrawData.rotation.set(adjacentDrawData.rotation);
-                                                        textProjectorDrawData.scale = adjacentDrawData.scale;
-                                                        textProjectorDrawData.holographic = adjacentDrawData.holographic;
-                                                        textProjectorDrawData.changed = true;
-                                                        needsUpdate = true;
-                                                    }
-                                                }
-                                            }
-                                            if (needsUpdate)
-                                                ((SimpleDataStorageMCModule)
-                                                         ServerUtils.getManagerContainer(
-                                                                            event.getSegmentPiece().getSegmentController())
-                                                                    .getModMCModule(
-                                                                            ElementManager.getBlock("Text Projector").getId()))
-                                                        .flagUpdatedData();
-                                        }
-                                    }
-                                }
-                            }
+            if (event.isServer()) {
+              if ((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID
+                      || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM)
+                  && event.getSegmentPiece().isActive()) {
+                SegmentPiece adjacent =
+                    SegmentPieceUtils.getFirstMatchingAdjacent(
+                        event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+                if (adjacent != null) {
+                  HoloProjectorDrawData adjacentDrawData =
+                      (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+                  ArrayList<SegmentPiece> controlling =
+                      SegmentPieceUtils.getControlledPiecesMatching(
+                          event.getSegmentPiece(),
+                          ElementManager.getBlock("Holo Projector").getId());
+                  if (!controlling.isEmpty() && adjacentDrawData != null) {
+                    boolean needsUpdate = false;
+                    for (SegmentPiece segmentPiece : controlling) {
+                      Object drawData = ProjectorUtils.getDrawData(segmentPiece);
+                      if (drawData instanceof HoloProjectorDrawData) {
+                        HoloProjectorDrawData holoProjectorDrawData =
+                            (HoloProjectorDrawData) drawData;
+                        if (!holoProjectorDrawData.changed
+                            && !(holoProjectorDrawData.src.equals(adjacentDrawData.src))) {
+                          holoProjectorDrawData.src = adjacentDrawData.src;
+                          holoProjectorDrawData.offset.set(adjacentDrawData.offset);
+                          holoProjectorDrawData.rotation.set(adjacentDrawData.rotation);
+                          holoProjectorDrawData.scale = adjacentDrawData.scale;
+                          holoProjectorDrawData.holographic = adjacentDrawData.holographic;
+                          holoProjectorDrawData.changed = true;
+                          needsUpdate = true;
                         }
+                      }
                     }
-                },
-                this);
+                    if (needsUpdate)
+                      ((SimpleDataStorageMCModule)
+                              ServerUtils.getManagerContainer(
+                                      event.getSegmentPiece().getSegmentController())
+                                  .getModMCModule(
+                                      ElementManager.getBlock("Holo Projector").getId()))
+                          .flagUpdatedData();
+                  }
+                } else {
+                  adjacent =
+                      SegmentPieceUtils.getFirstMatchingAdjacent(
+                          event.getSegmentPiece(),
+                          ElementManager.getBlock("Text Projector").getId());
+                  if (adjacent != null) {
+                    TextProjectorDrawData adjacentDrawData =
+                        (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+                    ArrayList<SegmentPiece> controlling =
+                        SegmentPieceUtils.getControlledPiecesMatching(
+                            event.getSegmentPiece(),
+                            ElementManager.getBlock("Text Projector").getId());
+                    if (!controlling.isEmpty() && adjacentDrawData != null) {
+                      boolean needsUpdate = false;
+                      for (SegmentPiece segmentPiece : controlling) {
+                        Object drawData = ProjectorUtils.getDrawData(segmentPiece);
+                        if (drawData instanceof TextProjectorDrawData) {
+                          TextProjectorDrawData textProjectorDrawData =
+                              (TextProjectorDrawData) drawData;
+                          if (!textProjectorDrawData.changed
+                              && !(textProjectorDrawData.text.equals(adjacentDrawData.text))) {
+                            textProjectorDrawData.text = adjacentDrawData.text;
+                            textProjectorDrawData.color = adjacentDrawData.color;
+                            textProjectorDrawData.offset.set(adjacentDrawData.offset);
+                            textProjectorDrawData.rotation.set(adjacentDrawData.rotation);
+                            textProjectorDrawData.scale = adjacentDrawData.scale;
+                            textProjectorDrawData.holographic = adjacentDrawData.holographic;
+                            textProjectorDrawData.changed = true;
+                            needsUpdate = true;
+                          }
+                        }
+                      }
+                      if (needsUpdate)
+                        ((SimpleDataStorageMCModule)
+                                ServerUtils.getManagerContainer(
+                                        event.getSegmentPiece().getSegmentController())
+                                    .getModMCModule(
+                                        ElementManager.getBlock("Text Projector").getId()))
+                            .flagUpdatedData();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        this);
 
     /* Todo: Fix display screen orientation
     StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
@@ -395,27 +395,27 @@ public class DerpsDecor extends StarMod {
         }
     }, this);
      */
-    }
+  }
 
-    private void registerCommands() {
-        StarLoader.registerCommand(new ClearProjectorsCommand());
-    }
+  private void registerCommands() {
+    StarLoader.registerCommand(new ClearProjectorsCommand());
+  }
 
-    private byte[] overwriteClass(String className, byte[] byteCode) {
-        byte[] bytes = null;
-        try {
-            ZipInputStream file =
-                    new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
-            while (true) {
-                ZipEntry nextEntry = file.getNextEntry();
-                if (nextEntry == null) break;
-                if (nextEntry.getName().endsWith(className + ".class")) bytes = IOUtils.toByteArray(file);
-            }
-            file.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (bytes != null) return bytes;
-        else return byteCode;
+  private byte[] overwriteClass(String className, byte[] byteCode) {
+    byte[] bytes = null;
+    try {
+      ZipInputStream file =
+          new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
+      while (true) {
+        ZipEntry nextEntry = file.getNextEntry();
+        if (nextEntry == null) break;
+        if (nextEntry.getName().endsWith(className + ".class")) bytes = IOUtils.toByteArray(file);
+      }
+      file.close();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    if (bytes != null) return bytes;
+    else return byteCode;
+  }
 }

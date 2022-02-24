@@ -3,12 +3,6 @@ package thederpgamer.decor.manager;
 import api.utils.textures.StarLoaderTexture;
 import com.sun.imageio.plugins.gif.GIFImageReader;
 import com.sun.imageio.plugins.gif.GIFImageReaderSpi;
-import org.schema.schine.graphicsengine.forms.Sprite;
-import thederpgamer.decor.DerpsDecor;
-
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -19,6 +13,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import org.schema.schine.graphicsengine.forms.Sprite;
+import thederpgamer.decor.DerpsDecor;
 
 /**
  * <Description>
@@ -29,8 +28,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ImageManager {
 
   private static final ConcurrentHashMap<String, Sprite> imgCache = new ConcurrentHashMap<>();
-  private static final ConcurrentHashMap<String, Sprite[]> animatedImgCache = new ConcurrentHashMap<>();
-  private static final ConcurrentLinkedQueue<String> downloadingImages = new ConcurrentLinkedQueue<>();
+  private static final ConcurrentHashMap<String, Sprite[]> animatedImgCache =
+      new ConcurrentHashMap<>();
+  private static final ConcurrentLinkedQueue<String> downloadingImages =
+      new ConcurrentLinkedQueue<>();
 
   @Nullable
   public static Sprite getImage(String url) {
