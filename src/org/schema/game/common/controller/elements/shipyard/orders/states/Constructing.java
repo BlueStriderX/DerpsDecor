@@ -2,7 +2,7 @@ package org.schema.game.common.controller.elements.shipyard.orders.states;
 
 import api.listener.fastevents.FastListenerCommon;
 import api.listener.fastevents.ProductionItemPullListener;
-import api.utils.game.module.ModTagUtils;
+import api.utils.game.module.ModManagerContainerModule;
 import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -14,6 +14,7 @@ import org.schema.game.common.controller.SegmentBufferManager;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.Ship;
 import org.schema.game.common.controller.elements.ManagerContainer;
+import org.schema.game.common.controller.elements.ShipManagerContainer;
 import org.schema.game.common.controller.elements.shipyard.ShipyardCollectionManager;
 import org.schema.game.common.controller.elements.shipyard.ShipyardElementManager;
 import org.schema.game.common.controller.elements.shipyard.orders.ShipyardEntityState;
@@ -29,9 +30,9 @@ import org.schema.game.server.data.GameServerState;
 import org.schema.schine.ai.stateMachines.FSMException;
 import org.schema.schine.ai.stateMachines.Transition;
 import org.schema.schine.common.language.Lng;
-import org.schema.schine.resource.tag.Tag;
 
 import java.util.List;
+import java.util.Map;
 
 public class Constructing extends ShipyardState{
 
@@ -280,20 +281,22 @@ public class Constructing extends ShipyardState{
                             System.err.println("[SERVER][SHIPYARD] copy finished!");
 
                             //INSERTED CODE
+                            /*
                             Tag tag = currentDocked.toTagStructure();
                             Tag[] parts = (Tag[]) tag.getValue();
                             if(parts.length > 17 && parts[17].getType() != Tag.Type.FINISH) {
                                 System.err.println("CALLED ON TAG DESERIALIZE");
                                 ModTagUtils.onTagDeserialize(newShip.getManagerContainer(), parts[17]);
                             }
-                            /*
+                            */
                             ShipManagerContainer oldManagerContainer = ((Ship) currentDocked).getManagerContainer();
                             ShipManagerContainer newManagerContainer = newShip.getManagerContainer();
                             for(Map.Entry<Short, ModManagerContainerModule> entry : oldManagerContainer.getModModuleMap().entrySet()) {
+                                ModManagerContainerModule module = entry.getValue();
                                 newManagerContainer.getModModuleMap().remove(entry.getKey());
-                                newManagerContainer.getModModuleMap().put(entry.getKey(), entry.getValue());
+                                newManagerContainer.getModModuleMap().put(entry.getKey(), module);
+                                if(module.isOnServer()) module.syncToNearbyClients();
                             }
-                             */
                             //
 
                             //replace segment buffer, so it is not referenced twice
