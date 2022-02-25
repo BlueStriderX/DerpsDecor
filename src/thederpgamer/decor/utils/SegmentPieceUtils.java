@@ -3,10 +3,6 @@ package thederpgamer.decor.utils;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import java.util.ArrayList;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
 import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
@@ -18,6 +14,11 @@ import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SegmentData;
 import org.schema.game.common.util.FastCopyLongOpenHashSet;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 
 /**
  * <Description>
@@ -216,14 +217,9 @@ public class SegmentPieceUtils {
     return transform;
   }
 
-  public static ArrayList<SegmentPiece> getControlledPiecesMatching(
-      SegmentPiece segmentPiece, short type) {
+  public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
     ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-    PositionControl control =
-        segmentPiece
-            .getSegmentController()
-            .getControlElementMap()
-            .getDirectControlledElements(type, segmentPiece.getAbsolutePos(new Vector3i()));
+    PositionControl control = segmentPiece.getSegmentController().getControlElementMap().getDirectControlledElements(type, segmentPiece.getAbsolutePos(new Vector3i()));
     if (control != null) {
       for (long l : control.getControlMap().toLongArray()) {
         SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
@@ -235,19 +231,13 @@ public class SegmentPieceUtils {
 
   public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
     ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-    ControlElementMapper controlElementMapper =
-        segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
+    ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
     if (controlElementMapper.containsKey(segmentPiece.getAbsoluteIndex())) {
-      for (FastCopyLongOpenHashSet longs :
-          controlElementMapper.get(segmentPiece.getAbsoluteIndex()).values()) {
+      for (FastCopyLongOpenHashSet longs : controlElementMapper.get(segmentPiece.getAbsoluteIndex()).values()) {
         LongIterator longIterator = longs.iterator();
         while (longIterator.hasNext()) {
           try {
-            controlledPieces.add(
-                segmentPiece
-                    .getSegmentController()
-                    .getSegmentBuffer()
-                    .getPointUnsave(longIterator.nextLong()));
+            controlledPieces.add(segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(longIterator.nextLong()));
           } catch (Exception exception) {
             exception.printStackTrace();
           }

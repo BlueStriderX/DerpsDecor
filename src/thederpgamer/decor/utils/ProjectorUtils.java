@@ -18,22 +18,16 @@ import thederpgamer.decor.systems.modules.TextProjectorModule;
  */
 public class ProjectorUtils {
 
-  public static Object getDrawData(SegmentPiece segmentPiece) {
-    SegmentController segmentController = segmentPiece.getSegmentController();
-    ManagerContainer<?> managerContainer = null;
-    if (segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP))
-      managerContainer = ((Ship) segmentController).getManagerContainer();
-    else if (segmentController
-        .getType()
-        .equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION))
-      managerContainer = ((SpaceStation) segmentController).getManagerContainer();
-    if (managerContainer != null) {
-      ModManagerContainerModule module = managerContainer.getModMCModule(segmentPiece.getType());
-      if (module instanceof HoloProjectorModule)
-        return ((HoloProjectorModule) module).getDrawData(segmentPiece);
-      else if (module instanceof TextProjectorModule)
-        return ((TextProjectorModule) module).getDrawData(segmentPiece);
-    }
-    return null;
-  }
+	public static Object getDrawData(SegmentPiece segmentPiece) {
+		SegmentController segmentController = segmentPiece.getSegmentController();
+		ManagerContainer<?> managerContainer = null;
+		if (segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) managerContainer = ((Ship) segmentController).getManagerContainer();
+		else if (segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) managerContainer = ((SpaceStation) segmentController).getManagerContainer();
+		if (managerContainer != null) {
+			ModManagerContainerModule module = managerContainer.getModMCModule(segmentPiece.getType());
+			if (module instanceof HoloProjectorModule) return ((HoloProjectorModule) module).getDrawData(segmentPiece);
+			else if (module instanceof TextProjectorModule) return ((TextProjectorModule) module).getDrawData(segmentPiece);
+		}
+		return null;
+	}
 }

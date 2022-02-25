@@ -7,6 +7,7 @@ import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
@@ -21,6 +22,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -60,16 +62,12 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 
                 if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
                     SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-                    if (canDraw(segmentPiece) && !segmentPiece.isActive()) {
-                        if (drawData.changed
-                            || drawData.transform == null
-                            || drawData.transform.origin.length() <= 0
-                            || drawData.subSprite == null) {
+                    if (canDraw(segmentPiece)) {
+                        if (drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0 || drawData.subSprite == null) {
                             if (drawData.image != null) {
                                 float maxDim = Math.max(drawData.image.getWidth(), drawData.image.getHeight());
                                 if (drawData.transform == null) drawData.transform = new Transform();
-                                SegmentPieceUtils.getProjectorTransform(
-                                        segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+                                SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
                                 Quat4f currentRot = new Quat4f();
                                 drawData.transform.getRotation(currentRot);
                                 Quat4f addRot = new Quat4f();
@@ -83,11 +81,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
                                 drawData.transform.setRotation(currentRot);
                                 drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
                                 MathUtils.roundVector(drawData.transform.origin);
-                                drawData.subSprite =
-                                        new ScalableImageSubSprite[] {
-                                                new ScalableImageSubSprite(
-                                                        ((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)
-                                        };
+                                drawData.subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)};
                                 drawData.changed = false;
                                 getProjectorDrawer().addDraw(segmentPiece, drawData);
                             }
@@ -150,11 +144,21 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
     }
 
     private boolean canDraw(SegmentPiece segmentPiece) {
-        if (segmentPiece.getSegmentController().isFullyLoaded() && segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex())) {
-            short type = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType();
-            return type == ElementManager.getBlock("Holo Projector").getId();
+        boolean canToggle = false;
+        SegmentController segmentController = segmentPiece.getSegmentController();
+        SegmentPiece activator = SegmentPieceUtils.getFirstMatchingAdjacent(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
+        if(activator != null) {
+            ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(activator, segmentPiece.getType());
+            if(!controlling.isEmpty()) {
+                for(SegmentPiece controlled : controlling) {
+                    if(controlled.equals(segmentPiece)) {
+                        canToggle = true;
+                        break;
+                    }
+                }
+            }
         }
-        return false;
+        return segmentController.getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) && segmentController.getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() == segmentPiece.getType() && segmentController.isFullyLoadedWithDock() && segmentController.isInClientRange()  && ((canToggle && activator.isActive()) || activator == null);
     }
 
     private HoloProjectorDrawData createNewDrawData(long indexAndOrientation) {
