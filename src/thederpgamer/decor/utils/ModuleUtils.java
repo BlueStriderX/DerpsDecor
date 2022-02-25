@@ -14,11 +14,15 @@ import org.schema.game.common.data.world.SimpleTransformableSendableObject;
  */
 public class ModuleUtils {
 
-	public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
-		if(segmentController instanceof Ship && segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-			return ((Ship) segmentController).getManagerContainer();
-		} else if(segmentController instanceof SpaceStation && segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-			return ((SpaceStation) segmentController).getManagerContainer();
-		} else return null;
-	}
+  public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
+    if (segmentController instanceof Ship
+        && segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+      return ((Ship) segmentController).getManagerContainer();
+    } else if (segmentController instanceof SpaceStation
+        && segmentController
+            .getType()
+            .equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+      return ((SpaceStation) segmentController).getManagerContainer();
+    } else return null;
+  }
 }
