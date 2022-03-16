@@ -20,14 +20,15 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.element.blocks.decor.DisplayScreen;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
 import thederpgamer.decor.element.blocks.decor.StrutConnector;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.systems.inventories.StorageCapsuleModule;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
+import thederpgamer.decor.systems.modules.StrutConnectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.ProjectorUtils;
@@ -90,10 +91,9 @@ public class DerpsDecor extends StarMod {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
 		ElementManager.addBlock(new StrutConnector());
-		// ElementManager.addBlock(new DisplayScreen());
+		ElementManager.addBlock(new DisplayScreen());
 		// ElementManager.addBlock(new HoloTable());
 		// ElementManager.addBlock(new StorageCapsule());
-		// ElementManager.addBlock(new CakeBlock());
 		ElementManager.doOverwrites();
 		ElementManager.initialize();
 	}
@@ -116,8 +116,8 @@ public class DerpsDecor extends StarMod {
 			public void onEvent(ManagerContainerRegisterEvent event) {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-				//event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
-				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
+				event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
+				//event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, this);
 
@@ -133,53 +133,7 @@ public class DerpsDecor extends StarMod {
 
            /*
             } else if(event.getSegmentPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                final PlayerInteractionControlManager cm = event.getControlManager();
-                String text = piece.getSegment().getSegmentController().getTextMap().get(ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation()));
-                if(text == null) text = "";
 
-                final PlayerTextAreaInput t = new PlayerTextAreaInput("EDIT_DISPLAY_BLOCK_POPUP", cm.getState(), 400, 300, SendableGameState.TEXT_BLOCK_LIMIT, SendableGameState.TEXT_BLOCK_LINE_LIMIT + 1, "Edit Holoprojector", "", text, FontLibrary.FontSize.SMALL) {
-
-                    @Override
-                    public void onDeactivate() {
-                        cm.suspend(false);
-                    }
-
-                    @Override
-                    public String[] getCommandPrefixes() {
-                        return null;
-                    }
-
-                    @Override
-                    public boolean onInput(String entry) {
-                        SendableSegmentProvider ss = ((ClientSegmentProvider) piece.getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
-                        TextBlockPair f = new TextBlockPair();
-                        f.block = ElementCollection.getIndex4(piece.getAbsoluteIndex(), piece.getOrientation());
-                        f.text = entry;
-                        System.err.println("[CLIENT]Text entry:\n\"" + f.text + "\"");
-                        ss.getNetworkObject().textBlockResponsesAndChangeRequests.add(new RemoteTextBlockPair(f, false));
-                        return true;
-                    }
-
-                    @Override
-                    public String handleAutoComplete(String s, TextCallback callback, String prefix) throws PrefixNotFoundException {
-                        return null;
-                    }
-
-                    @Override
-                    public boolean isOccluded() {
-                        return false;
-                    }
-
-
-                    @Override
-                    public void onFailedTextCheck(String msg) {
-
-                    }
-                };
-
-                t.getTextInput().setAllowEmptyEntry(true);
-                t.getInputPanel().onInit();
-                t.activate();
             }
              */
 			}

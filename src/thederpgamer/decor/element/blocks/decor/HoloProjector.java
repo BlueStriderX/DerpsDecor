@@ -11,6 +11,7 @@ import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.gui.panel.holoprojector.HoloProjectorConfigDialog;
 import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.BlockIconUtils;
 
 /**
  * <Description>
@@ -26,18 +27,16 @@ public class HoloProjector extends Block implements ActivationInterface {
 
 	@Override
 	public void initialize() {
-		if (GraphicsContext.initialized) {
+		if(GraphicsContext.initialized) {
 			try {
+				BlockIconUtils.createBlockIcon(blockInfo);
 				blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-				blockInfo.setTextureId(
-						0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
-			} catch (Exception ignored) {
+				blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
+			} catch(Exception exception) {
+				exception.printStackTrace();
 			}
 		}
-		blockInfo.setDescription(
-				"A block used to project an image at a specified location, scale, and rotation.\n"
-				+ "Check the building quick reference menu for a detailed usage guide.");
+		blockInfo.setDescription("A block used to project an image at a specified location, scale, and rotation.\n" + "Check the building quick reference menu for a detailed usage guide.");
 		blockInfo.setInRecipe(true);
 		blockInfo.setShoppable(true);
 		blockInfo.setCanActivate(true);
@@ -54,12 +53,7 @@ public class HoloProjector extends Block implements ActivationInterface {
 		ElementKeyMap.getInfo(666).controlling.add(getId());
 		ElementKeyMap.getInfo(399).controlling.add(getId());
 
-		BlockConfig.addRecipe(
-				blockInfo,
-				ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(),
-				(int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-				new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-				new FactoryResource(50, (short) 220));
+		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX), new FactoryResource(50, (short) 220));
 		BlockConfig.add(blockInfo);
 	}
 
@@ -69,15 +63,9 @@ public class HoloProjector extends Block implements ActivationInterface {
 		configDialog.setSegmentPiece(event.getSegmentPiece());
 		configDialog.activate();
 		event.getSegmentPiece().setActive(!event.getSegmentPiece().isActive());
-		if (GameClient.getClientState() != null)
-			GameClient.getClientState()
-			          .getGlobalGameControlManager()
-			          .getIngameControlManager()
-			          .getPlayerGameControlManager()
-			          .getPlayerIntercationManager()
-			          .suspend(true);
+		if(GameClient.getClientState() != null) GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(true);
 	}
 
 	@Override
-	public void onLogicActivation(SegmentPieceActivateEvent event) {}
+	public void onLogicActivation(SegmentPieceActivateEvent event) { }
 }

@@ -25,13 +25,7 @@ public class ResourceManager {
 
 	private static final String[] textureNames = {
 			"holo-projector-front",
-			//"holo-projector-icon",
-			"text-projector-front",
-			//"text-projector-icon",
-			//"strut-connector-icon",
-			//"display-screen-icon",
-			//"holo-table-icon",
-			//"cake-icon"
+			"text-projector-front"
 	};
 
 	private static final String[] spriteNames = {
@@ -43,7 +37,7 @@ public class ResourceManager {
 	private static final String[] modelNames = {
 			"strut_connector",
 			"strut_tube",
-			//"display_screen",
+			"display_screen"
 			//"holo_table",
 			//"storage_capsule_closed",
 			//"storage_capsule_open",
