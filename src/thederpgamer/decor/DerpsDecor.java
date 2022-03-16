@@ -2,8 +2,7 @@ package thederpgamer.decor;
 
 import api.config.BlockConfig;
 import api.listener.Listener;
-import api.listener.events.block.SegmentPieceActivateByPlayer;
-import api.listener.events.block.SegmentPieceActivateEvent;
+import api.listener.events.block.*;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
@@ -11,7 +10,9 @@ import api.mod.StarMod;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import org.apache.commons.io.IOUtils;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementKeyMap;
+import org.schema.game.common.data.world.Segment;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
@@ -38,6 +39,7 @@ import thederpgamer.decor.utils.ServerUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -52,11 +54,10 @@ public class DerpsDecor extends StarMod {
 	// Instance
 	private static DerpsDecor instance;
 	// Other
-	private final String[] overwriteClasses = {
-			"GUIQuickReferencePanel"
-			// "Constructing",
-			// "ElementCollection",
-			// "ElementCollectionMesh"
+	private final String[] overwriteClasses = {"GUIQuickReferencePanel"
+	                                           // "Constructing",
+	                                           // "ElementCollection",
+	                                           // "ElementCollectionMesh"
 	};
 	// Utils
 	public ClipboardUtils clipboard;
@@ -130,12 +131,6 @@ public class DerpsDecor extends StarMod {
 						return;
 					}
 				}
-
-           /*
-            } else if(event.getSegmentPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-
-            }
-             */
 			}
 		}, this);
 
@@ -195,39 +190,37 @@ public class DerpsDecor extends StarMod {
 			}
 		}, this);
 
-    /* Todo: Fix display screen orientation
-    StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
-        @Override
-        public void onEvent(SegmentPieceAddEvent event) {
-            if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
-                event.getSegmentController().getTextBlocks().add(indexAndOrientation);
-            }
-        }
-    }, this);
+		StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
+			@Override
+			public void onEvent(SegmentPieceAddEvent event) {
+				if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+					long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
+					event.getSegmentController().getTextBlocks().add(indexAndOrientation);
+				}
+			}
+		}, this);
 
-    StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
-        @Override
-        public void onEvent(SegmentPieceRemoveEvent event) {
-            if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                Segment segment = event.getSegment();
-                long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
-                long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
-                event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
-                event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
-            }
-        }
-    }, this);
+		StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
+			@Override
+			public void onEvent(SegmentPieceRemoveEvent event) {
+				if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+					Segment segment = event.getSegment();
+					long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
+					long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
+					event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
+					event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
+				}
+			}
+		}, this);
 
-    StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
-        @Override
-        public void onEvent(SegmentPieceAddByMetadataEvent event) {
-            if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-                event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
-            }
-        }
-    }, this);
-     */
+		StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
+			@Override
+			public void onEvent(SegmentPieceAddByMetadataEvent event) {
+				if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
+					event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
+				}
+			}
+		}, this);
 	}
 
 	private void registerCommands() {
