@@ -44,6 +44,7 @@ public class HoloTableDrawData {
 	}
 
 	public Transform getTransform() {
-		return systemMesh.getTransform();
+		return new Transform();
+		//return systemMesh.getTransform();
 	}
 }
