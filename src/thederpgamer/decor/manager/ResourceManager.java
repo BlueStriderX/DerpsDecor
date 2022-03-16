@@ -43,12 +43,12 @@ public class ResourceManager {
 	private static final String[] modelNames = {
 			"strut_connector",
 			"strut_tube",
-			"display_screen",
-			"holo_table",
-			"storage_capsule_closed",
-			"storage_capsule_open",
-			"activation_lever_off",
-			"activation_lever_on"
+			//"display_screen",
+			//"holo_table",
+			//"storage_capsule_closed",
+			//"storage_capsule_open",
+			//"activation_lever_off",
+			//"activation_lever_on"
 	};
 
 	private static final String[] fontNames = {
