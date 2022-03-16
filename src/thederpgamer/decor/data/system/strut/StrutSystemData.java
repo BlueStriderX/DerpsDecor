@@ -1,6 +1,6 @@
 package thederpgamer.decor.data.system.strut;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,13 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0 - [03/16/2022]
  */
 public class StrutSystemData {
-	public ConcurrentHashMap<Pair<Long, Long>, StrutData> map;
+	public ConcurrentHashMap<MutablePair<Long, Long>, StrutData> map;
 
 	public StrutSystemData() {
 		map = new ConcurrentHashMap<>();
-	}
-
-	public StrutSystemData(ConcurrentHashMap<Pair<Long, Long>, StrutData> map) {
-		this.map = map;
 	}
 }

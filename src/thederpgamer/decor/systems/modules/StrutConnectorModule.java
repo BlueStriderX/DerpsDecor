@@ -34,7 +34,7 @@ public class StrutConnectorModule extends SimpleDataStorageMCModule {
 		if(!(data instanceof StrutSystemData)) data = new StrutSystemData();
 	}
 
-	public ConcurrentHashMap<Pair<Long, Long>, StrutData> getData() {
+	public ConcurrentHashMap<MutablePair<Long, Long>, StrutData> getData() {
 		initData();
 		return ((StrutSystemData) data).map;
 	}
@@ -57,7 +57,7 @@ public class StrutConnectorModule extends SimpleDataStorageMCModule {
 	}
 
 	public void updateEntries() {
-		for(Map.Entry<Pair<Long, Long>, StrutData> entry : getData().entrySet()) {
+		for(Map.Entry<MutablePair<Long, Long>, StrutData> entry : getData().entrySet()) {
 			SegmentPiece pieceA = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey().getLeft());
 			SegmentPiece pieceB = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey().getRight());
 			if(pieceA == null || pieceB == null || pieceA.equals(pieceB) || pieceA.getType() != getBlockId() || pieceB.getType() != getBlockId()) getData().remove(entry.getKey());

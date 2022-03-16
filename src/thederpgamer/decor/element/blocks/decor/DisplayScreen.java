@@ -6,7 +6,6 @@ import api.listener.events.block.SegmentPieceActivateEvent;
 import org.schema.game.client.controller.PlayerTextAreaInput;
 import org.schema.game.client.controller.element.world.ClientSegmentProvider;
 import org.schema.game.client.controller.manager.ingame.PlayerInteractionControlManager;
-import org.schema.game.client.view.cubes.shapes.BlockStyle;
 import org.schema.game.common.controller.SendableSegmentProvider;
 import org.schema.game.common.data.SendableGameState;
 import org.schema.game.common.data.element.ElementCollection;
@@ -15,7 +14,6 @@ import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
 import org.schema.schine.common.TextCallback;
-import org.schema.schine.graphicsengine.core.GraphicsContext;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import thederpgamer.decor.DerpsDecor;
@@ -37,14 +35,6 @@ public class DisplayScreen extends Block implements ActivationInterface {
 
 	@Override
 	public void initialize() {
-		if (GraphicsContext.initialized) {
-			try {
-				BlockIconUtils.createBlockIcon(blockInfo);
-				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
-			} catch (Exception exception) {
-				exception.printStackTrace();
-			}
-		}
 		blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
 		blockInfo.setCanActivate(true);
 		blockInfo.setInRecipe(true);
@@ -52,11 +42,17 @@ public class DisplayScreen extends Block implements ActivationInterface {
 		blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
 		blockInfo.setOrientatable(true);
 		blockInfo.setIndividualSides(6);
-		blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
+		blockInfo.setBlockStyle(ElementKeyMap.getInfo(698).getBlockStyle().id);
 		blockInfo.lodShapeStyle = 1;
 
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX));
 		BlockConfig.add(blockInfo);
+	}
+
+	@Override
+	public void createGraphics() {
+		BlockIconUtils.createBlockIcon(blockInfo);
+		BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
 	}
 
 	@Override
@@ -73,11 +69,6 @@ public class DisplayScreen extends Block implements ActivationInterface {
 			}
 
 			@Override
-			public String[] getCommandPrefixes() {
-				return null;
-			}
-
-			@Override
 			public boolean onInput(String entry) {
 				SendableSegmentProvider ss = ((ClientSegmentProvider) event.getSegmentPiece().getSegment().getSegmentController().getSegmentProvider()).getSendableSegmentProvider();
 				TextBlockPair f = new TextBlockPair();
@@ -89,19 +80,23 @@ public class DisplayScreen extends Block implements ActivationInterface {
 			}
 
 			@Override
+			public String[] getCommandPrefixes() {
+				return null;
+			}
+
+			@Override
 			public String handleAutoComplete(String s, TextCallback callback, String prefix) throws PrefixNotFoundException {
 				return null;
 			}
 
 			@Override
-			public boolean isOccluded() {
-				return false;
-			}
-
-
-			@Override
 			public void onFailedTextCheck(String msg) {
 
+			}
+
+			@Override
+			public boolean isOccluded() {
+				return false;
 			}
 		};
 

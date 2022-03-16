@@ -6,7 +6,6 @@ import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceActivateEvent;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
-import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.gui.panel.textprojector.TextProjectorConfigDialog;
@@ -27,15 +26,6 @@ public class TextProjector extends Block implements ActivationInterface {
 
 	@Override
 	public void initialize() {
-		if(GraphicsContext.initialized) {
-			try {
-				BlockIconUtils.createBlockIcon(blockInfo);
-				blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
-				blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
-		}
 		blockInfo.setDescription("A block used to project text at a specified location, scale, and rotation.\nCheck the building quick reference menu for a detailed usage guide.");
 		blockInfo.setInRecipe(true);
 		blockInfo.setShoppable(true);
@@ -55,6 +45,13 @@ public class TextProjector extends Block implements ActivationInterface {
 
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX), new FactoryResource(50, (short) 440));
 		BlockConfig.add(blockInfo);
+	}
+
+	@Override
+	public void createGraphics() {
+		BlockIconUtils.createBlockIcon(blockInfo);
+		blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
+		blockInfo.setTextureId(0, (short) ResourceManager.getTexture("text-projector-front").getTextureId());
 	}
 
 	@Override

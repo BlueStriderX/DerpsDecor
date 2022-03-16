@@ -96,6 +96,7 @@ public class DerpsDecor extends StarMod {
 		// ElementManager.addBlock(new HoloTable());
 		// ElementManager.addBlock(new StorageCapsule());
 		ElementManager.doOverwrites();
+		ElementManager.createGraphics();
 		ElementManager.initialize();
 	}
 

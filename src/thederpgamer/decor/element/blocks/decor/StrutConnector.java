@@ -6,14 +6,12 @@ import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceActivateEvent;
 import api.utils.game.inventory.InventoryUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.schema.game.client.view.cubes.shapes.BlockStyle;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.common.data.player.inventory.InventorySlot;
-import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.system.strut.StrutData;
 import thederpgamer.decor.element.ElementManager;
@@ -38,13 +36,6 @@ public class StrutConnector extends Block implements ActivationInterface {
 
 	@Override
 	public void initialize() {
-		if(GraphicsContext.initialized) {
-			try {
-				BlockIconUtils.createBlockIcon(blockInfo);
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
-		}
 		blockInfo.setDescription("Place two of these down and activate each while holding paint to create a colored strut" + " in-between them.");
 		blockInfo.setCanActivate(true);
 		blockInfo.setInRecipe(true);
@@ -52,7 +43,7 @@ public class StrutConnector extends Block implements ActivationInterface {
 		blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
 		blockInfo.setOrientatable(true);
 		blockInfo.setIndividualSides(6);
-		blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
+		blockInfo.setBlockStyle(BlockStyle.WEDGE.id);
 		blockInfo.lodShapeStyle = 1;
 		blockInfo.sideTexturesPointToOrientation = false;
 
@@ -60,6 +51,11 @@ public class StrutConnector extends Block implements ActivationInterface {
 
 		BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "strut_connector", null);
 		BlockConfig.add(blockInfo);
+	}
+
+	@Override
+	public void createGraphics() {
+		BlockIconUtils.createBlockIcon(blockInfo);
 	}
 
 	@Override
@@ -97,7 +93,7 @@ public class StrutConnector extends Block implements ActivationInterface {
 										if(otherPiece.equals(event.getSegmentPiece())) {
 											api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "Strut A cannot be connected to itself!");
 										} else {
-											Pair<Long, Long> key = new MutablePair<>(otherPiece.getAbsoluteIndex(), event.getSegmentPiece().getAbsoluteIndex());
+											MutablePair<Long, Long> key = new MutablePair<>(otherPiece.getAbsoluteIndex(), event.getSegmentPiece().getAbsoluteIndex());
 											module.getData().remove(key);
 											module.getData().put(key, new StrutData(PaintColor.fromId(selectedSlot.getType()), otherPiece, event.getSegmentPiece()));
 											module.flagUpdatedData();

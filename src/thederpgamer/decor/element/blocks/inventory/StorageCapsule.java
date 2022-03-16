@@ -9,7 +9,6 @@ import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.common.data.player.inventory.Inventory;
 import org.schema.game.common.data.player.inventory.InventoryHolder;
 import org.schema.game.common.data.player.inventory.StashInventory;
-import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.element.blocks.InventoryBlock;
 import thederpgamer.decor.utils.BlockIconUtils;
@@ -28,15 +27,6 @@ public class StorageCapsule extends InventoryBlock {
 
 	@Override
 	public void initialize() {
-		if(GraphicsContext.initialized) {
-			try {
-				BlockIconUtils.createBlockIcon(blockInfo);
-				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
-			} catch(Exception exception) {
-				exception.printStackTrace();
-			}
-		}
-
 		blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
 		blockInfo.setCanActivate(true);
 		blockInfo.setInRecipe(true);
@@ -55,6 +45,12 @@ public class StorageCapsule extends InventoryBlock {
 		                      new FactoryResource(1, (short) 120),
 		                      new FactoryResource(1,  (short) 976));
 		BlockConfig.add(blockInfo);
+	}
+
+	@Override
+	public void createGraphics() {
+		BlockIconUtils.createBlockIcon(blockInfo);
+		BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
 	}
 
 	@Override

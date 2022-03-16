@@ -1,11 +1,13 @@
 package thederpgamer.decor.element;
 
 import api.config.BlockConfig;
+import api.utils.textures.StarLoaderTexture;
 import org.apache.commons.lang3.StringUtils;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCategory;
 import org.schema.game.common.data.element.ElementInformation;
 import org.schema.game.common.data.element.ElementKeyMap;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.element.blocks.BlockGroup;
 import thederpgamer.decor.element.blocks.Factory;
@@ -38,6 +40,20 @@ public class ElementManager {
 		for (Block block : blockList) block.initialize();
 		for (Factory factory : factoryList) factory.initialize();
 		for (Item item : itemList) item.initialize();
+	}
+
+	public static void createGraphics() {
+		StarLoaderTexture.runOnGraphicsThread(new Runnable() {
+			@Override
+			public void run() {
+				if(GraphicsContext.initialized) {
+					for (Block block : blockList) block.createGraphics();
+					for (Factory factory : factoryList) factory.createGraphics();
+					for (Item item : itemList) item.createGraphics();
+				}
+			}
+		});
+
 	}
 
 	public static void doOverwrites() {

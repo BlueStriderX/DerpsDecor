@@ -29,17 +29,17 @@ import java.io.IOException;
  */
 public class StrutData implements Drawable, ByteArrayTagSerializable {
 
-	private final Vector3f pointA = new Vector3f();
-	private final Vector3f pointB = new Vector3f();
-	private final Transform transform = new Transform();
-	private final Vector3f scale = new Vector3f();
+	private transient final Vector3f pointA = new Vector3f();
+	private transient final Vector3f pointB = new Vector3f();
+	private transient final Transform transform = new Transform();
+	public Vector3f scale = new Vector3f();
 	public long pieceAIndex;
 	public long pieceBIndex;
 	public int entityId;
-	private SegmentPiece pieceA;
-	private SegmentPiece pieceB;
-	private PaintColor color = PaintColor.WHITE;
-	private Mesh mesh;
+	private transient SegmentPiece pieceA;
+	private transient SegmentPiece pieceB;
+	public PaintColor color = PaintColor.WHITE;
+	private transient Mesh mesh;
 
 	public StrutData(PaintColor color, SegmentPiece pieceA, SegmentPiece pieceB) {
 		assert pieceA != null && pieceB != null;
