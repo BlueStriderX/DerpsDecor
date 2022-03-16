@@ -36,35 +36,28 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TextProjectorModule extends SimpleDataStorageMCModule {
 
 	public TextProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
-		super(
-				ship,
-				managerContainer,
-				DerpsDecor.getInstance(),
-				ElementManager.getBlock("Text Projector").getId());
-		if (!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
+		super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Text Projector").getId());
+		if(!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
 	}
 
 	@Override
 	public void handle(Timer timer) {
-		if (isOnServer()) return;
-		for (Object obj : getProjectorMap().values()) {
+		if(isOnServer()) return;
+		for(Object obj : getProjectorMap().values()) {
 			TextProjectorDrawData drawData = (TextProjectorDrawData) obj;
 			long indexAndOrientation = drawData.indexAndOrientation;
 			long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-			if (drawData.text != null && drawData.color != null && !drawData.text.isEmpty()) {
-				if (drawData.changed || drawData.textOverlay == null || drawData.color.isEmpty()) {
+			if(drawData.text != null && drawData.color != null && !drawData.text.isEmpty()) {
+				if(drawData.changed || drawData.textOverlay == null || drawData.color.isEmpty()) {
 					GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
 					textOverlay.onInit();
 					int trueSize = drawData.scale + 10;
 					try {
-						textOverlay.setFont(
-								ResourceManager.getFont(
-										"Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
-					} catch (Exception exception) {
+						textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
+					} catch(Exception exception) {
 						exception.printStackTrace();
-						textOverlay.setFont(
-								ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
+						textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
 						drawData.color = "FFFFFF";
 					}
 					textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
@@ -75,23 +68,16 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 					drawData.changed = false;
 				}
 
-				if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
+				if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
 					SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-					if (canDraw(segmentPiece)) {
-						if (drawData.changed
-						    || drawData.transform == null
-						    || drawData.transform.origin.length() <= 0) {
-							if (drawData.transform == null) drawData.transform = new Transform();
-							SegmentPieceUtils.getProjectorTransform(
-									segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+					if(canDraw(segmentPiece)) {
+						if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
+							if(drawData.transform == null) drawData.transform = new Transform();
+							SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
 							Quat4f currentRot = new Quat4f();
 							drawData.transform.getRotation(currentRot);
 							Quat4f addRot = new Quat4f();
-							QuaternionUtil.setEuler(
-									addRot,
-									drawData.rotation.x / 100.0f,
-									drawData.rotation.y / 100.0f,
-									drawData.rotation.z / 100.0f);
+							QuaternionUtil.setEuler(addRot, drawData.rotation.x / 100.0f, drawData.rotation.y / 100.0f, drawData.rotation.z / 100.0f);
 							currentRot.mul(addRot);
 							MathUtils.roundQuat(currentRot);
 							drawData.transform.setRotation(currentRot);
@@ -107,13 +93,6 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	}
 
 	@Override
-	public void handleRemove(long abs) {
-		super.handleRemove(abs);
-		removeDrawData(abs);
-		flagUpdatedData();
-	}
-
-	@Override
 	public double getPowerConsumedPerSecondResting() {
 		return 0;
 	}
@@ -124,14 +103,20 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	}
 
 	@Override
+	public void handleRemove(long abs) {
+		super.handleRemove(abs);
+		removeDrawData(abs);
+		flagUpdatedData();
+	}
+
+	@Override
 	public String getName() {
 		return "TextProjector_ManagerModule";
 	}
 
 	public ConcurrentHashMap<Long, TextProjectorDrawData> getProjectorMap() {
-		if (!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
-		if (((TextProjectorDrawMap) data).map == null)
-			((TextProjectorDrawMap) data).map = new ConcurrentHashMap<>();
+		if(!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
+		if(((TextProjectorDrawMap) data).map == null) ((TextProjectorDrawMap) data).map = new ConcurrentHashMap<>();
 		return ((TextProjectorDrawMap) data).map;
 	}
 
@@ -144,15 +129,12 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	}
 
 	public Object getDrawData(long indexAndOrientation) {
-		if (getProjectorMap().containsKey(indexAndOrientation))
-			return getProjectorMap().get(indexAndOrientation);
+		if(getProjectorMap().containsKey(indexAndOrientation)) return getProjectorMap().get(indexAndOrientation);
 		return createNewDrawData(indexAndOrientation);
 	}
 
 	public Object getDrawData(SegmentPiece segmentPiece) {
-		return getDrawData(
-				ElementCollection.getIndex4(
-						segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+		return getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
 	}
 
 	public void setDrawData(long indexAndOrientation, TextProjectorDrawData drawData) {
@@ -197,7 +179,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 		try {
 			getProjectorMap().clear();
 			flagUpdatedData();
-		} catch (Exception exception) {
+		} catch(Exception exception) {
 			exception.printStackTrace();
 		}
 	}

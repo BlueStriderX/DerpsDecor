@@ -6,7 +6,7 @@ import org.schema.game.common.data.element.FactoryResource;
 import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.manager.ResourceManager;
+import thederpgamer.decor.utils.BlockIconUtils;
 
 /**
  * <Description>
@@ -16,37 +16,33 @@ import thederpgamer.decor.manager.ResourceManager;
  */
 public class DisplayScreen extends Block {
 
-  public DisplayScreen() {
-    super("Display Screen", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
-  }
+	public DisplayScreen() {
+		super("Display Screen", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+	}
 
-  @Override
-  public void initialize() {
-    if (GraphicsContext.initialized) {
-      try {
-        blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
-      } catch (Exception ignored) {
-      }
-    }
-    blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
-    blockInfo.setCanActivate(true);
-    blockInfo.setInRecipe(false); // Todo: Fix orientation bug
-    blockInfo.setShoppable(false);
-    blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
-    blockInfo.setOrientatable(true);
-    blockInfo.setIndividualSides(
-        ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getIndividualSides());
-    blockInfo.setBlockStyle(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getBlockStyle().id);
-    blockInfo.lodShapeStyle = 1;
-    blockInfo.sideTexturesPointToOrientation = false;
+	@Override
+	public void initialize() {
+		if (GraphicsContext.initialized) {
+			try {
+				BlockIconUtils.createBlockIcon(blockInfo);
+				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
+				//blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
+		blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
+		blockInfo.setCanActivate(true);
+		blockInfo.setInRecipe(false); // Todo: Fix orientation bug
+		blockInfo.setShoppable(false);
+		blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
+		blockInfo.setOrientatable(true);
+		blockInfo.setIndividualSides(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getIndividualSides());
+		blockInfo.setBlockStyle(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getBlockStyle().id);
+		blockInfo.lodShapeStyle = 1;
+		blockInfo.sideTexturesPointToOrientation = false;
 
-    BlockConfig.addRecipe(
-        blockInfo,
-        ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(),
-        (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-        new FactoryResource(1, ElementKeyMap.TEXT_BOX));
-
-    BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
-    BlockConfig.add(blockInfo);
-  }
+		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX));
+		BlockConfig.add(blockInfo);
+	}
 }

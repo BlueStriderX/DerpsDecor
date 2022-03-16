@@ -34,11 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HoloProjectorModule extends SimpleDataStorageMCModule {
 
     public HoloProjectorModule(SegmentController ship, ManagerContainer<?> managerContainer) {
-        super(
-                ship,
-                managerContainer,
-                DerpsDecor.getInstance(),
-                ElementManager.getBlock("Holo Projector").getId());
+        super(ship, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Holo Projector").getId());
         if (!(data instanceof HoloProjectorDrawMap)) data = new HoloProjectorDrawMap();
     }
 
