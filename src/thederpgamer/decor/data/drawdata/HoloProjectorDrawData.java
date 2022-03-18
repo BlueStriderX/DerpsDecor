@@ -68,8 +68,9 @@ public class HoloProjectorDrawData {
 	public void nextFrame() {
 		if (!src.endsWith(".gif") || frames == null) currentFrame = 0;
 		else {
-			if (currentFrame < frames.length) currentFrame++;
+			if (currentFrame < frames.length - 1) currentFrame++;
 			else currentFrame = 0;
+			image = frames[currentFrame];
 		}
 	}
 
@@ -79,8 +80,9 @@ public class HoloProjectorDrawData {
 			if (frames == null) frames = ImageManager.getAnimatedImage(src);
 			if (frames == null) return image;
 			else {
-				if (currentFrame < frames.length) return frames[currentFrame];
-				else return frames[frames.length - 1];
+				if (currentFrame < frames.length) image = frames[currentFrame];
+				else image = frames[frames.length - 1];
+				return image;
 			}
 		}
 	}
