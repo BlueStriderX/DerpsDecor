@@ -9,9 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HoloProjectorDrawMap {
 
-	public ConcurrentHashMap<Long, HoloProjectorDrawData> map;
+  public ConcurrentHashMap<Long, HoloProjectorDrawData> map;
 
-	public HoloProjectorDrawMap() {
-		map = new ConcurrentHashMap<>();
-	}
+  public HoloProjectorDrawMap() {
+    map = new ConcurrentHashMap<>();
+  }
 }

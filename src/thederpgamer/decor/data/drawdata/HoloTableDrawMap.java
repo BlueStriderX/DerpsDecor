@@ -10,13 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HoloTableDrawMap {
 
-	public ConcurrentHashMap<Long, HoloTableDrawData> map;
+  public ConcurrentHashMap<Long, HoloTableDrawData> map;
 
-	public HoloTableDrawMap() {
-		map = new ConcurrentHashMap<>();
-	}
+  public HoloTableDrawMap() {
+    map = new ConcurrentHashMap<>();
+  }
 
-	public HoloTableDrawMap(ConcurrentHashMap<Long, HoloTableDrawData> map) {
-		this.map = map;
-	}
+  public HoloTableDrawMap(ConcurrentHashMap<Long, HoloTableDrawData> map) {
+    this.map = map;
+  }
 }

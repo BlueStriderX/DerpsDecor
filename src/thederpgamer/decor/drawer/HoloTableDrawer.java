@@ -15,38 +15,26 @@ import org.schema.schine.graphicsengine.shader.Shaderable;
  */
 public class HoloTableDrawer extends ModWorldDrawer implements Drawable, Shaderable {
 
-	@Override
-	public void update(Timer timer) {
+  @Override
+  public void update(Timer timer) {}
 
-	}
+  @Override
+  public void cleanUp() {}
 
-	@Override
-	public void cleanUp() {
+  @Override
+  public boolean isInvisible() {
+    return false;
+  }
 
-	}
+  @Override
+  public void onInit() {}
 
-	@Override
-	public boolean isInvisible() {
-		return false;
-	}
+  @Override
+  public void onExit() {}
 
-	@Override
-	public void onInit() {
+  @Override
+  public void updateShader(DrawableScene drawableScene) {}
 
-	}
-
-	@Override
-	public void onExit() {
-
-	}
-
-	@Override
-	public void updateShader(DrawableScene drawableScene) {
-
-	}
-
-	@Override
-	public void updateShaderParameters(Shader shader) {
-
-	}
+  @Override
+  public void updateShaderParameters(Shader shader) {}
 }
