@@ -2,7 +2,6 @@ package thederpgamer.decor.systems.modules;
 
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -10,7 +9,6 @@ import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.system.strut.StrutData;
 import thederpgamer.decor.data.system.strut.StrutSystemData;
-import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ public class StrutConnectorModule extends SimpleDataStorageMCModule {
 
 	private void initData() {
 		if(!(data instanceof StrutSystemData)) data = new StrutSystemData();
+		if(((StrutSystemData) data).map == null) ((StrutSystemData) data).map = new ConcurrentHashMap<>();
 	}
 
 	public ConcurrentHashMap<MutablePair<Long, Long>, StrutData> getData() {
@@ -61,7 +60,7 @@ public class StrutConnectorModule extends SimpleDataStorageMCModule {
 			SegmentPiece pieceA = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey().getLeft());
 			SegmentPiece pieceB = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey().getRight());
 			if(pieceA == null || pieceB == null || pieceA.equals(pieceB) || pieceA.getType() != getBlockId() || pieceB.getType() != getBlockId()) getData().remove(entry.getKey());
-			else GlobalDrawManager.getStrutDrawer().drawMap.putIfAbsent(new MutablePair<>(pieceA, pieceB), entry.getValue());
+			//else GlobalDrawManager.getStrutDrawer().drawMap.putIfAbsent(new MutablePair<>(pieceA, pieceB), entry.getValue());
 		}
 	}
 
@@ -76,7 +75,7 @@ public class StrutConnectorModule extends SimpleDataStorageMCModule {
 
 	public ArrayList<SegmentPiece> getConnections(SegmentPiece segmentPiece) {
 		ArrayList<SegmentPiece> connections = new ArrayList<>();
-		for(Pair<Long, Long> pair : getData().keySet()) {
+		for(MutablePair<Long, Long> pair : getData().keySet()) {
 			SegmentPiece pieceA = segmentController.getSegmentBuffer().getPointUnsave(pair.getLeft());
 			SegmentPiece pieceB = segmentController.getSegmentBuffer().getPointUnsave(pair.getRight());
 			if(pieceA != null && pieceB != null && pieceA != pieceB) {

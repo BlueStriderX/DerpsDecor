@@ -14,12 +14,13 @@ import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.network.objects.remote.RemoteTextBlockPair;
 import org.schema.game.network.objects.remote.TextBlockPair;
 import org.schema.schine.common.TextCallback;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
 import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.utils.BlockIconUtils;
+import thederpgamer.decor.manager.ResourceManager;
 
 /**
  * <Description>
@@ -45,14 +46,17 @@ public class DisplayScreen extends Block implements ActivationInterface {
 		blockInfo.setBlockStyle(ElementKeyMap.getInfo(698).getBlockStyle().id);
 		blockInfo.lodShapeStyle = 1;
 
+		if(GraphicsContext.initialized) {
+			BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
+			blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
+		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX));
 		BlockConfig.add(blockInfo);
 	}
 
 	@Override
 	public void createGraphics() {
-		BlockIconUtils.createBlockIcon(blockInfo);
-		BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
+		//BlockIconUtils.createBlockIcon(blockInfo);
 	}
 
 	@Override

@@ -25,7 +25,11 @@ public class ResourceManager {
 
 	private static final String[] textureNames = {
 			"holo-projector-front",
-			"text-projector-front"
+			"holo-projector-icon",
+			"text-projector-front",
+			"text-projector-icon",
+			//"display-screen-icon",
+			"holo-table-icon"
 	};
 
 	private static final String[] spriteNames = {
@@ -35,10 +39,10 @@ public class ResourceManager {
 	};
 
 	private static final String[] modelNames = {
-			"strut_connector",
-			"strut_tube",
-			"display_screen"
-			//"holo_table",
+			//"strut_connector",
+			//"strut_tube",
+			//"display_screen",
+			"holo_table"
 			//"storage_capsule_closed",
 			//"storage_capsule_open",
 			//"activation_lever_off",
@@ -71,7 +75,11 @@ public class ResourceManager {
 				// Load Textures
 				for(String textureName : textureNames) {
 					try {
-						textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+						if(textureName.endsWith("icon")) {
+							textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+						} else {
+							textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/decor/resources/textures/" + textureName + ".png")));
+						}
 					} catch(Exception exception) {
 						LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
 					}
@@ -109,6 +117,10 @@ public class ResourceManager {
 							loader.getMeshLoader().loadModMesh(instance, modelName, instance.getJarResource("thederpgamer/decor/resources/models/" + modelName + ".zip"), null);
 							Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
 							mesh.setFirstDraw(true);
+							if(modelName.equals("display_screen")) { //Temp fix
+								mesh.rotateBy(0.0f, 180.0f, 0.0f);
+								mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
+							}
 							meshMap.put(modelName, mesh);
 						}
 					} catch(ResourceException | IOException exception) {

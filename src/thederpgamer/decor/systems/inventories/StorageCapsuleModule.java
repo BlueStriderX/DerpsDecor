@@ -27,6 +27,7 @@ public class StorageCapsuleModule extends SimpleDataStorageMCModule implements C
 
 	private void initData() {
 		if(!(data instanceof StorageCapsuleSystemData)) data = new StorageCapsuleSystemData();
+		if(((StorageCapsuleSystemData) data).map == null) ((StorageCapsuleSystemData) data).map = new ConcurrentHashMap<>();
 	}
 
 	@Override

@@ -2,7 +2,8 @@ package thederpgamer.decor;
 
 import api.config.BlockConfig;
 import api.listener.Listener;
-import api.listener.events.block.*;
+import api.listener.events.block.SegmentPieceActivateByPlayer;
+import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
@@ -10,9 +11,7 @@ import api.mod.StarMod;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import org.apache.commons.io.IOUtils;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.element.ElementKeyMap;
-import org.schema.game.common.data.world.Segment;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
@@ -21,15 +20,13 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.element.blocks.decor.DisplayScreen;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
-import thederpgamer.decor.element.blocks.decor.StrutConnector;
+import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
-import thederpgamer.decor.systems.modules.StrutConnectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.ProjectorUtils;
@@ -39,7 +36,6 @@ import thederpgamer.decor.utils.ServerUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -54,10 +50,10 @@ public class DerpsDecor extends StarMod {
 	// Instance
 	private static DerpsDecor instance;
 	// Other
-	private final String[] overwriteClasses = {"GUIQuickReferencePanel"
-	                                           // "Constructing",
-	                                           // "ElementCollection",
-	                                           // "ElementCollectionMesh"
+	private final String[] overwriteClasses = {
+			"GUIQuickReferencePanel"
+			// "ElementCollection",
+			// "ElementCollectionMesh"
 	};
 	// Utils
 	public ClipboardUtils clipboard;
@@ -91,10 +87,10 @@ public class DerpsDecor extends StarMod {
 	public void onBlockConfigLoad(BlockConfig config) {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
-		ElementManager.addBlock(new StrutConnector());
-		ElementManager.addBlock(new DisplayScreen());
-		// ElementManager.addBlock(new HoloTable());
-		// ElementManager.addBlock(new StorageCapsule());
+		// ElementManager.addBlock(new StrutConnector());
+		//ElementManager.addBlock(new DisplayScreen());
+		ElementManager.addBlock(new HoloTable());
+		//ElementManager.addBlock(new StorageCapsule());
 		ElementManager.doOverwrites();
 		ElementManager.createGraphics();
 		ElementManager.initialize();
@@ -118,7 +114,7 @@ public class DerpsDecor extends StarMod {
 			public void onEvent(ManagerContainerRegisterEvent event) {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-				event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
+				//event.addModMCModule(new StrutConnectorModule(event.getSegmentController(), event.getContainer()));
 				//event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, this);
@@ -191,6 +187,7 @@ public class DerpsDecor extends StarMod {
 			}
 		}, this);
 
+		/*
 		StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
 			@Override
 			public void onEvent(SegmentPieceAddEvent event) {
@@ -222,6 +219,8 @@ public class DerpsDecor extends StarMod {
 				}
 			}
 		}, this);
+
+		 */
 	}
 
 	private void registerCommands() {
