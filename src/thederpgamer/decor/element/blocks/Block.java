@@ -29,4 +29,5 @@ public abstract class Block {
   }
 
   public abstract void initialize();
+  public abstract void createGraphics();
 }

@@ -17,36 +17,34 @@ import thederpgamer.decor.manager.ResourceManager;
  */
 public class HoloTable extends Block {
 
-  public HoloTable() {
-    super("Holo Table", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
-  }
+	public HoloTable() {
+		super("Holo Table", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
+	}
 
-  @Override
-  public void initialize() {
-    if (GraphicsContext.initialized) {
-      try {
-        blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
-      } catch (Exception ignored) {
-      }
-    }
-    blockInfo.setDescription("A decorative hologram table.");
-    blockInfo.setInRecipe(true);
-    blockInfo.setCanActivate(true);
-    blockInfo.setShoppable(true);
-    blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
-    blockInfo.setOrientatable(true);
-    blockInfo.setIndividualSides(6);
-    blockInfo.setBlockStyle(BlockStyle.NORMAL.id);
-    blockInfo.lodShapeStyle = 1;
-    blockInfo.sideTexturesPointToOrientation = false;
+	@Override
+	public void initialize() {
+		blockInfo.setDescription("A decorative hologram table.");
+		blockInfo.setInRecipe(false);
+		blockInfo.setCanActivate(true);
+		blockInfo.setShoppable(false);
+		blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
+		blockInfo.setOrientatable(true);
+		blockInfo.setIndividualSides(6);
+		blockInfo.setBlockStyle(BlockStyle.NORMAL.id);
+		blockInfo.lodShapeStyle = 1;
+		blockInfo.sideTexturesPointToOrientation = false;
 
-    BlockConfig.addRecipe(
-        blockInfo,
-        ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(),
-        (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-        new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-        new FactoryResource(1, (short) 660));
-    BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_table", null);
-    BlockConfig.add(blockInfo);
-  }
+		if(GraphicsContext.initialized) {
+			blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
+			BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_table", null);
+		}
+
+		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX), new FactoryResource(1, (short) 660));
+		BlockConfig.add(blockInfo);
+	}
+
+	@Override
+	public void createGraphics() {
+		//BlockIconUtils.createBlockIcon(blockInfo);
+	}
 }

@@ -50,14 +50,14 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 		if (!drawMap.isEmpty()) {
 			int drawCount = 0;
 			for (Map.Entry<SegmentPiece, Object> entry : drawMap.entrySet()) {
-				if (drawCount >= ConfigManager.getMainConfig().getConfigurableInt("max-projector-draws-per-frame", 30)) return;
+				if (drawCount >= ConfigManager.getMainConfig().getConfigurableInt("max-projector-draws-per-frame", 120)) return;
 				SegmentPiece segmentPiece = entry.getKey();
 				//if (!segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) || segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() != segmentPiece.getType() || !segmentPiece.getSegmentController().isFullyLoadedWithDock() || !segmentPiece.getSegmentController().isInClientRange()) drawMap.remove(segmentPiece);
 				if(!checkDraw(segmentPiece)) drawMap.remove(segmentPiece);
 				else {
 					if (entry.getValue() instanceof HoloProjectorDrawData) {
 						HoloProjectorDrawData drawData = (HoloProjectorDrawData) entry.getValue();
-						if (drawData.changed || !checkDraw(segmentPiece)) {
+						if (!checkDraw(segmentPiece)) {
 							drawMap.remove(entry.getKey()); // Force an update next frame
 							continue;
 						}
