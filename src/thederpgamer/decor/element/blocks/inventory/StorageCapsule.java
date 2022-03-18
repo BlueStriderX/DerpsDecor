@@ -21,45 +21,47 @@ import thederpgamer.decor.utils.BlockIconUtils;
  */
 public class StorageCapsule extends InventoryBlock {
 
-	public StorageCapsule() {
-		super("Storage Capsule", ElementKeyMap.getInfo(120).getType());
-	}
+  public StorageCapsule() {
+    super("Storage Capsule", ElementKeyMap.getInfo(120).getType());
+  }
 
-	@Override
-	public void initialize() {
-		blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
-		blockInfo.setCanActivate(true);
-		blockInfo.setInRecipe(true);
-		blockInfo.setShoppable(true);
-		blockInfo.setPrice(ElementKeyMap.getInfo(120).price);
-		blockInfo.setOrientatable(true);
-		blockInfo.setIndividualSides(6);
-		blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
-		blockInfo.lodShapeStyle = 0;
-		blockInfo.sideTexturesPointToOrientation = false;
-		blockInfo.controlling.addAll(ElementKeyMap.getInfo(120).controlling);
-		blockInfo.controlledBy.addAll(ElementKeyMap.getInfo(120).controlledBy);
-		//Todo: Add controlling and controlled by for other blocks
+  @Override
+  public void initialize() {
+    blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
+    blockInfo.setCanActivate(true);
+    blockInfo.setInRecipe(true);
+    blockInfo.setShoppable(true);
+    blockInfo.setPrice(ElementKeyMap.getInfo(120).price);
+    blockInfo.setOrientatable(true);
+    blockInfo.setIndividualSides(6);
+    blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
+    blockInfo.lodShapeStyle = 0;
+    blockInfo.sideTexturesPointToOrientation = false;
+    blockInfo.controlling.addAll(ElementKeyMap.getInfo(120).controlling);
+    blockInfo.controlledBy.addAll(ElementKeyMap.getInfo(120).controlledBy);
+    // Todo: Add controlling and controlled by for other blocks
 
-		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(120).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(120).getFactoryBakeTime(),
-		                      new FactoryResource(1, (short) 120),
-		                      new FactoryResource(1,  (short) 976));
-		BlockConfig.add(blockInfo);
-	}
+    BlockConfig.addRecipe(
+        blockInfo,
+        ElementKeyMap.getInfo(120).getProducedInFactoryType(),
+        (int) ElementKeyMap.getInfo(120).getFactoryBakeTime(),
+        new FactoryResource(1, (short) 120),
+        new FactoryResource(1, (short) 976));
+    BlockConfig.add(blockInfo);
+  }
 
-	@Override
-	public void createGraphics() {
-		BlockIconUtils.createBlockIcon(blockInfo);
-		BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
-	}
+  @Override
+  public void createGraphics() {
+    BlockIconUtils.createBlockIcon(blockInfo);
+    BlockConfig.assignLod(
+        blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
+  }
 
-	@Override
-	public Inventory createInventory(InventoryHolder holder, SegmentPiece segmentPiece) {
-		return new StashInventory(holder, segmentPiece.getAbsoluteIndex());
-	}
+  @Override
+  public Inventory createInventory(InventoryHolder holder, SegmentPiece segmentPiece) {
+    return new StashInventory(holder, segmentPiece.getAbsoluteIndex());
+  }
 
-	@Override
-	public void onLogicActivation(SegmentPieceActivateEvent event) {
-
-	}
+  @Override
+  public void onLogicActivation(SegmentPieceActivateEvent event) {}
 }

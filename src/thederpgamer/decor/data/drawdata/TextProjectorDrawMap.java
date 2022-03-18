@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TextProjectorDrawMap {
 
-	public ConcurrentHashMap<Long, TextProjectorDrawData> map;
+  public ConcurrentHashMap<Long, TextProjectorDrawData> map;
 
-	public TextProjectorDrawMap() {
-		map = new ConcurrentHashMap<>();
-	}
+  public TextProjectorDrawMap() {
+    map = new ConcurrentHashMap<>();
+  }
 }
