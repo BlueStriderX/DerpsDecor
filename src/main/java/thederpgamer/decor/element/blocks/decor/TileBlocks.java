@@ -3,9 +3,10 @@ package thederpgamer.decor.element.blocks.decor;
 import api.config.BlockConfig;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.utils.BlockIconUtils;
+import thederpgamer.decor.manager.ResourceManager;
 
 public class TileBlocks {
 
@@ -24,8 +25,11 @@ public class TileBlocks {
 			blockInfo.setInRecipe(true);
 			blockInfo.setShoppable(true);
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
-			blockInfo.setOrientatable(false);
-			blockInfo.setIndividualSides(1);
+
+			if(GraphicsContext.initialized) {
+				short textureId = (short) ResourceManager.getTexture("small-dark-tiles").getTextureId();
+				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 205));
 			BlockConfig.add(blockInfo);
@@ -33,7 +37,7 @@ public class TileBlocks {
 
 		@Override
 		public void createGraphics() {
-			BlockIconUtils.createBlockIcon(blockInfo);
+
 		}
 	}
 
@@ -50,8 +54,11 @@ public class TileBlocks {
 			blockInfo.setInRecipe(true);
 			blockInfo.setShoppable(true);
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
-			blockInfo.setOrientatable(false);
-			blockInfo.setIndividualSides(1);
+
+			if(GraphicsContext.initialized) {
+				short textureId = (short) ResourceManager.getTexture("small-light-tiles").getTextureId();
+				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 161));
 			BlockConfig.add(blockInfo);
@@ -59,7 +66,7 @@ public class TileBlocks {
 
 		@Override
 		public void createGraphics() {
-			BlockIconUtils.createBlockIcon(blockInfo);
+
 		}
 	}
 
@@ -76,8 +83,11 @@ public class TileBlocks {
 			blockInfo.setInRecipe(true);
 			blockInfo.setShoppable(true);
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
-			blockInfo.setOrientatable(false);
-			blockInfo.setIndividualSides(1);
+
+			if(GraphicsContext.initialized) {
+				short textureId = (short) ResourceManager.getTexture("large-dark-tiles").getTextureId();
+				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 205));
 			BlockConfig.add(blockInfo);
@@ -85,7 +95,7 @@ public class TileBlocks {
 
 		@Override
 		public void createGraphics() {
-			BlockIconUtils.createBlockIcon(blockInfo);
+
 		}
 	}
 
@@ -102,8 +112,11 @@ public class TileBlocks {
 			blockInfo.setInRecipe(true);
 			blockInfo.setShoppable(true);
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
-			blockInfo.setOrientatable(false);
-			blockInfo.setIndividualSides(1);
+
+			if(GraphicsContext.initialized) {
+				short textureId = (short) ResourceManager.getTexture("large-light-tiles").getTextureId();
+				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 161));
 			BlockConfig.add(blockInfo);
@@ -111,7 +124,7 @@ public class TileBlocks {
 
 		@Override
 		public void createGraphics() {
-			BlockIconUtils.createBlockIcon(blockInfo);
+
 		}
 	}
 }

@@ -62,7 +62,7 @@ public class StrutConnector extends Block implements ActivationInterface {
 
 	@Override
 	public void createGraphics() {
-		BlockIconUtils.createBlockIcon(blockInfo);
+
 	}
 
 	@Override

@@ -29,10 +29,7 @@ import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
-import thederpgamer.decor.utils.ClipboardUtils;
-import thederpgamer.decor.utils.ProjectorUtils;
-import thederpgamer.decor.utils.SegmentPieceUtils;
-import thederpgamer.decor.utils.ServerUtils;
+import thederpgamer.decor.utils.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,6 +54,7 @@ public class DerpsDecor extends StarMod {
 	};
 	// Utils
 	public ClipboardUtils clipboard;
+	private BlockIconUtils iconUtils;
 
 	public DerpsDecor() {}
 
@@ -97,8 +95,8 @@ public class DerpsDecor extends StarMod {
 		ElementManager.addBlock(new TileBlocks.LargeDarkTiles());
 		ElementManager.addBlock(new TileBlocks.LargeLightTiles());
 		ElementManager.doOverwrites();
-		ElementManager.createGraphics();
 		ElementManager.initialize();
+		ResourceManager.setIcons();
 	}
 
 	@Override
