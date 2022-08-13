@@ -4,7 +4,6 @@ import api.utils.textures.StarLoaderTexture;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 import org.newdawn.slick.font.effects.OutlineEffect;
-import org.schema.game.common.data.element.ElementInformation;
 import org.schema.schine.graphicsengine.core.ResourceException;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
@@ -61,7 +60,6 @@ public class ResourceManager {
 	private static final HashMap<String, Sprite> spriteMap = new HashMap<>();
 	private static final HashMap<String, Mesh> meshMap = new HashMap<>();
 	private static final HashMap<String, Font> fontMap = new HashMap<>();
-	private static final HashMap<ElementInformation, StarLoaderTexture> iconMap = new HashMap<>();
 
 	public static void loadResources(final DerpsDecor instance, final ResourceLoader loader) {
 		// Load fonts
@@ -213,13 +211,5 @@ public class ResourceManager {
 			exception.printStackTrace();
 		}
 		return null;
-	}
-
-	public static void setBlockIconTexture(ElementInformation e, StarLoaderTexture texture) {
-		iconMap.put(e, texture);
-	}
-
-	public static void setIcons() {
-		for(ElementInformation e : iconMap.keySet()) e.setBuildIconNum(iconMap.get(e).getTextureId());
 	}
 }

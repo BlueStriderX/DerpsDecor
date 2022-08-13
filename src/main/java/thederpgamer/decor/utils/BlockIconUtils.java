@@ -1,6 +1,7 @@
 package thederpgamer.decor.utils;
 
 import api.utils.draw.ModWorldDrawer;
+import api.utils.textures.IconBakeryUtils;
 import api.utils.textures.StarLoaderTexture;
 import api.utils.textures.TextureSwapper;
 import com.bulletphysics.linearmath.Transform;
@@ -19,6 +20,7 @@ import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.ResourceManager;
 
 import javax.imageio.ImageIO;
@@ -71,6 +73,27 @@ public class BlockIconUtils extends ModWorldDrawer {
 		initialized = true;
 		ArrayList<ElementInformation> types = new ArrayList<>();
 		for(Block block : ElementManager.getAllBlocks()) types.add(block.getBlockInfo());
+
+		/*
+		FrameBufferObjects fbo = new FrameBufferObjects("ModIconBakery", 1024, 1024);
+		try {
+			fbo.initialize();
+		} catch(GLException exception) {
+			exception.printStackTrace();
+		}
+		fbo.enable();
+		GL11.glClearColor(0, 0, 0, 0);
+		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_COLOR_BUFFER_BIT);
+		GL11.glViewport(0, 0, 1024, 1024);
+
+		GlUtil.glEnable(GL11.GL_LIGHTING);
+		GlUtil.glDisable(GL11.GL_DEPTH_TEST);
+		GlUtil.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+		int x = 0;
+		int y = 0;
+
+		 */
 
 		File iconsFolder = new File(DataUtils.getWorldDataPath() + "/block-icons");
 		if(!iconsFolder.exists()) iconsFolder.mkdirs();
@@ -139,14 +162,24 @@ public class BlockIconUtils extends ModWorldDrawer {
 				final File outputFile = new File(path + ".png");
 				if(!outputFile.exists()) outputFile.createNewFile();
 				GlUtil.writeScreenToDisk(path, "png", 64, 64, 4, fbo);
+				final String finalPath = path;
 				StarLoaderTexture.runOnGraphicsThread(new Runnable() {
 					@Override
 					public void run() {
 						try {
+							String textureName = finalPath.substring(finalPath.lastIndexOf("/") + 1);
 							BufferedImage image = ImageIO.read(outputFile);
 							StarLoaderTexture texture = StarLoaderTexture.newIconTexture(image);
-							ResourceManager.setBlockIconTexture(e, texture);
-							//e.setBuildIconNum(texture.getTextureId());
+							e.setBuildIconNum(texture.getTextureId());
+							BufferedImage source = IconBakeryUtils.writeFBOToBufferedImage(64, 64, 4, fbo);
+							StarLoaderTexture target = ResourceManager.getTexture(textureName);
+							TextureSwapper.setIconTexture(source, e.getBuildIconNum(), target);
+							int sheetNum = e.buildIconNum % 256;
+							int x = sheetNum % 16;
+							int y = sheetNum / 16;
+							ImageIO.write(source, "png", outputFile);
+							target.res64.getGraphics().drawImage(source, x, y, null);
+							TextureSwapper.swapSpriteTexture(findSprite(e.getBuildIconNum()), source);
 						} catch(Exception exception) {
 							exception.printStackTrace();
 						}
@@ -160,6 +193,8 @@ public class BlockIconUtils extends ModWorldDrawer {
 			fbo.cleanUp();
 		}
 		GL11.glViewport(0, 0, GLFrame.getWidth(), GLFrame.getHeight());
+		if(ConfigManager.getMainConfig().getBoolean("debug-mode")) iconsFolder.deleteOnExit();
+		else iconsFolder.delete();
 	}
 
 	private Sprite findSprite(int buildIconNum) {

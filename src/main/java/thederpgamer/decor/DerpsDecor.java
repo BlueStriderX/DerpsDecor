@@ -96,7 +96,6 @@ public class DerpsDecor extends StarMod {
 		ElementManager.addBlock(new TileBlocks.LargeLightTiles());
 		ElementManager.doOverwrites();
 		ElementManager.initialize();
-		ResourceManager.setIcons();
 	}
 
 	@Override
