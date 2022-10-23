@@ -27,8 +27,10 @@ public class TileBlocks {
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
 
 			if(GraphicsContext.initialized) {
-				short textureId = (short) ResourceManager.getTexture("small-dark-tiles").getTextureId();
-				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				try {
+					short textureId = (short) ResourceManager.getTexture("small-dark-tiles").getTextureId();
+					blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				} catch(Exception ignored) {}
 			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 205));
@@ -56,8 +58,10 @@ public class TileBlocks {
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
 
 			if(GraphicsContext.initialized) {
-				short textureId = (short) ResourceManager.getTexture("small-light-tiles").getTextureId();
-				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				try {
+					short textureId = (short) ResourceManager.getTexture("small-light-tiles").getTextureId();
+					blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				} catch(Exception ignored) {}
 			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 161));
@@ -85,8 +89,10 @@ public class TileBlocks {
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
 
 			if(GraphicsContext.initialized) {
-				short textureId = (short) ResourceManager.getTexture("large-dark-tiles").getTextureId();
-				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				try {
+					short textureId = (short) ResourceManager.getTexture("large-dark-tiles").getTextureId();
+					blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				} catch(Exception ignored) {}
 			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 205));
@@ -114,8 +120,10 @@ public class TileBlocks {
 			blockInfo.setPrice(ElementKeyMap.getInfo(205).price);
 
 			if(GraphicsContext.initialized) {
-				short textureId = (short) ResourceManager.getTexture("large-light-tiles").getTextureId();
-				blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				try {
+					short textureId = (short) ResourceManager.getTexture("large-light-tiles").getTextureId();
+					blockInfo.setTextureId(new short[] { textureId, textureId, textureId, textureId, textureId, textureId });
+				} catch(Exception ignored) {}
 			}
 
 			BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 161));

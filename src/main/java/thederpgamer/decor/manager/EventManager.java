@@ -76,25 +76,18 @@ public class EventManager {
 					}
 				}
 
-				if(event.isServer()) {
-					if(event.getSegmentPiece().getType() == ElementKeyMap.SHIPYARD_COMPUTER) {
-						ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControllingPieces(event.getSegmentPiece());
-						SegmentPiece controller = null;
-						for(SegmentPiece control : controlling) {
-							if(control.getType() == ElementKeyMap.ACTIVAION_BLOCK_ID) {
-								controller = control;
-								break;
-							}
-						}
-						if(controller != null) {
+					if(event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) {
+						SegmentPiece controller = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).get(0);
+						if(controller != null && !event.isServer()) {
 							try {
+								if(!event.getSegmentPiece().isActive()) return;
 								ShipyardElementManager shipyard = SegmentControllerUtils.getElementManager((ManagedUsableSegmentController<?>) event.getSegmentPiece().getSegmentController(), ShipyardElementManager.class);
 								assert shipyard != null;
 
-								SegmentPiece textBlock = SegmentPieceUtils.getFirstMatchingAdjacent(controller, ElementKeyMap.TEXT_BOX);
+								SegmentPiece textBlock = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementKeyMap.TEXT_BOX);
 								String text = textBlock.getSegmentController().getTextMap().get(ElementCollection.getIndex4(textBlock.getAbsoluteIndex(), textBlock.getOrientation()));
 								String command = text.split("\n")[0].trim().replaceAll(" ", "_").toUpperCase();
-								String[] args = text.split("\n")[1].trim().split(", ");
+								String[] args = (text.split("\n").length > 1) ? text.split("\n")[1].trim().split(", ") : new String[] {""};
 								int factionId = event.getSegmentPiece().getSegmentController().getFactionId();
 
 								ShipyardCollectionManager collection = shipyard.getCollectionManagers().get(0);
@@ -203,7 +196,6 @@ public class EventManager {
 							}
 						}
 					}
-				}
 			}
 		}, instance);
 	}

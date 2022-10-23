@@ -18,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    implementation(fileTree(dir: ("lib"), include: "*.jar"))
     implementation(files(starmadeDirectory + "StarMade.jar"))
     implementation(fileTree(dir: (starmadeDirectory + "lib"), include: "*.jar"))
 }

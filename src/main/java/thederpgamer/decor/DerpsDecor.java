@@ -4,11 +4,15 @@ import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceActivateEvent;
+import api.listener.events.controller.ClientInitializeEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
+import glossar.GlossarCategory;
+import glossar.GlossarEntry;
+import glossar.GlossarInit;
 import org.apache.commons.io.IOUtils;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
@@ -84,6 +88,12 @@ public class DerpsDecor extends StarMod {
 	}
 
 	@Override
+	public void onClientCreated(ClientInitializeEvent clientInitializeEvent) {
+		super.onClientCreated(clientInitializeEvent);
+		initGlossary();
+	}
+
+	@Override
 	public void onBlockConfigLoad(BlockConfig config) {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
@@ -91,10 +101,10 @@ public class DerpsDecor extends StarMod {
 		// ElementManager.addBlock(new DisplayScreen());
 		ElementManager.addBlock(new HoloTable());
 		// ElementManager.addBlock(new StorageCapsule());
-		ElementManager.addBlock(new TileBlocks.SmallDarkTiles());
-		ElementManager.addBlock(new TileBlocks.SmallLightTiles());
-		ElementManager.addBlock(new TileBlocks.LargeDarkTiles());
-		ElementManager.addBlock(new TileBlocks.LargeLightTiles());
+		//ElementManager.addBlock(new TileBlocks.SmallDarkTiles());
+		//ElementManager.addBlock(new TileBlocks.SmallLightTiles());
+		//ElementManager.addBlock(new TileBlocks.LargeDarkTiles());
+		//ElementManager.addBlock(new TileBlocks.LargeLightTiles());
 		ElementManager.doOverwrites();
 		ElementManager.initialize();
 	}
@@ -102,6 +112,15 @@ public class DerpsDecor extends StarMod {
 	@Override
 	public void onResourceLoad(ResourceLoader loader) {
 		ResourceManager.loadResources(this, loader);
+	}
+
+	private void initGlossary() {
+		GlossarInit.initGlossar(this);
+		GlossarCategory derpsDecor = new GlossarCategory("DerpsDecor");
+		derpsDecor.addEntry(new GlossarEntry("Holo Projector", "A holographic projector that can display images. Input a direct image URL ending in .png or .gif into the src field to display an image."));
+		derpsDecor.addEntry(new GlossarEntry("Text Projector", "A holographic projector that can display text. Input text into the src field to display it."));
+		derpsDecor.addEntry(new GlossarEntry("Command Selection", "You can activate shipyard commands using logic blocks. To do so, place an activation module and connect it to the shipyard computer. Then, put a display module next to the activation module and input the name of the shipyard command you want to activate on the first line, and any arguments on the second separated by commas."));
+		GlossarInit.addCategory(derpsDecor);
 	}
 
 	private void registerCommands() {

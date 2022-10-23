@@ -10,6 +10,7 @@ import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.DerpsDecor;
 
+import javax.imageio.ImageIO;
 import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.io.IOException;
@@ -86,15 +87,11 @@ public class ResourceManager {
 								if(textureName.endsWith("icon")) {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newIconTexture(
-													instance.getJarBufferedImage(
-															"textures/" + textureName + ".png")));
+											StarLoaderTexture.newIconTexture(ImageIO.read(instance.getClass().getResourceAsStream("textures/" + textureName + ".png"))));
 								} else {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newBlockTexture(
-													instance.getJarBufferedImage(
-															"textures/" + textureName + ".png")));
+											StarLoaderTexture.newBlockTexture(ImageIO.read(instance.getClass().getResourceAsStream("textures/" + textureName + ".png"))));
 								}
 							} catch(Exception exception) {
 								LogManager.logException(
@@ -105,12 +102,7 @@ public class ResourceManager {
 						// Load Sprites
 						for(String spriteName : spriteNames) {
 							try {
-								Sprite sprite =
-										StarLoaderTexture.newSprite(
-												instance.getJarBufferedImage(
-														"sprites/" + spriteName + ".png"),
-												instance,
-												spriteName);
+								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(instance.getClass().getResourceAsStream("sprites/" + spriteName + ".png")), instance, spriteName);
 								sprite.setPositionCenter(false);
 								sprite.setName(spriteName);
 								spriteMap.put(spriteName, sprite);
@@ -132,28 +124,13 @@ public class ResourceManager {
 									offset.x = Float.parseFloat(values[0]);
 									offset.y = Float.parseFloat(values[1]);
 									offset.z = Float.parseFloat(values[2]);
-									loader
-											.getMeshLoader()
-											.loadModMesh(
-													instance,
-													meshName,
-													instance.getJarResource(
-															"models/" + meshName + ".zip"),
-													null);
+									loader.getMeshLoader().loadModMesh(instance, meshName, instance.getClass().getResourceAsStream("models/" + meshName + ".zip"), null);
 									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
 									mesh.getTransform().origin.add(offset);
 									meshMap.put(meshName, mesh);
 								} else {
-									loader
-											.getMeshLoader()
-											.loadModMesh(
-													instance,
-													modelName,
-													instance.getJarResource(
-															"models/" + modelName + ".zip"),
-													null);
-									Mesh mesh =
-											loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+									loader.getMeshLoader().loadModMesh(instance, modelName, instance.getClass().getResourceAsStream(															"models/" + modelName + ".zip"), null);
+									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
 									mesh.setFirstDraw(true);
 									if(modelName.equals("display_screen")) { // Temp fix
 										mesh.rotateBy(0.0f, 180.0f, 0.0f);
