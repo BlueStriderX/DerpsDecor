@@ -25,6 +25,7 @@ import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.element.blocks.decor.TileBlocks;
 import thederpgamer.decor.manager.ConfigManager;
+import thederpgamer.decor.manager.EventManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
@@ -78,7 +79,7 @@ public class DerpsDecor extends StarMod {
 		ConfigManager.initialize(this);
 		LogManager.initialize();
 		SegmentPieceUtils.initialize();
-		registerListeners();
+		EventManager.initialize(this);
 		registerCommands();
 	}
 
@@ -101,176 +102,6 @@ public class DerpsDecor extends StarMod {
 	@Override
 	public void onResourceLoad(ResourceLoader loader) {
 		ResourceManager.loadResources(this, loader);
-	}
-
-	private void registerListeners() {
-		StarLoader.registerListener(
-				RegisterWorldDrawersEvent.class,
-				new Listener<RegisterWorldDrawersEvent>() {
-					@Override
-					public void onEvent(RegisterWorldDrawersEvent event) {
-						GlobalDrawManager.initialize(event);
-					}
-				},
-				this);
-
-		StarLoader.registerListener(
-				ManagerContainerRegisterEvent.class,
-				new Listener<ManagerContainerRegisterEvent>() {
-					@Override
-					public void onEvent(ManagerContainerRegisterEvent event) {
-						event.addModMCModule(
-								new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
-						event.addModMCModule(
-								new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-						// event.addModMCModule(new StrutConnectorModule(event.getSegmentController(),
-						// event.getContainer()));
-						// event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(),
-						// event.getContainer()));
-					}
-				},
-				this);
-
-		StarLoader.registerListener(
-				SegmentPieceActivateByPlayer.class,
-				new Listener<SegmentPieceActivateByPlayer>() {
-					@Override
-					public void onEvent(SegmentPieceActivateByPlayer event) {
-						for(Block block : ElementManager.getAllBlocks()) {
-							if(block instanceof ActivationInterface
-									&& block.getId() == event.getSegmentPiece().getType()) {
-								((ActivationInterface) block).onPlayerActivation(event);
-								return;
-							}
-						}
-					}
-				},
-				this);
-
-		StarLoader.registerListener(
-				SegmentPieceActivateEvent.class,
-				new Listener<SegmentPieceActivateEvent>() {
-					@Override
-					public void onEvent(SegmentPieceActivateEvent event) {
-						for(Block block : ElementManager.getAllBlocks()) {
-							if(block instanceof ActivationInterface
-									&& block.getId() == event.getSegmentPiece().getType()) {
-								((ActivationInterface) block).onLogicActivation(event);
-								break;
-							}
-						}
-
-						if(event.isServer()) {
-							if((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID
-									|| event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM)) {
-								SegmentPiece adjacent =
-										SegmentPieceUtils.getFirstMatchingAdjacent(
-												event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
-								if(adjacent != null) {
-									HoloProjectorDrawData adjacentDrawData =
-											(HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-									ArrayList<SegmentPiece> controlling =
-											SegmentPieceUtils.getControlledPiecesMatching(
-													event.getSegmentPiece(),
-													ElementManager.getBlock("Holo Projector").getId());
-									if(! controlling.isEmpty() && adjacentDrawData != null) {
-										boolean needsUpdate = false;
-										for(SegmentPiece segmentPiece : controlling) {
-											Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-											if(drawData instanceof HoloProjectorDrawData) {
-												HoloProjectorDrawData holoProjectorDrawData =
-														(HoloProjectorDrawData) drawData;
-												if(! (holoProjectorDrawData.equals(adjacentDrawData))
-														|| segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
-													adjacentDrawData.copyTo(holoProjectorDrawData);
-													needsUpdate = true;
-												}
-											}
-										}
-										if(needsUpdate)
-											((SimpleDataStorageMCModule)
-													ServerUtils.getManagerContainer(
-																	event.getSegmentPiece().getSegmentController())
-															.getModMCModule(
-																	ElementManager.getBlock("Holo Projector").getId()))
-													.flagUpdatedData();
-									}
-								} else {
-									adjacent =
-											SegmentPieceUtils.getFirstMatchingAdjacent(
-													event.getSegmentPiece(),
-													ElementManager.getBlock("Text Projector").getId());
-									if(adjacent != null) {
-										TextProjectorDrawData adjacentDrawData =
-												(TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-										ArrayList<SegmentPiece> controlling =
-												SegmentPieceUtils.getControlledPiecesMatching(
-														event.getSegmentPiece(),
-														ElementManager.getBlock("Text Projector").getId());
-										if(! controlling.isEmpty() && adjacentDrawData != null) {
-											boolean needsUpdate = false;
-											for(SegmentPiece segmentPiece : controlling) {
-												Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-												if(drawData instanceof TextProjectorDrawData) {
-													TextProjectorDrawData textProjectorDrawData =
-															(TextProjectorDrawData) drawData;
-													if(! (textProjectorDrawData.equals(adjacentDrawData))
-															|| segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
-														adjacentDrawData.copyTo(textProjectorDrawData);
-														needsUpdate = true;
-													}
-												}
-											}
-											if(needsUpdate)
-												((SimpleDataStorageMCModule)
-														ServerUtils.getManagerContainer(
-																		event.getSegmentPiece().getSegmentController())
-																.getModMCModule(
-																		ElementManager.getBlock("Text Projector").getId()))
-														.flagUpdatedData();
-										}
-									}
-								}
-							}
-						}
-					}
-				},
-				this);
-
-    /*
-    StarLoader.registerListener(SegmentPieceAddEvent.class, new Listener<SegmentPieceAddEvent>() {
-    	@Override
-    	public void onEvent(SegmentPieceAddEvent event) {
-    		if(event.getNewType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-    			long indexAndOrientation = ElementCollection.getIndex4(event.getAbsIndex(), event.getOrientation());
-    			event.getSegmentController().getTextBlocks().add(indexAndOrientation);
-    		}
-    	}
-    }, this);
-
-    StarLoader.registerListener(SegmentPieceRemoveEvent.class, new Listener<SegmentPieceRemoveEvent>() {
-    	@Override
-    	public void onEvent(SegmentPieceRemoveEvent event) {
-    		if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-    			Segment segment = event.getSegment();
-    			long absoluteIndex = segment.getAbsoluteIndex(event.getX(), event.getY(), event.getZ());
-    			long indexAndOrientation = ElementCollection.getIndex4(absoluteIndex, event.getOrientation());
-    			event.getSegment().getSegmentController().getTextBlocks().remove(indexAndOrientation);
-    			event.getSegment().getSegmentController().getTextMap().remove(indexAndOrientation);
-    		}
-    	}
-    }, this);
-
-    StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
-    	@Override
-    	public void onEvent(SegmentPieceAddByMetadataEvent event) {
-    		if(event.getType() == Objects.requireNonNull(ElementManager.getBlock("Display Screen")).getId()) {
-    			event.getSegment().getSegmentController().getTextBlocks().add(event.getIndexAndOrientation());
-    		}
-    	}
-    }, this);
-
-     */
 	}
 
 	private void registerCommands() {
