@@ -11,7 +11,7 @@ def starmadeDirectory = 'C:/Program Files (x86)/Steam/steamapps/common/StarMade/
 def jarName = 'DerpsDecor'
 mainClassName = 'thederpgamer.derpsdecor.DerpsDecor'
 group 'thederpgamer.derpsdecor'
-version '1.6.0'
+version '1.6.1'
 
 repositories {
     mavenCentral()

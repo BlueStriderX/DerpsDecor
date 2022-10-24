@@ -28,7 +28,6 @@ import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 import thederpgamer.decor.utils.ServerUtils;
 
-import javax.swing.text.Segment;
 import java.util.ArrayList;
 
 /**
@@ -77,6 +76,7 @@ public class EventManager {
 				}
 
 					if(event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) {
+						if(SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).isEmpty()) return;
 						SegmentPiece controller = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).get(0);
 						if(controller != null && !event.isServer()) {
 							try {
