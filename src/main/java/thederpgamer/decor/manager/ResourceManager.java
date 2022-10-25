@@ -87,11 +87,11 @@ public class ResourceManager {
 								if(textureName.endsWith("icon")) {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newIconTexture(ImageIO.read(instance.getClass().getResourceAsStream("textures/" + textureName + ".png"))));
+											StarLoaderTexture.newIconTexture(ImageIO.read(instance.getClass().getResourceAsStream("/textures/" + textureName + ".png"))));
 								} else {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newBlockTexture(ImageIO.read(instance.getClass().getResourceAsStream("textures/" + textureName + ".png"))));
+											StarLoaderTexture.newBlockTexture(ImageIO.read(instance.getClass().getResourceAsStream("/textures/" + textureName + ".png"))));
 								}
 							} catch(Exception exception) {
 								LogManager.logException(
@@ -102,7 +102,7 @@ public class ResourceManager {
 						// Load Sprites
 						for(String spriteName : spriteNames) {
 							try {
-								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(instance.getClass().getResourceAsStream("sprites/" + spriteName + ".png")), instance, spriteName);
+								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(instance.getClass().getResourceAsStream("/sprites/" + spriteName + ".png")), instance, spriteName);
 								sprite.setPositionCenter(false);
 								sprite.setName(spriteName);
 								spriteMap.put(spriteName, sprite);
@@ -124,7 +124,7 @@ public class ResourceManager {
 									offset.x = Float.parseFloat(values[0]);
 									offset.y = Float.parseFloat(values[1]);
 									offset.z = Float.parseFloat(values[2]);
-									loader.getMeshLoader().loadModMesh(instance, meshName, instance.getClass().getResourceAsStream("models/" + meshName + ".zip"), null);
+									loader.getMeshLoader().loadModMesh(instance, meshName, instance.getClass().getResourceAsStream("/models/" + meshName + ".zip"), null);
 									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
 									mesh.getTransform().origin.add(offset);
 									meshMap.put(meshName, mesh);
