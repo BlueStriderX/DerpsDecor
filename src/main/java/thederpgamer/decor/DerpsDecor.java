@@ -1,44 +1,31 @@
 package thederpgamer.decor;
 
 import api.config.BlockConfig;
-import api.listener.Listener;
-import api.listener.events.block.SegmentPieceActivateByPlayer;
-import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.controller.ClientInitializeEvent;
-import api.listener.events.draw.RegisterWorldDrawersEvent;
-import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
-import api.utils.game.module.util.SimpleDataStorageMCModule;
 import glossar.GlossarCategory;
 import glossar.GlossarEntry;
 import glossar.GlossarInit;
 import org.apache.commons.io.IOUtils;
-import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
-import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
-import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
-import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.element.blocks.HullBlock;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
 import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
-import thederpgamer.decor.element.blocks.decor.TileBlocks;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.EventManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
-import thederpgamer.decor.systems.modules.HoloProjectorModule;
-import thederpgamer.decor.systems.modules.TextProjectorModule;
-import thederpgamer.decor.utils.*;
+import thederpgamer.decor.utils.BlockIconUtils;
+import thederpgamer.decor.utils.ClipboardUtils;
+import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -101,10 +88,16 @@ public class DerpsDecor extends StarMod {
 		// ElementManager.addBlock(new DisplayScreen());
 		ElementManager.addBlock(new HoloTable());
 		// ElementManager.addBlock(new StorageCapsule());
-		//ElementManager.addBlock(new TileBlocks.SmallDarkTiles());
-		//ElementManager.addBlock(new TileBlocks.SmallLightTiles());
-		//ElementManager.addBlock(new TileBlocks.LargeDarkTiles());
-		//ElementManager.addBlock(new TileBlocks.LargeLightTiles());
+
+		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+
+		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+
+		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+
 		ElementManager.doOverwrites();
 		ElementManager.initialize();
 	}

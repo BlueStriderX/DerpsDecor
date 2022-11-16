@@ -8,7 +8,7 @@ import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.manager.ResourceManager;
 
-public class TileBlocks {
+public class TileBlocksOld {
 
 	private static final String categoryPath = "";
 

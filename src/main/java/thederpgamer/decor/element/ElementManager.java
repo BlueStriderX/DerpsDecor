@@ -2,7 +2,6 @@ package thederpgamer.decor.element;
 
 import api.config.BlockConfig;
 import api.utils.textures.StarLoaderTexture;
-import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCategory;
@@ -13,6 +12,8 @@ import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.element.blocks.BlockGroup;
 import thederpgamer.decor.element.blocks.Factory;
 import thederpgamer.decor.element.items.Item;
+
+import java.util.ArrayList;
 
 /**
  * <Description>
@@ -68,14 +69,12 @@ public class ElementManager {
 					ElementKeyMap.getInfo(ElementKeyMap.LOGIC_BUTTON_NORM).controlledBy.add(info.getId());
 					ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID).controlledBy.add(info.getId());
 				} else if(info.getId() == ElementKeyMap.SHIPYARD_COMPUTER) {
-					//info.signal = true;
-					//info.canActivate = true;
+					info.signal = false;
+					info.controlledBy.add(ElementKeyMap.LOGIC_BUTTON_NORM);
+					info.controlledBy.add(ElementKeyMap.ACTIVAION_BLOCK_ID);
 
-					info.controlling.add(ElementKeyMap.LOGIC_BUTTON_NORM);
-					info.controlling.add(ElementKeyMap.ACTIVAION_BLOCK_ID);
-
-					ElementKeyMap.getInfo(ElementKeyMap.LOGIC_BUTTON_NORM).controlledBy.add(info.getId());
-					ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID).controlledBy.add(info.getId());
+					ElementKeyMap.getInfo(ElementKeyMap.LOGIC_BUTTON_NORM).controlling.add(info.getId());
+					ElementKeyMap.getInfo(ElementKeyMap.ACTIVAION_BLOCK_ID).controlling.add(info.getId());
 				}
 			} catch (NullPointerException ignored) {
 			}
