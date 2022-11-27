@@ -13,7 +13,7 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @author TheDerpGamer
  * @since 08/06/2021
  */
-public class TextProjectorDrawData {
+public class TextProjectorDrawData implements ProjectorInterface {
 
 	public long indexAndOrientation;
 	public Vector3i offset;
@@ -53,22 +53,25 @@ public class TextProjectorDrawData {
 		}
 	}
 
-
-	public void copyTo(TextProjectorDrawData drawData) {
-		drawData.text = text;
-		drawData.color = color;
-		drawData.offset.set(offset);
-		drawData.rotation.set(rotation);
-		drawData.scale = scale;
-		drawData.holographic = holographic;
-		drawData.changed = true;
-	}
-
 	@Override
 	public boolean equals(Object object) {
 		if(object instanceof TextProjectorDrawData) {
 			TextProjectorDrawData drawData = (TextProjectorDrawData) object;
 			return drawData.text.equals(text) && drawData.color.equals(color) && drawData.offset.equals(offset) && drawData.rotation.equals(rotation) && drawData.scale == scale && drawData.holographic == holographic;
 		} else return false;
+	}
+
+	@Override
+	public void copyTo(ProjectorInterface drawData) {
+		if(drawData instanceof TextProjectorDrawData) {
+			TextProjectorDrawData projectorDrawData = (TextProjectorDrawData) drawData;
+			projectorDrawData.text = text;
+			projectorDrawData.color = color;
+			projectorDrawData.offset.set(offset);
+			projectorDrawData.rotation.set(rotation);
+			projectorDrawData.scale = scale;
+			projectorDrawData.holographic = holographic;
+			projectorDrawData.changed = true;
+		}
 	}
 }

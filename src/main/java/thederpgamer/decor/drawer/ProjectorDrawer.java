@@ -1,161 +1,234 @@
 package thederpgamer.decor.drawer;
 
+import api.common.GameClient;
 import api.utils.draw.ModWorldDrawer;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.graphicsengine.core.*;
+import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
+import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
+import org.schema.schine.network.objects.Sendable;
 import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorInterface;
+import thederpgamer.decor.data.drawdata.ShapeProjectorDrawData;
 import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
-import thederpgamer.decor.manager.ConfigManager;
+import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.systems.modules.HoloProjectorModule;
+import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
- * Mod world drawer for projector blocks.
+ * [Description]
  *
- * @author TheDerpGamer
- * @since 07/18/2021
+ * @author TheDerpGamer (TheDerpGamer#0027)
  */
 public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shaderable {
 
-  private final ConcurrentHashMap<SegmentPiece, Object> drawMap = new ConcurrentHashMap<>();
-  private float time;
+	public static final int MS_BETWEEN_RE_ADD = 5000;
+	public static final int MAX_DRAWS_PER_FRAME = 240;
 
-  @Override
-  public void cleanUp() {}
+	private final ObjectArrayList<ProjectorInterface> drawQueue = new ObjectArrayList<>();
+	private float time;
+	private float lastAdd;
+	private final Vector3i lastClientSector = new Vector3i();
+	private final ObjectArrayList<SegmentController> loadedControllers = new ObjectArrayList<>();
+	private short holoProjectorId;
+	private short textProjectorId;
+	private short shapeProjectorId;
 
-  @Override
-  public boolean isInvisible() {
-    return false;
-  }
+	@Override
+	public void onInit() {
+		holoProjectorId = ElementManager.getBlock("Holo Projector").getId();
+		textProjectorId = ElementManager.getBlock("Text Projector").getId();
+		//shapeProjectorId = ElementManager.getBlock("Shape Projector").getId();
+	}
 
-  @Override
-  public void onInit() {}
+	@Override
+	public void draw() {
+		if(drawQueue.isEmpty() || lastAdd + MS_BETWEEN_RE_ADD < System.currentTimeMillis()) enqueueDraws();
+		else {
+			int drawCount = 0;
+			for(ProjectorInterface projector : drawQueue) {
+				if(drawCount >= MAX_DRAWS_PER_FRAME) break;
+				if(projector instanceof HoloProjectorDrawData) {
+					HoloProjectorDrawData drawData = (HoloProjectorDrawData) projector;
+					Sprite image = drawData.image;
+					if(image != null) {
+						if(drawData.holographic) {
+							ShaderLibrary.scanlineShader.setShaderInterface(this);
+							ShaderLibrary.scanlineShader.load();
+						}
+						image.setTransform(drawData.transform);
+						Sprite.draw3D(image, drawData.subSprite, 1, Controller.getCamera());
+						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
+						drawCount ++;
+					}
+				} else if(projector instanceof TextProjectorDrawData) {
+					TextProjectorDrawData drawData = (TextProjectorDrawData) projector;
+					GUITextOverlay text = drawData.textOverlay;
+					if(text != null) {
+						if(drawData.holographic) {
+							ShaderLibrary.scanlineShader.setShaderInterface(this);
+							ShaderLibrary.scanlineShader.load();
+						}
+						text.setTransform(drawData.transform);
+						text.draw();
+						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
+						drawCount ++;
+					}
+				} else if(projector instanceof ShapeProjectorDrawData) {
+					ShapeProjectorDrawData drawData = (ShapeProjectorDrawData) projector;
+					Mesh mesh = drawData.getShape();
+					if(mesh != null) {
+						if(drawData.isHolographic()) {
+							ShaderLibrary.scanlineShader.setShaderInterface(this);
+							ShaderLibrary.scanlineShader.load();
+						}
+						mesh.setTransform(drawData.getTransform());
+						mesh.transform();
+						mesh.draw();
+						if(drawData.isHolographic()) ShaderLibrary.scanlineShader.unload();
+						drawCount ++;
+					}
+				}
+			}
+		}
+	}
 
-  @Override
-  public void update(Timer timer) {
-    time += timer.getDelta() * 2f;
-  }
+	@Override
+	public void update(Timer timer) {
+		time += timer.getDelta() * 2f;
+	}
 
-  @Override
-  public void draw() {
-    if (!drawMap.isEmpty()) {
-      int drawCount = 0;
-      for (Map.Entry<SegmentPiece, Object> entry : drawMap.entrySet()) {
-        if (drawCount
-            >= ConfigManager.getMainConfig()
-                .getConfigurableInt("max-projector-draws-per-frame", 120)) return;
-        SegmentPiece segmentPiece = entry.getKey();
-        // if
-        // (!segmentPiece.getSegmentController().getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) || segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() != segmentPiece.getType() || !segmentPiece.getSegmentController().isFullyLoadedWithDock() || !segmentPiece.getSegmentController().isInClientRange()) drawMap.remove(segmentPiece);
-        if (!checkDraw(segmentPiece)) drawMap.remove(segmentPiece);
-        else {
-          if (entry.getValue() instanceof HoloProjectorDrawData) {
-            HoloProjectorDrawData drawData = (HoloProjectorDrawData) entry.getValue();
-            if (!checkDraw(segmentPiece)) {
-              drawMap.remove(entry.getKey()); // Force an update next frame
-              continue;
-            }
-            Sprite image;
-            if (drawData.src.endsWith(".gif")) {
-              drawData.nextFrame();
-              image = drawData.getCurrentFrame();
-            } else image = drawData.image;
-            if (image != null) {
-              if (drawData.holographic) {
-                ShaderLibrary.scanlineShader.setShaderInterface(this);
-                ShaderLibrary.scanlineShader.load();
-              }
-              SegmentPieceUtils.getProjectorTransform(
-                  segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+	@Override
+	public void cleanUp() {
 
-              // Don't create new objects every frame
-              // float maxDim = Math.max(image.getWidth(), image.getHeight());
-              // ScalableImageSubSprite[] subSprite = new ScalableImageSubSprite[] {new
-              // ScalableImageSubSprite(((float) drawData.scale / (maxDim * 5)) * -1,
-              // drawData.transform)};
-              image.setTransform(drawData.transform);
-              Sprite.draw3D(image, drawData.subSprite, 1, Controller.getCamera());
-              if (drawData.holographic) ShaderLibrary.scanlineShader.unload();
-              drawCount++;
-            }
-          } else if (entry.getValue() instanceof TextProjectorDrawData) {
-            TextProjectorDrawData drawData = (TextProjectorDrawData) entry.getValue();
-            if (drawData.changed || !checkDraw(segmentPiece)) {
-              drawMap.remove(entry.getKey()); // Force an update next frame
-              continue;
-            }
-            if (drawData.textOverlay != null) {
-              if (drawData.holographic) {
-                ShaderLibrary.scanlineShader.setShaderInterface(this);
-                ShaderLibrary.scanlineShader.load();
-              }
-              // if(drawData.textOverlay.getFont() == null)
-              // drawData.textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold",
-              // drawData.scale + 10, Color.decode("0x" + drawData.color)));
-              SegmentPieceUtils.getProjectorTransform(
-                  segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
-              drawData.textOverlay.setTransform(drawData.transform);
-              drawData.textOverlay.draw();
-              if (drawData.holographic) ShaderLibrary.scanlineShader.unload();
-              drawCount++;
-            }
-          }
-        }
-      }
-    }
-  }
+	}
 
-  private boolean checkDraw(SegmentPiece segmentPiece) {
-    boolean canToggle = false;
-    SegmentController segmentController = segmentPiece.getSegmentController();
-    SegmentPiece activator =
-        SegmentPieceUtils.getFirstMatchingAdjacent(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
-    if (activator != null) {
-      ArrayList<SegmentPiece> controlling =
-          SegmentPieceUtils.getControlledPiecesMatching(activator, segmentPiece.getType());
-      if (!controlling.isEmpty()) {
-        for (SegmentPiece controlled : controlling) {
-          if (controlled.equals(segmentPiece)) {
-            canToggle = true;
-            break;
-          }
-        }
-      }
-    }
-    return segmentController.getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex())
-        && segmentController
-                .getSegmentBuffer()
-                .getPointUnsave(segmentPiece.getAbsoluteIndex())
-                .getType()
-            == segmentPiece.getType()
-        && segmentController.isFullyLoadedWithDock()
-        && segmentController.isInClientRange()
-        && ((canToggle && activator.isActive()) || activator == null);
-  }
+	@Override
+	public boolean isInvisible() {
+		return false;
+	}
 
-  @Override
-  public void onExit() {}
 
-  @Override
-  public void updateShader(DrawableScene drawableScene) {}
 
-  @Override
-  public void updateShaderParameters(Shader shader) {
-    GlUtil.updateShaderFloat(shader, "uTime", time);
-    GlUtil.updateShaderVector2f(shader, "uResolution", 20, 1000);
-    GlUtil.updateShaderInt(shader, "uDiffuseTexture", 0);
-  }
+	@Override
+	public void onExit() {
 
-  public void addDraw(SegmentPiece segmentPiece, Object drawData) {
-    drawMap.remove(segmentPiece);
-    drawMap.put(segmentPiece, drawData);
-  }
+	}
+
+	@Override
+	public void updateShader(DrawableScene drawableScene) {
+
+	}
+
+	@Override
+	public void updateShaderParameters(Shader shader) {
+		GlUtil.updateShaderFloat(shader, "uTime", time);
+		GlUtil.updateShaderVector2f(shader, "uResolution", 20, 1000);
+		GlUtil.updateShaderInt(shader, "uDiffuseTexture", 0);
+	}
+
+	private void enqueueDraws() {
+		drawQueue.clear();
+		updateLoaded();
+		for(final SegmentController segmentController : loadedControllers) {
+			new Thread() {
+				@Override
+				public void run() {
+					Long2ObjectArrayMap<ProjectorInterface> map = new Long2ObjectArrayMap<>();
+					getProjectorsForEntity(segmentController, map);
+					for(Map.Entry<Long, ProjectorInterface> entry : map.long2ObjectEntrySet()) drawQueue.add(entry.getValue());
+				}
+			}.start();
+		}
+		lastAdd = System.currentTimeMillis();
+	}
+
+	private void updateLoaded() {
+		lastClientSector.set(GameClient.getClientPlayerState().getCurrentSector());
+		loadedControllers.clear();
+		for(Sendable sendable : GameClient.getClientState().getLocalAndRemoteObjectContainer().getLocalObjects().values()) {
+			if(sendable instanceof SegmentController) loadedControllers.add((SegmentController) sendable);
+		}
+	}
+
+	private Long2ObjectArrayMap<ProjectorInterface> getProjectorsForEntity(SegmentController segmentController, Long2ObjectArrayMap<ProjectorInterface> map) {
+		ManagerContainer<?> managerContainer = ((ManagedUsableSegmentController<?>) segmentController).getManagerContainer();
+
+		if(managerContainer.getModMCModule(holoProjectorId) != null) {
+			HoloProjectorModule holoProjectorModule = (HoloProjectorModule) managerContainer.getModMCModule(holoProjectorId);
+			for(Map.Entry<Long, HoloProjectorDrawData> entry : holoProjectorModule.getProjectorMap().entrySet()) {
+				SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey());
+				if(segmentPiece == null || !checkDraw(segmentPiece)) continue;
+				SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset,  entry.getValue().rotation,  entry.getValue().transform);
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		if(managerContainer.getModMCModule(textProjectorId) != null) {
+			TextProjectorModule textProjectorModule = (TextProjectorModule) managerContainer.getModMCModule(textProjectorId);
+			for(Map.Entry<Long, TextProjectorDrawData> entry : textProjectorModule.getProjectorMap().entrySet()) {
+				SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey());
+				if(segmentPiece == null || !checkDraw(segmentPiece)) continue;
+				SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset,  entry.getValue().rotation,  entry.getValue().transform);
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+
+		/*
+		if(managerContainer.getModMCModule(shapeProjectorId) != null) {
+			ShapeProjectorModule shapeProjectorModule = (ShapeProjectorModule) managerContainer.getModMCModule(textProjectorId);
+			for(Map.Entry<Long, ShapeProjectorDrawData> entry : shapeProjectorModule.getProjectorMap().entrySet()) {
+				SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey());
+				if(segmentPiece == null || !checkDraw(segmentPiece)) continue;
+				SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().getOffset(), entry.getValue().getRotation(), entry.getValue().getTransform());
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+		*/
+		return map;
+	}
+
+	private boolean checkDraw(SegmentPiece segmentPiece) {
+		boolean canToggle = false;
+		SegmentController segmentController = segmentPiece.getSegmentController();
+		SegmentPiece activator =
+				SegmentPieceUtils.getFirstMatchingAdjacent(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
+		if (activator != null) {
+			ArrayList<SegmentPiece> controlling =
+					SegmentPieceUtils.getControlledPiecesMatching(activator, segmentPiece.getType());
+			if (!controlling.isEmpty()) {
+				for (SegmentPiece controlled : controlling) {
+					if (controlled.equals(segmentPiece)) {
+						canToggle = true;
+						break;
+					}
+				}
+			}
+		}
+		return segmentController.getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex())
+				&& segmentController
+				.getSegmentBuffer()
+				.getPointUnsave(segmentPiece.getAbsoluteIndex())
+				.getType()
+				== segmentPiece.getType()
+				&& segmentController.isFullyLoadedWithDock()
+				&& segmentController.isInClientRange()
+				&& ((canToggle && activator.isActive()) || activator == null);
+	}
+
 }

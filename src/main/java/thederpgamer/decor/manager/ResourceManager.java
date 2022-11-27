@@ -31,8 +31,9 @@ public class ResourceManager {
 			"holo-projector-icon",
 			"text-projector-front",
 			"text-projector-icon",
-			"holo-table-icon",
-
+			"holo-table-icon"
+	};
+	/*
 			"grey-basic-armor-small-tiles",
 			"grey-basic-armor-small-tiles-icon",
 			"grey-standard-armor-small-tiles",
@@ -214,10 +215,11 @@ public class ResourceManager {
 			"brown-standard-armor-large-tiles-icon",
 			"brown-advanced-armor-large-tiles",
 			"brown-advanced-armor-large-tiles-icon",
-	};
+	}
+	 */
 
 	private static final String[] spriteNames = {
-			"transparent", "projector-debug-grid", "projectors-infographic"
+			"projectors-infographic", "transparent", "projector-debug-grid"
 	};
 
 	private static final String[] modelNames = {
@@ -295,11 +297,11 @@ public class ResourceManager {
 								if(textureName.endsWith("icon")) {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("/textures/" + textureName + ".png"))));
+											StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("textures/" + textureName + ".png"))));
 								} else {
 									textureMap.put(
 											textureName,
-											StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("/textures/" + textureName + ".png"))));
+											StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("textures/" + textureName + ".png"))));
 								}
 							} catch(Exception exception) {
 								LogManager.logException(
@@ -310,7 +312,7 @@ public class ResourceManager {
 						// Load Sprites
 						for(String spriteName : spriteNames) {
 							try {
-								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(DerpsDecor.class.getResourceAsStream("/sprites/" + spriteName + ".png")), instance, spriteName);
+								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(DerpsDecor.class.getResourceAsStream("sprites/" + spriteName + ".png")), instance, spriteName);
 								sprite.setPositionCenter(false);
 								sprite.setName(spriteName);
 								spriteMap.put(spriteName, sprite);
@@ -332,7 +334,7 @@ public class ResourceManager {
 									offset.x = Float.parseFloat(values[0]);
 									offset.y = Float.parseFloat(values[1]);
 									offset.z = Float.parseFloat(values[2]);
-									loader.getMeshLoader().loadModMesh(instance, meshName, DerpsDecor.class.getResourceAsStream("/models/" + meshName + ".zip"), null);
+									loader.getMeshLoader().loadModMesh(instance, meshName, DerpsDecor.class.getResourceAsStream("models/" + meshName + ".zip"), null);
 									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
 									mesh.getTransform().origin.add(offset);
 									meshMap.put(meshName, mesh);
@@ -340,10 +342,10 @@ public class ResourceManager {
 									loader.getMeshLoader().loadModMesh(instance, modelName, DerpsDecor.class.getResourceAsStream("models/" + modelName + ".zip"), null);
 									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
 									mesh.setFirstDraw(true);
-									if(modelName.equals("display_screen")) { // Temp fix
-										mesh.rotateBy(0.0f, 180.0f, 0.0f);
-										mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
-									}
+									//if(modelName.equals("display_screen")) { // Temp fix
+									//	mesh.rotateBy(0.0f, 180.0f, 0.0f);
+									//	mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
+									//}
 									meshMap.put(modelName, mesh);
 								}
 							} catch(ResourceException | IOException exception) {

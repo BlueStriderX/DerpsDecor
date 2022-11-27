@@ -11,8 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.element.blocks.HullBlock;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
 import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
@@ -40,7 +38,8 @@ public class DerpsDecor extends StarMod {
 	// Instance
 	private static DerpsDecor instance;
 	// Other
-	private final String[] overwriteClasses = {"GUIQuickReferencePanel"
+	private final String[] overwriteClasses = {
+			"GUIQuickReferencePanel"
 			// "ElementCollection",
 			// "ElementCollectionMesh"
 	};
@@ -89,14 +88,14 @@ public class DerpsDecor extends StarMod {
 		ElementManager.addBlock(new HoloTable());
 		// ElementManager.addBlock(new StorageCapsule());
 
-		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
 
-		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
 
-		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
-		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
 
 		ElementManager.doOverwrites();
 		ElementManager.initialize();

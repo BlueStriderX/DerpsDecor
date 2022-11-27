@@ -2,24 +2,22 @@ package thederpgamer.decor.utils;
 
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
-import it.unimi.dsi.fastutil.longs.LongIterator;
-import java.util.ArrayList;
-import java.util.Map;
-import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
-import javax.vecmath.Vector3f;
-
-import it.unimi.dsi.fastutil.objects.ObjectSet;
-import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.PositionControl;
 import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.*;
+import org.schema.game.common.data.element.Element;
+import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.element.ElementInformation;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.SegmentData;
-import org.schema.game.common.util.FastCopyLongOpenHashSet;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+import java.util.ArrayList;
 
 /**
  * <Description>
@@ -102,8 +100,7 @@ public class SegmentPieceUtils {
 	 * @param segmentPiece The SegmentPiece
 	 * @return The full transform of the Projector
 	 */
-	public static Transform getProjectorTransform(
-			SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
+	public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
 		if (out == null) out = new Transform();
 		out.setIdentity();
 		segmentPiece.getTransform(out);
