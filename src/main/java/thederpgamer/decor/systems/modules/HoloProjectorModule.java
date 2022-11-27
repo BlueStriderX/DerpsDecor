@@ -3,6 +3,8 @@ package thederpgamer.decor.systems.modules;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -23,7 +25,6 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -44,55 +45,49 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 
 	@Override
 	public void handle(Timer timer) {
-		if (isOnServer()) return;
-		for (Object obj : getProjectorMap().values()) {
-			HoloProjectorDrawData drawData = (HoloProjectorDrawData) obj;
-			long indexAndOrientation = drawData.indexAndOrientation;
-			long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
+		if(isOnServer()) return;
+		final Long2ObjectMap<HoloProjectorDrawData> drawDataMap = getProjectorMap();
+		new Thread() {
+			@Override
+			public void run() {
+				for(HoloProjectorDrawData obj : drawDataMap.values()) {
+					long indexAndOrientation = obj.indexAndOrientation;
+					long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-			if (drawData.src != null && !drawData.src.isEmpty()) {
-				if (drawData.changed || drawData.getCurrentFrame() == null) {
-					if (!drawData.src.endsWith(".gif")) drawData.image = ImageManager.getImage(drawData.src);
-					drawData.changed = false;
-				}
+					if (obj.src != null && !obj.src.isEmpty()) {
+						if (obj.changed || obj.getCurrentFrame() == null) {
+							if (!obj.src.endsWith(".gif")) obj.image = ImageManager.getImage(obj.src);
+							obj.changed = false;
+						}
 
-				if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
-					SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-					if (canDraw(segmentPiece)) {
-						if (drawData.changed
-								|| drawData.transform == null
-								|| drawData.transform.origin.length() <= 0
-								|| drawData.subSprite == null) {
-							if (drawData.getCurrentFrame() != null) {
-								float maxDim = Math.max(drawData.image.getWidth(), drawData.image.getHeight());
-								if (drawData.transform == null) drawData.transform = new Transform();
-								SegmentPieceUtils.getProjectorTransform(
-										segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
-								Quat4f currentRot = new Quat4f();
-								drawData.transform.getRotation(currentRot);
-								Quat4f addRot = new Quat4f();
-								QuaternionUtil.setEuler(
-										addRot,
-										drawData.rotation.x / 100.0f,
-										drawData.rotation.y / 100.0f,
-										drawData.rotation.z / 100.0f);
-								currentRot.mul(addRot);
-								MathUtils.roundQuat(currentRot);
-								drawData.transform.setRotation(currentRot);
-								drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-								MathUtils.roundVector(drawData.transform.origin);
-								drawData.subSprite =
-										new ScalableImageSubSprite[] {
-												new ScalableImageSubSprite(
-														((float) drawData.scale / (maxDim * 5)) * -1, drawData.transform)
-										};
-								drawData.changed = false;
+						if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
+							SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+							if (canDraw(segmentPiece)) {
+								if (obj.changed || obj.transform == null || obj.transform.origin.length() <= 0 || obj.subSprite == null) {
+									if (obj.getCurrentFrame() != null) {
+										float maxDim = Math.max(obj.image.getWidth(), obj.image.getHeight());
+										if (obj.transform == null) obj.transform = new Transform();
+										SegmentPieceUtils.getProjectorTransform(segmentPiece, obj.offset, obj.rotation, obj.transform);
+										Quat4f currentRot = new Quat4f();
+										obj.transform.getRotation(currentRot);
+										Quat4f addRot = new Quat4f();
+										QuaternionUtil.setEuler(addRot, obj.rotation.x / 100.0f, obj.rotation.y / 100.0f, obj.rotation.z / 100.0f);
+										currentRot.mul(addRot);
+										MathUtils.roundQuat(currentRot);
+										obj.transform.setRotation(currentRot);
+										obj.transform.origin.add(new Vector3f(obj.offset.toVector3f()));
+										MathUtils.roundVector(obj.transform.origin);
+										obj.subSprite = new ScalableImageSubSprite[] {new ScalableImageSubSprite(((float) obj.scale / (maxDim * 5)) * -1, obj.transform)};
+										obj.changed = false;
+									}
+								}
 							}
 						}
 					}
 				}
 			}
-		}
+		}.start();
+
 	}
 
 	@Override
@@ -117,11 +112,18 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 		return "HoloProjector_ManagerModule";
 	}
 
-	public ConcurrentHashMap<Long, HoloProjectorDrawData> getProjectorMap() {
-		if (!(data instanceof HoloProjectorDrawMap)) data = new HoloProjectorDrawMap();
-		if (((HoloProjectorDrawMap) data).map == null)
-			((HoloProjectorDrawMap) data).map = new ConcurrentHashMap<>();
-		return ((HoloProjectorDrawMap) data).map;
+	public Long2ObjectMap<HoloProjectorDrawData> getProjectorMap() {
+		if(data instanceof HoloProjectorDrawMap) migrate();
+		if(!(data instanceof Long2ObjectMap)) data = new Long2ObjectArrayMap<>();
+		return (Long2ObjectMap<HoloProjectorDrawData>) data;
+	}
+
+	private void migrate() {
+		if(data instanceof HoloProjectorDrawMap) {
+			Long2ObjectMap<HoloProjectorDrawData> drawDataMap = new Long2ObjectArrayMap<>();
+			for(HoloProjectorDrawData drawData : ((HoloProjectorDrawMap) data).map.values()) drawDataMap.put(drawData.indexAndOrientation, drawData);
+			data = drawDataMap;
+		}
 	}
 
 	public short getProjectorId() {

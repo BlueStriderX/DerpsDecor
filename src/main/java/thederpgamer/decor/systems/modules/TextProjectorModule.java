@@ -4,6 +4,8 @@ import api.common.GameClient;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
@@ -23,7 +25,6 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -44,66 +45,61 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 
 	@Override
 	public void handle(Timer timer) {
-		if (isOnServer()) return;
-		for (Object obj : getProjectorMap().values()) {
-			TextProjectorDrawData drawData = (TextProjectorDrawData) obj;
-			long indexAndOrientation = drawData.indexAndOrientation;
-			long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
+		if(isOnServer()) return;
+		final Long2ObjectMap<TextProjectorDrawData> drawDataMap = getProjectorMap();
+		new Thread() {
+			@Override
+			public void run() {
+				for(TextProjectorDrawData obj : getProjectorMap().values()) {
+					long indexAndOrientation = obj.indexAndOrientation;
+					long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 
-			if (drawData.text != null && drawData.color != null && !drawData.text.isEmpty()) {
-				if (drawData.changed || drawData.textOverlay == null || drawData.color.isEmpty()) {
-					GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
-					textOverlay.onInit();
-					int trueSize = drawData.scale + 10;
-					try {
-						textOverlay.setFont(
-								ResourceManager.getFont(
-										"Monda-Extended-Bold", trueSize, Color.decode("0x" + drawData.color)));
-					} catch (Exception exception) {
-						exception.printStackTrace();
-						textOverlay.setFont(
-								ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
-						drawData.color = "FFFFFF";
-					}
-					textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
-					String text = drawData.text;
-					//Process regex
-					//text = replaceRegex(text);
-					textOverlay.setTextSimple(text);
-					textOverlay.setBlend(true);
-					textOverlay.doDepthTest = true;
-					drawData.textOverlay = textOverlay;
-					drawData.changed = false;
-				}
+					if (obj.text != null && obj.color != null && !obj.text.isEmpty()) {
+						if (obj.changed || obj.textOverlay == null || obj.color.isEmpty()) {
+							GUITextOverlay textOverlay = new GUITextOverlay(30, 10, GameClient.getClientState());
+							textOverlay.onInit();
+							int trueSize = obj.scale + 10;
+							try {
+								textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.decode("0x" + obj.color)));
+							} catch (Exception exception) {
+								exception.printStackTrace();
+								textOverlay.setFont(ResourceManager.getFont("Monda-Extended-Bold", trueSize, Color.white));
+								obj.color = "FFFFFF";
+							}
+							textOverlay.setScale(-trueSize / 1000.0f, -trueSize / 1000.0f, -trueSize / 1000.0f);
+							String text = obj.text;
+							//Process regex
+							//text = replaceRegex(text);
+							textOverlay.setTextSimple(text);
+							textOverlay.setBlend(true);
+							textOverlay.doDepthTest = true;
+							obj.textOverlay = textOverlay;
+							obj.changed = false;
+						}
 
-				if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
-					SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-					if (canDraw(segmentPiece)) {
-						if (drawData.changed
-								|| drawData.transform == null
-								|| drawData.transform.origin.length() <= 0) {
-							if (drawData.transform == null) drawData.transform = new Transform();
-							SegmentPieceUtils.getProjectorTransform(
-									segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
-							Quat4f currentRot = new Quat4f();
-							drawData.transform.getRotation(currentRot);
-							Quat4f addRot = new Quat4f();
-							QuaternionUtil.setEuler(
-									addRot,
-									drawData.rotation.x / 100.0f,
-									drawData.rotation.y / 100.0f,
-									drawData.rotation.z / 100.0f);
-							currentRot.mul(addRot);
-							MathUtils.roundQuat(currentRot);
-							drawData.transform.setRotation(currentRot);
-							drawData.transform.origin.add(new Vector3f(drawData.offset.toVector3f()));
-							MathUtils.roundVector(drawData.transform.origin);
-							drawData.changed = false;
+						if (segmentController.getSegmentBuffer().existsPointUnsave(index)) {
+							SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+							if (canDraw(segmentPiece)) {
+								if (obj.changed || obj.transform == null || obj.transform.origin.length() <= 0) {
+									if (obj.transform == null) obj.transform = new Transform();
+									SegmentPieceUtils.getProjectorTransform(segmentPiece, obj.offset, obj.rotation, obj.transform);
+									Quat4f currentRot = new Quat4f();
+									obj.transform.getRotation(currentRot);
+									Quat4f addRot = new Quat4f();
+									QuaternionUtil.setEuler(addRot, obj.rotation.x / 100.0f, obj.rotation.y / 100.0f, obj.rotation.z / 100.0f);
+									currentRot.mul(addRot);
+									MathUtils.roundQuat(currentRot);
+									obj.transform.setRotation(currentRot);
+									obj.transform.origin.add(new Vector3f(obj.offset.toVector3f()));
+									MathUtils.roundVector(obj.transform.origin);
+									obj.changed = false;
+								}
+							}
 						}
 					}
 				}
 			}
-		}
+		}.start();
 	}
 
 	/*
@@ -143,13 +139,19 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 		return "TextProjector_ManagerModule";
 	}
 
-	public ConcurrentHashMap<Long, TextProjectorDrawData> getProjectorMap() {
-		if (!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
-		if (((TextProjectorDrawMap) data).map == null)
-			((TextProjectorDrawMap) data).map = new ConcurrentHashMap<>();
-		return ((TextProjectorDrawMap) data).map;
+	public Long2ObjectMap<TextProjectorDrawData> getProjectorMap() {
+		if(data instanceof TextProjectorDrawMap) migrate();
+		if(!(data instanceof Long2ObjectMap)) data = new Long2ObjectArrayMap<>();
+		return (Long2ObjectMap<TextProjectorDrawData>) data;
 	}
 
+	private void migrate() {
+		if(data instanceof TextProjectorDrawMap) {
+			Long2ObjectMap<TextProjectorDrawData> drawDataMap = new Long2ObjectArrayMap<>();
+			for(TextProjectorDrawData drawData : ((TextProjectorDrawMap) data).map.values()) drawDataMap.put(drawData.indexAndOrientation, drawData);
+			data = drawDataMap;
+		}
+	}
 	public short getProjectorId() {
 		return ElementManager.getBlock("Text Projector").getId();
 	}
