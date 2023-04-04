@@ -10,7 +10,7 @@ import thederpgamer.decor.data.system.storagecapsule.StorageCapsuleData;
 import thederpgamer.decor.data.system.storagecapsule.StorageCapsuleSystemData;
 import thederpgamer.decor.element.ElementManager;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * <Description>
@@ -18,32 +18,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @version 1.0 - [03/16/2022]
  */
-public class StorageCapsuleModule extends SimpleDataStorageMCModule
-		implements CargoCapacityElementManagerInterface {
-
-	public StorageCapsuleModule(
-			SegmentController segmentController, ManagerContainer<?> managerContainer) {
-		super(
-				segmentController,
-				managerContainer,
-				DerpsDecor.getInstance(),
-				ElementManager.getBlock("Storage Capsule").getId());
+public class StorageCapsuleModule extends SimpleDataStorageMCModule implements CargoCapacityElementManagerInterface {
+	public StorageCapsuleModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
+		super(segmentController, managerContainer, DerpsDecor.getInstance(), ElementManager.getBlock("Storage Capsule").getId());
 		initData();
 	}
 
 	private void initData() {
-		if (!(data instanceof StorageCapsuleSystemData)) data = new StorageCapsuleSystemData();
-		if (((StorageCapsuleSystemData) data).map == null)
-			((StorageCapsuleSystemData) data).map = new ConcurrentHashMap<>();
+		if(!(data instanceof StorageCapsuleSystemData)) data = new StorageCapsuleSystemData();
+		if(((StorageCapsuleSystemData) data).map == null) ((StorageCapsuleSystemData) data).map = new HashMap<>();
 	}
 
 	@Override
-	public void handle(Timer timer) {}
-
-	@Override
-	public void handleRemove(long abs) {
-		super.handleRemove(abs);
-		flagUpdatedData();
+	public void handle(Timer timer) {
 	}
 
 	@Override
@@ -57,11 +44,17 @@ public class StorageCapsuleModule extends SimpleDataStorageMCModule
 	}
 
 	@Override
+	public void handleRemove(long abs) {
+		super.handleRemove(abs);
+		flagUpdatedData();
+	}
+
+	@Override
 	public String getName() {
 		return "StorageCapsuleModule";
 	}
 
-	public ConcurrentHashMap<Long, StorageCapsuleData> getData() {
+	public HashMap<Long, StorageCapsuleData> getData() {
 		initData();
 		return ((StorageCapsuleSystemData) data).map;
 	}

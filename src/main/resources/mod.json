@@ -3,7 +3,7 @@
   "author": "TheDerpGamer",
   "description": "Adds some new decorative blocks for the creative builder.",
   "version": "1.7.0 - Magnificent",
-  "starmade_version": "0.203.133",
+  "starmade_version": "0.203.142",
   "client_mod": false,
   "server_mod": false,
   "main_class": "thederpgamer.decor.DerpsDecor",

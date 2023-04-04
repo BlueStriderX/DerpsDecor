@@ -13,7 +13,6 @@ import org.schema.game.common.data.world.SimpleTransformableSendableObject;
  * @version 1.0 - [02/25/2022]
  */
 public class ModuleUtils {
-
 	public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
 		if(segmentController instanceof Ship && segmentController.getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
 			return ((Ship) segmentController).getManagerContainer();

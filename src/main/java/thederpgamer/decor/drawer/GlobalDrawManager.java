@@ -2,6 +2,7 @@ package thederpgamer.decor.drawer;
 
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.utils.draw.ModWorldDrawer;
+
 import java.util.Arrays;
 
 /**
@@ -11,7 +12,6 @@ import java.util.Arrays;
  * @since 09/02/2021
  */
 public class GlobalDrawManager {
-
 	private static final ModWorldDrawer[] worldDrawers = new ModWorldDrawer[1];
 
 	public static void initialize(RegisterWorldDrawersEvent event) {

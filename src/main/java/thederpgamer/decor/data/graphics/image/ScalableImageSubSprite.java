@@ -11,32 +11,31 @@ import org.schema.schine.graphicsengine.forms.TransformableSubSprite;
  * @since 06/16/2021
  */
 public class ScalableImageSubSprite implements TransformableSubSprite {
+	private float scale;
+	private Transform transform;
 
-  private float scale;
-  private Transform transform;
+	public ScalableImageSubSprite(float scale, Transform transform) {
+		this.scale = scale;
+		this.transform = transform;
+	}
 
-  public ScalableImageSubSprite(float scale, Transform transform) {
-    this.scale = scale;
-    this.transform = transform;
-  }
+	@Override
+	public float getScale(long l) {
+		return scale;
+	}
 
-  @Override
-  public float getScale(long l) {
-    return scale;
-  }
+	@Override
+	public int getSubSprite(Sprite sprite) {
+		return 0;
+	}
 
-  @Override
-  public int getSubSprite(Sprite sprite) {
-    return 0;
-  }
+	@Override
+	public boolean canDraw() {
+		return true;
+	}
 
-  @Override
-  public boolean canDraw() {
-    return true;
-  }
-
-  @Override
-  public Transform getWorldTransform() {
-    return transform;
-  }
+	@Override
+	public Transform getWorldTransform() {
+		return transform;
+	}
 }

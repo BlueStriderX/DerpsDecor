@@ -9,7 +9,10 @@ import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.common.data.player.inventory.Inventory;
 import org.schema.game.common.data.player.inventory.InventoryHolder;
 import org.schema.game.common.data.player.inventory.StashInventory;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
+import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.element.blocks.InventoryBlock;
+import thederpgamer.decor.manager.ResourceManager;
 
 /**
  * <Description>
@@ -18,7 +21,6 @@ import thederpgamer.decor.element.blocks.InventoryBlock;
  * @version 1.0 - [03/15/2022]
  */
 public class StorageCapsule extends InventoryBlock {
-
 	public StorageCapsule() {
 		super("Storage Capsule", ElementKeyMap.getInfo(120).getType());
 	}
@@ -33,23 +35,20 @@ public class StorageCapsule extends InventoryBlock {
 		blockInfo.setOrientatable(true);
 		blockInfo.setIndividualSides(6);
 		blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
-		blockInfo.lodShapeStyle = 0;
+		blockInfo.lodShapeStyle = 1;
 		blockInfo.sideTexturesPointToOrientation = false;
 		blockInfo.controlling.addAll(ElementKeyMap.getInfo(120).controlling);
 		blockInfo.controlledBy.addAll(ElementKeyMap.getInfo(120).controlledBy);
-		// Todo: Add controlling and controlled by for other blocks
-
-		BlockConfig.addRecipe(
-				blockInfo,
-				ElementKeyMap.getInfo(120).getProducedInFactoryType(),
-				(int) ElementKeyMap.getInfo(120).getFactoryBakeTime(),
-				new FactoryResource(1, (short) 120),
-				new FactoryResource(1, (short) 976));
+		for(short id : ElementKeyMap.getInfo(120).controlledBy) blockInfo.controlledBy.add(id);
+		for(short id : ElementKeyMap.getInfo(120).controlling) blockInfo.controlling.add(id);
+		if(GraphicsContext.initialized) {
+			try {
+				blockInfo.setBuildIconNum(ResourceManager.getTexture("storage-capsule-icon").getTextureId());
+				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
+			} catch(Exception ignored) {}
+		}
+		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(120).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(120).getFactoryBakeTime(), new FactoryResource(1, (short) 120), new FactoryResource(1, (short) 976));
 		BlockConfig.add(blockInfo);
-	}
-
-	@Override
-	public void createGraphics() {
 	}
 
 	@Override
@@ -58,5 +57,6 @@ public class StorageCapsule extends InventoryBlock {
 	}
 
 	@Override
-	public void onLogicActivation(SegmentPieceActivateEvent event) {}
+	public void onLogicActivation(SegmentPieceActivateEvent event) {
+	}
 }

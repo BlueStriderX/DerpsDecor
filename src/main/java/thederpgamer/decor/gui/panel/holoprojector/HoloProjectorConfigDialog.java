@@ -23,122 +23,76 @@ import thederpgamer.decor.systems.modules.HoloProjectorModule;
  * @since 07/09/2021
  */
 public class HoloProjectorConfigDialog extends GUIInputDialog {
+	private SegmentPiece segmentPiece;
 
-  private SegmentPiece segmentPiece;
+	public void setSegmentPiece(SegmentPiece segmentPiece) {
+		this.segmentPiece = segmentPiece;
+		ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
+		HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
+		HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+		setDefaults(drawData);
+		getConfigPanel().setText(drawData.src);
+		getConfigPanel().setXOffset(drawData.offset.x);
+		getConfigPanel().setYOffset(drawData.offset.y);
+		getConfigPanel().setZOffset(drawData.offset.z);
+		getConfigPanel().setXRot(drawData.rotation.x);
+		getConfigPanel().setYRot(drawData.rotation.y);
+		getConfigPanel().setZRot(drawData.rotation.z);
+		getConfigPanel().setScaleSetting(drawData.scale);
+		getConfigPanel().setHolographic(drawData.holographic);
+	}
 
-  public void setSegmentPiece(SegmentPiece segmentPiece) {
-    this.segmentPiece = segmentPiece;
+	private void setDefaults(HoloProjectorDrawData drawData) {
+		if(drawData.offset == null) drawData.offset = new Vector3i();
+		if(drawData.rotation == null) drawData.rotation = new Vector3i();
+		if(drawData.src == null) drawData.src = "";
+	}
 
-    ManagedUsableSegmentController<?> segmentController =
-        (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
-    HoloProjectorModule module =
-        (HoloProjectorModule)
-            segmentController
-                .getManagerContainer()
-                .getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-    HoloProjectorDrawData drawData =
-        (HoloProjectorDrawData)
-            module.getDrawData(
-                ElementCollection.getIndex4(
-                    segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-    setDefaults(drawData);
+	private HoloProjectorConfigPanel getConfigPanel() {
+		return (HoloProjectorConfigPanel) getInputPanel();
+	}
 
-    getConfigPanel().setText(drawData.src);
-    getConfigPanel().setXOffset(drawData.offset.x);
-    getConfigPanel().setYOffset(drawData.offset.y);
-    getConfigPanel().setZOffset(drawData.offset.z);
-    getConfigPanel().setXRot(drawData.rotation.x);
-    getConfigPanel().setYRot(drawData.rotation.y);
-    getConfigPanel().setZRot(drawData.rotation.z);
-    getConfigPanel().setScaleSetting(drawData.scale);
-    getConfigPanel().setHolographic(drawData.holographic);
-  }
+	@Override
+	public GUIInputDialogPanel createPanel() {
+		return new HoloProjectorConfigPanel(getState(), this);
+	}
 
-  @Override
-  public GUIInputDialogPanel createPanel() {
-    return new HoloProjectorConfigPanel(getState(), this);
-  }
+	@Override
+	public void callback(GUIElement callingElement, MouseEvent mouseEvent) {
+		if(!isOccluded() && mouseEvent.pressedLeftMouse()) {
+			if(callingElement.getUserPointer() != null) {
+				switch((String) callingElement.getUserPointer()) {
+					case "X":
+					case "CANCEL":
+						deactivate();
+						break;
+					case "OK":
+						HoloProjectorDrawData drawData = getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+						drawData.src = getConfigPanel().getText();
+						drawData.offset = new Vector3i(getConfigPanel().getXOffset(), getConfigPanel().getYOffset(), getConfigPanel().getZOffset());
+						drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
+						drawData.scale = getConfigPanel().getScaleSetting();
+						drawData.holographic = getConfigPanel().getHolographic();
+						drawData.changed = true;
+						getModule().setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
+						deactivate();
+						break;
+				}
+			}
+		}
+	}
 
-  @Override
-  public void callback(GUIElement callingElement, MouseEvent mouseEvent) {
-    if (!isOccluded() && mouseEvent.pressedLeftMouse()) {
-      if (callingElement.getUserPointer() != null) {
-        switch ((String) callingElement.getUserPointer()) {
-          case "X":
-          case "CANCEL":
-            deactivate();
-            break;
-          case "OK":
-            HoloProjectorDrawData drawData =
-                (HoloProjectorDrawData)
-                    getModule()
-                        .getDrawData(
-                            ElementCollection.getIndex4(
-                                segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
-            drawData.src = getConfigPanel().getText();
-            drawData.offset =
-                new Vector3i(
-                    getConfigPanel().getXOffset(),
-                    getConfigPanel().getYOffset(),
-                    getConfigPanel().getZOffset());
-            drawData.rotation =
-                new Vector3i(
-                    getConfigPanel().getXRot(),
-                    getConfigPanel().getYRot(),
-                    getConfigPanel().getZRot());
-            drawData.scale = getConfigPanel().getScaleSetting();
-            drawData.holographic = getConfigPanel().getHolographic();
-            drawData.changed = true;
-            getModule()
-                .setDrawData(
-                    ElementCollection.getIndex4(
-                        segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()),
-                    drawData);
-            deactivate();
-            break;
-        }
-      }
-    }
-  }
+	@Override
+	public void onDeactivate() {
+		super.onDeactivate();
+		GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(false);
+	}
 
-  @Override
-  public void onDeactivate() {
-    super.onDeactivate();
-    GameClient.getClientState()
-        .getGlobalGameControlManager()
-        .getIngameControlManager()
-        .getPlayerGameControlManager()
-        .getPlayerIntercationManager()
-        .suspend(false);
-  }
-
-  private HoloProjectorConfigPanel getConfigPanel() {
-    return (HoloProjectorConfigPanel) getInputPanel();
-  }
-
-  private HoloProjectorModule getModule() {
-    if (segmentPiece
-        .getSegmentController()
-        .getType()
-        .equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-      return (HoloProjectorModule)
-          ((Ship) segmentPiece.getSegmentController())
-              .getManagerContainer()
-              .getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-    } else if (segmentPiece
-        .getSegmentController()
-        .getType()
-        .equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-      return (HoloProjectorModule)
-          ((SpaceStation) segmentPiece.getSegmentController())
-              .getManagerContainer()
-              .getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-    } else return null;
-  }
-
-  private void setDefaults(HoloProjectorDrawData drawData) {
-    if (drawData.offset == null) drawData.offset = new Vector3i();
-    if (drawData.rotation == null) drawData.rotation = new Vector3i();
-    if (drawData.src == null) drawData.src = "";
-  }
+	private HoloProjectorModule getModule() {
+		if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+			return (HoloProjectorModule) ((Ship) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
+		} else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+			return (HoloProjectorModule) ((SpaceStation) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
+		} else return null;
+	}
 }

@@ -37,14 +37,12 @@ import java.util.ArrayList;
  * @version 1.0 - [03/30/2022]
  */
 public class BlockIconUtils extends ModWorldDrawer {
-
 	private Transform orientation = new Transform();
 	private Transform orientationTmp = new Transform();
 	private Matrix3f rot = new Matrix3f();
 	private Transform mView = new Transform();
 	private FloatBuffer fb = BufferUtils.createFloatBuffer(16);
 	private float[] ff = new float[16];
-
 	private boolean initialized = false;
 
 	public BlockIconUtils() {
@@ -54,12 +52,10 @@ public class BlockIconUtils extends ModWorldDrawer {
 
 	@Override
 	public void update(Timer timer) {
-
 	}
 
 	@Override
 	public void cleanUp() {
-
 	}
 
 	@Override
@@ -94,10 +90,8 @@ public class BlockIconUtils extends ModWorldDrawer {
 		int y = 0;
 
 		 */
-
 		File iconsFolder = new File(DataUtils.getWorldDataPath() + "/block-icons");
 		if(!iconsFolder.exists()) iconsFolder.mkdirs();
-
 		for(final ElementInformation e : types) {
 			if(e.getName().contains("environmental")) continue;
 			final FrameBufferObjects fbo = new FrameBufferObjects(e.getName(), 64, 64);
@@ -112,7 +106,6 @@ public class BlockIconUtils extends ModWorldDrawer {
 			GL11.glViewport(0, 0, 64, 64);
 			GlUtil.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 			GlUtil.glDisable(GL11.GL_DEPTH_TEST);
-
 			GUI3DBlockElement.setMatrix();
 			Matrix4f modelviewMatrix = Controller.modelviewMatrix;
 			fb.rewind();
@@ -135,7 +128,6 @@ public class BlockIconUtils extends ModWorldDrawer {
 				rot.set(orientation.basis);
 				mView.basis.mul(rot);
 			}
-
 			GlUtil.glMultMatrix(mView);
 			if(e.getBlockStyle() == BlockStyle.SPRITE) mView.basis.set(orientationTmp.basis);
 			SingleBlockDrawer drawer = new SingleBlockDrawer();
@@ -151,14 +143,12 @@ public class BlockIconUtils extends ModWorldDrawer {
 			AbstractScene.mainLight.draw();
 			GlUtil.glDisable(GL11.GL_NORMALIZE);
 			GlUtil.glEnable(GL11.GL_DEPTH_TEST);
-
 			try {
 				String path = DataUtils.getWorldDataPath() + "/block-icons/" + e.getName().toLowerCase().replaceAll(" ", "-") + "-icon";
 				if(e.isReactorChamberAny()) {
 					Block root = ElementManager.getBlock((short) e.chamberRoot);
 					if(root != null) path = root.getBlockInfo().getName().toLowerCase().replaceAll(" ", "-") + "-icon";
 				}
-
 				final File outputFile = new File(path + ".png");
 				if(!outputFile.exists()) outputFile.createNewFile();
 				GlUtil.writeScreenToDisk(path, "png", 64, 64, 4, fbo);
@@ -188,7 +178,6 @@ public class BlockIconUtils extends ModWorldDrawer {
 			} catch(Exception ex) {
 				ex.printStackTrace();
 			}
-
 			fbo.disable();
 			fbo.cleanUp();
 		}

@@ -9,17 +9,20 @@ import glossar.GlossarEntry;
 import glossar.GlossarInit;
 import org.apache.commons.io.IOUtils;
 import org.schema.schine.resource.ResourceLoader;
+import thederpgamer.decor.api.luamade.LuaMadeAPIManager;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.element.blocks.decor.ActivationLever;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
-import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
+import thederpgamer.decor.element.blocks.inventory.StorageCapsule;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.EventManager;
 import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.BlockIconUtils;
 import thederpgamer.decor.utils.ClipboardUtils;
+import thederpgamer.decor.utils.MessageType;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import java.io.FileInputStream;
@@ -34,26 +37,26 @@ import java.util.zip.ZipInputStream;
  * @version 1.1 - [11/12/2021]
  */
 public class DerpsDecor extends StarMod {
-
 	// Instance
 	private static DerpsDecor instance;
 	// Other
-	private final String[] overwriteClasses = {
-			"GUIQuickReferencePanel"
-			// "ElementCollection",
-			// "ElementCollectionMesh"
+	private final String[] overwriteClasses = {"GUIQuickReferencePanel"
+		// "ElementCollection",
+		// "ElementCollectionMesh"
 	};
 	// Utils
 	public ClipboardUtils clipboard;
 	private BlockIconUtils iconUtils;
 
-	public DerpsDecor() {}
+	public DerpsDecor() {
+	}
 
 	public static DerpsDecor getInstance() {
 		return instance;
 	}
 
-	public static void main(String[] args) {}
+	public static void main(String[] args) {
+	}
 
 	@Override
 	public byte[] onClassTransform(String className, byte[] byteCode) {
@@ -71,6 +74,7 @@ public class DerpsDecor extends StarMod {
 		SegmentPieceUtils.initialize();
 		EventManager.initialize(this);
 		registerCommands();
+		if(LuaMadeAPIManager.initialize()) LogManager.logMessage(MessageType.INFO, "Loaded LuaMade API integration.");
 	}
 
 	@Override
@@ -83,21 +87,14 @@ public class DerpsDecor extends StarMod {
 	public void onBlockConfigLoad(BlockConfig config) {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
-		// ElementManager.addBlock(new StrutConnector());
-		// ElementManager.addBlock(new DisplayScreen());
-		ElementManager.addBlock(new HoloTable());
-		// ElementManager.addBlock(new StorageCapsule());
-
-		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-
-		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-
-		//for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
-		//for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
-
-		ElementManager.doOverwrites();
+		ElementManager.addBlock(new StorageCapsule());
+		ElementManager.addBlock(new ActivationLever());
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
 		ElementManager.initialize();
 	}
 
@@ -122,8 +119,7 @@ public class DerpsDecor extends StarMod {
 	private byte[] overwriteClass(String className, byte[] byteCode) {
 		byte[] bytes = null;
 		try {
-			ZipInputStream file =
-					new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
+			ZipInputStream file = new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
 			while(true) {
 				ZipEntry nextEntry = file.getNextEntry();
 				if(nextEntry == null) break;

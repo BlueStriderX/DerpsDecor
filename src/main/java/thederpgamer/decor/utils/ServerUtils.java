@@ -14,21 +14,20 @@ import org.schema.game.server.data.ServerConfig;
  * @since 08/13/2021
  */
 public class ServerUtils {
+	public static int getSectorSize() {
+		return (int) ServerConfig.SECTOR_SIZE.getCurrentState();
+	}
 
-  public static int getSectorSize() {
-    return (int) ServerConfig.SECTOR_SIZE.getCurrentState();
-  }
-
-  public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
-    switch (segmentController.getType()) {
-      case SHIP:
-        return ((Ship) segmentController).getManagerContainer();
-      case SPACE_STATION:
-        return ((SpaceStation) segmentController).getManagerContainer();
-      case PLANET_SEGMENT:
-        return ((Planet) segmentController).getManagerContainer();
-      default:
-        return null;
-    }
-  }
+	public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {
+		switch(segmentController.getType()) {
+			case SHIP:
+				return ((Ship) segmentController).getManagerContainer();
+			case SPACE_STATION:
+				return ((SpaceStation) segmentController).getManagerContainer();
+			case PLANET_SEGMENT:
+				return ((Planet) segmentController).getManagerContainer();
+			default:
+				return null;
+		}
+	}
 }

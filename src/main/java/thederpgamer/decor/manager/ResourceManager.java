@@ -25,14 +25,7 @@ import java.util.HashMap;
  * @since 06/15/2021
  */
 public class ResourceManager {
-
-	private static final String[] textureNames = {
-			"holo-projector-front",
-			"holo-projector-icon",
-			"text-projector-front",
-			"text-projector-icon",
-			"holo-table-icon"
-	};
+	private static final String[] textureNames = {"holo-projector-front", "holo-projector-icon", "text-projector-front", "text-projector-icon", "holo-table-icon"};
 	/*
 			"grey-basic-armor-small-tiles",
 			"grey-basic-armor-small-tiles-icon",
@@ -217,24 +210,9 @@ public class ResourceManager {
 			"brown-advanced-armor-large-tiles-icon",
 	}
 	 */
-
-	private static final String[] spriteNames = {
-			"projectors-infographic", "transparent", "projector-debug-grid"
-	};
-
-	private static final String[] modelNames = {
-			// "strut_connector",
-			// "strut_tube",
-			// "display_screen",
-			"holo_table"
-			// "storage_capsule_closed",
-			// "storage_capsule_open",
-			// "activation_lever_off",
-			// "activation_lever_on"
-	};
-
+	private static final String[] spriteNames = {"projectors-infographic", "transparent", "projector-debug-grid"};
+	private static final String[] modelNames = {"holo_table"};
 	private static final String[] fontNames = {"Monda-Extended-Regular", "Monda-Extended-Bold"};
-
 	private static final HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
 	private static final HashMap<String, Sprite> spriteMap = new HashMap<>();
 	private static final HashMap<String, Mesh> meshMap = new HashMap<>();
@@ -249,24 +227,43 @@ public class ResourceManager {
 		if(!outputDir.exists()) outputDir.mkdirs();
 		File baseTexture = new File(args[1]);
 		if(!baseTexture.exists()) throw new IllegalArgumentException("Base texture file does not exist.");
+		int lighterColor = 32;
+		int darkerColor = 64;
 		try {
 			BufferedImage baseImage = ImageIO.read(baseTexture);
-			/*
-			//Generate color variants
-			for(HullBlock.Color color : HullBlock.Color.values()) {
-				String outputName = (baseTexture.getName().substring(0, baseTexture.getName().lastIndexOf(".")) + "-" + color.name).toLowerCase(Locale.ENGLISH).replaceAll(" ", "-") + ".png";
-				File outputFile = new File(outputDir, outputName);
-				BufferedImage outputImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = outputImage.createGraphics();
-				g.drawImage(baseImage, 0, 0, null);
-				g.setColor(color.getColor());
-				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
-				g.fillRect(0, 0, baseImage.getWidth(), baseImage.getHeight());
-				g.dispose();
-				ImageIO.write(outputImage, "png", outputFile);
+			//Generate a variant of the image with a grid overlay. For the "large tiles" variant, the grid separates the texture into 2x2 squares. For the "small tiles" variant, the grid separates the texture into 4x4 squares.
+			//For each horizontal line, we make the line 2 pixels wide, with the left half of the line being lighter than the right. For each horizontal line, we make the line 2 pixels wide, with the top half of the line being lighter than the bottom.
+			//Assume the base image is 256x256.
+			{ //Generate the "large tiles" variant first.
+				BufferedImage largeTilesImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D largeTilesGraphics = largeTilesImage.createGraphics();
+				largeTilesGraphics.drawImage(baseImage, 0, 0, null);
+				//Make the lighter lines.
+				largeTilesGraphics.setColor(new Color(0, 0, 0, lighterColor));
+				for(int y = 0; y < largeTilesImage.getHeight(); y += 128) largeTilesGraphics.drawLine(0, y, largeTilesImage.getWidth(), y);
+				for(int x = 0; x < largeTilesImage.getWidth(); x += 128) largeTilesGraphics.drawLine(x, 0, x, largeTilesImage.getHeight());
+				//Make the darker lines.
+				largeTilesGraphics.setColor(new Color(0, 0, 0, darkerColor));
+				for(int y = 1; y < largeTilesImage.getHeight(); y += 128) largeTilesGraphics.drawLine(0, y, largeTilesImage.getWidth(), y);
+				for(int x = 1; x < largeTilesImage.getWidth(); x += 128) largeTilesGraphics.drawLine(x, 0, x, largeTilesImage.getHeight());
+				//Save the image.
+				ImageIO.write(largeTilesImage, "png", new File(outputDir, baseTexture.getName().substring(0, baseTexture.getName().indexOf(".png")) + "-large-tiles.png"));
 			}
-
-			 */
+			{ //Generate the "small tiles" variant next.
+				BufferedImage smallTilesImage = new BufferedImage(baseImage.getWidth(), baseImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+				Graphics2D smallTilesGraphics = smallTilesImage.createGraphics();
+				smallTilesGraphics.drawImage(baseImage, 0, 0, null);
+				//Make the lighter lines.
+				smallTilesGraphics.setColor(new Color(0, 0, 0, lighterColor));
+				for(int y = 0; y < smallTilesImage.getHeight(); y += 64) smallTilesGraphics.drawLine(0, y, smallTilesImage.getWidth(), y);
+				for(int x = 0; x < smallTilesImage.getWidth(); x += 64) smallTilesGraphics.drawLine(x, 0, x, smallTilesImage.getHeight());
+				//Make the darker lines.
+				smallTilesGraphics.setColor(new Color(0, 0, 0, darkerColor));
+				for(int y = 1; y < smallTilesImage.getHeight(); y += 64) smallTilesGraphics.drawLine(0, y, smallTilesImage.getWidth(), y);
+				for(int x = 1; x < smallTilesImage.getWidth(); x += 64) smallTilesGraphics.drawLine(x, 0, x, smallTilesImage.getHeight());
+				//Save the image.
+				ImageIO.write(smallTilesImage, "png", new File(outputDir, baseTexture.getName().substring(0, baseTexture.getName().indexOf(".png")) + "-small-tiles.png"));
+			}
 		} catch(Exception exception) {
 			throw new RuntimeException(exception);
 		}
@@ -276,84 +273,66 @@ public class ResourceManager {
 		// Load fonts
 		for(String fontName : fontNames) {
 			try {
-				fontMap.put(
-						fontName,
-						Font.createFont(
-								Font.TRUETYPE_FONT,
-								instance.getJarResource(
-										"fonts/" + fontName + ".ttf")));
+				fontMap.put(fontName, Font.createFont(Font.TRUETYPE_FONT, DerpsDecor.getInstance().getJarResource("fonts/" + fontName + ".ttf")));
 			} catch(Exception exception) {
 				LogManager.logException("Failed to load font \"" + fontName + "\"", exception);
 			}
 		}
-
-		StarLoaderTexture.runOnGraphicsThread(
-				new Runnable() {
-					@Override
-					public void run() {
-						// Load Textures
-						for(String textureName : textureNames) {
-							try {
-								if(textureName.endsWith("icon")) {
-									textureMap.put(
-											textureName,
-											StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("textures/" + textureName + ".png"))));
-								} else {
-									textureMap.put(
-											textureName,
-											StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.class.getResourceAsStream("textures/" + textureName + ".png"))));
-								}
-							} catch(Exception exception) {
-								LogManager.logException(
-										"Failed to load texture \"" + textureName + "\"", exception);
-							}
-						}
-
-						// Load Sprites
-						for(String spriteName : spriteNames) {
-							try {
-								Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(DerpsDecor.class.getResourceAsStream("sprites/" + spriteName + ".png")), instance, spriteName);
-								sprite.setPositionCenter(false);
-								sprite.setName(spriteName);
-								spriteMap.put(spriteName, sprite);
-							} catch(Exception exception) {
-								LogManager.logException("Failed to load sprite \"" + spriteName + "\"", exception);
-							}
-						}
-
-						// Load models
-						for(String modelName : modelNames) {
-							try {
-								Vector3f offset = new Vector3f();
-								if(modelName.contains("~")) {
-									String meshName = modelName.substring(0, modelName.indexOf('~'));
-									String offsetString =
-											modelName.substring(modelName.indexOf('(') + 1, modelName.lastIndexOf(')'));
-									String[] values = offsetString.split(", ");
-									assert values.length == 3;
-									offset.x = Float.parseFloat(values[0]);
-									offset.y = Float.parseFloat(values[1]);
-									offset.z = Float.parseFloat(values[2]);
-									loader.getMeshLoader().loadModMesh(instance, meshName, DerpsDecor.class.getResourceAsStream("models/" + meshName + ".zip"), null);
-									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
-									mesh.getTransform().origin.add(offset);
-									meshMap.put(meshName, mesh);
-								} else {
-									loader.getMeshLoader().loadModMesh(instance, modelName, DerpsDecor.class.getResourceAsStream("models/" + modelName + ".zip"), null);
-									Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
-									mesh.setFirstDraw(true);
-									//if(modelName.equals("display_screen")) { // Temp fix
-									//	mesh.rotateBy(0.0f, 180.0f, 0.0f);
-									//	mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
-									//}
-									meshMap.put(modelName, mesh);
-								}
-							} catch(ResourceException | IOException exception) {
-								LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
-							}
-						}
+		StarLoaderTexture.runOnGraphicsThread(new Runnable() {
+			@Override
+			public void run() {
+				// Load Textures
+				for(String textureName : textureNames) {
+					try {
+						if(textureName.endsWith("icon")) textureMap.put(textureName, StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png"))));
+						else textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png"))));
+					} catch(Exception exception) {
+						LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
 					}
-				});
+				}
+				// Load Sprites
+				for(String spriteName : spriteNames) {
+					try {
+						Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(DerpsDecor.getInstance().getJarResource("sprites/" + spriteName + ".png")), instance, spriteName);
+						sprite.setPositionCenter(false);
+						sprite.setName(spriteName);
+						spriteMap.put(spriteName, sprite);
+					} catch(Exception exception) {
+						LogManager.logException("Failed to load sprite \"" + spriteName + "\"", exception);
+					}
+				}
+				// Load models
+				for(String modelName : modelNames) {
+					try {
+						Vector3f offset = new Vector3f();
+						if(modelName.contains("~")) {
+							String meshName = modelName.substring(0, modelName.indexOf('~'));
+							String offsetString = modelName.substring(modelName.indexOf('(') + 1, modelName.lastIndexOf(')'));
+							String[] values = offsetString.split(", ");
+							assert values.length == 3;
+							offset.x = Float.parseFloat(values[0]);
+							offset.y = Float.parseFloat(values[1]);
+							offset.z = Float.parseFloat(values[2]);
+							loader.getMeshLoader().loadModMesh(instance, meshName, DerpsDecor.getInstance().getJarResource("models/" + meshName + ".zip"), null);
+							Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
+							mesh.getTransform().origin.add(offset);
+							meshMap.put(meshName, mesh);
+						} else {
+							loader.getMeshLoader().loadModMesh(instance, modelName, DerpsDecor.getInstance().getJarResource("models/" + modelName + ".zip"), null);
+							Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+							mesh.setFirstDraw(true);
+							//if(modelName.equals("display_screen")) { // Temp fix
+							//	mesh.rotateBy(0.0f, 180.0f, 0.0f);
+							//	mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
+							//}
+							meshMap.put(modelName, mesh);
+						}
+					} catch(ResourceException | IOException exception) {
+						LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
+					}
+				}
+			}
+		});
 	}
 
 	public static StarLoaderTexture getTexture(String name) {
@@ -369,8 +348,7 @@ public class ResourceManager {
 		else return null;
 	}
 
-	public static UnicodeFont getFont(
-			String fontName, int size, Color color, Color outlineColor, int outlineSize) {
+	public static UnicodeFont getFont(String fontName, int size, Color color, Color outlineColor, int outlineSize) {
 		try {
 			Font font = fontMap.get(fontName).deriveFont((float) size);
 			UnicodeFont unicodeFont = new UnicodeFont(font);

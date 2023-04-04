@@ -5,13 +5,11 @@ import com.bulletphysics.linearmath.Transform;
 import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.controller.PositionControl;
 import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.game.common.data.element.ControlElementMapper;
 import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
-import org.schema.game.common.data.element.ElementInformation;
-import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.SegmentData;
 
 import javax.vecmath.Matrix3f;
@@ -26,7 +24,6 @@ import java.util.ArrayList;
  * @since 08/10/2021
  */
 public class SegmentPieceUtils {
-
 	// Rotation Helpers
 	private static final Matrix3f mY = new Matrix3f();
 	private static final Matrix3f mYB = new Matrix3f();
@@ -42,7 +39,6 @@ public class SegmentPieceUtils {
 		mYB.rotY(-FastMath.HALF_PI);
 		mYC.setIdentity();
 		mYC.rotY(FastMath.PI);
-
 		mX.setIdentity();
 		mX.rotX(FastMath.HALF_PI);
 		mXB.setIdentity();
@@ -52,25 +48,18 @@ public class SegmentPieceUtils {
 	}
 
 	public static int getDistance(SegmentPiece pieceA, SegmentPiece pieceB) {
-		return (int)
-				Math.ceil(
-						Vector3fTools.distance(pieceA.x, pieceA.y, pieceA.z, pieceB.x, pieceB.y, pieceB.z));
+		return (int) Math.ceil(Vector3fTools.distance(pieceA.x, pieceA.y, pieceA.z, pieceB.x, pieceB.y, pieceB.z));
 	}
 
-	public static boolean withinSameAxisAndAngle(
-			SegmentPiece pieceA, SegmentPiece pieceB, float maxAngle) {
+	public static boolean withinSameAxisAndAngle(SegmentPiece pieceA, SegmentPiece pieceB, float maxAngle) {
 		Transform pieceATransform = new Transform();
 		pieceA.getTransform(pieceATransform);
-
 		Transform pieceBTransform = new Transform();
 		pieceB.getTransform(pieceBTransform);
-
 		Vector3f pieceAForward = new Vector3f();
 		Vector3f pieceBForward = new Vector3f();
-
 		Element.getRelativeForward(pieceA.getOrientation(), Element.FRONT, pieceAForward);
 		Element.getRelativeForward(pieceB.getOrientation(), Element.FRONT, pieceBForward);
-
 		return pieceAForward.dot(pieceBForward) <= 90 - maxAngle;
 	}
 
@@ -78,7 +67,8 @@ public class SegmentPieceUtils {
 	 * Gets the position of the specified face from the provided SegmentPiece.
 	 *
 	 * @param segmentPiece The SegmentPiece
-	 * @param face The face to find the position of (NOT the orientation of the piece itself)
+	 * @param face         The face to find the position of (NOT the orientation of the piece itself)
+	 *
 	 * @return The position of the specified face
 	 */
 	public static Vector3f getPieceFacePos(SegmentPiece segmentPiece, int face) {
@@ -98,21 +88,20 @@ public class SegmentPieceUtils {
 	 * Gets the full Transform of a Projector.
 	 *
 	 * @param segmentPiece The SegmentPiece
+	 *
 	 * @return The full transform of the Projector
 	 */
 	public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
-		if (out == null) out = new Transform();
+		if(out == null) out = new Transform();
 		out.setIdentity();
 		segmentPiece.getTransform(out);
 		ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), out.origin);
 		out.origin.x -= SegmentData.SEG_HALF;
 		out.origin.y -= SegmentData.SEG_HALF;
 		out.origin.z -= SegmentData.SEG_HALF;
-
 		float sNormalDir = 0.51f;
 		float sVertical = 0.5f;
 		float sHorizontal = 0.5f;
-
 		out.origin.add(offset.toVector3f());
 		Quat4f currentRot = new Quat4f();
 		out.getRotation(currentRot);
@@ -121,9 +110,8 @@ public class SegmentPieceUtils {
 		currentRot.mul(addRot);
 		MathUtils.roundQuat(currentRot);
 		out.setRotation(currentRot);
-
 		int orientation = segmentPiece.getOrientation();
-		switch (orientation) {
+		switch(orientation) {
 			case (Element.FRONT):
 				out.basis.mul(mYC);
 				out.origin.x -= sHorizontal;
@@ -169,10 +157,10 @@ public class SegmentPieceUtils {
 	 * Gets the full Transform of a SegmentPiece.
 	 *
 	 * @param segmentPiece The SegmentPiece
+	 *
 	 * @return The full transform of the SegmentPiece
 	 */
-	public static Transform getPieceTransform(
-			SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
+	public static Transform getPieceTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
 		Transform transform = new Transform();
 		transform.setIdentity();
 		segmentPiece.getTransform(transform);
@@ -180,7 +168,6 @@ public class SegmentPieceUtils {
 		transform.origin.x -= SegmentData.SEG_HALF;
 		transform.origin.y -= SegmentData.SEG_HALF;
 		transform.origin.z -= SegmentData.SEG_HALF;
-
 		transform.origin.add(offset.toVector3f());
 		Quat4f currentRot = new Quat4f();
 		transform.getRotation(currentRot);
@@ -189,9 +176,8 @@ public class SegmentPieceUtils {
 		currentRot.mul(addRot);
 		MathUtils.roundQuat(currentRot);
 		transform.setRotation(currentRot);
-
 		int orientation = segmentPiece.getOrientation();
-		switch (orientation) {
+		switch(orientation) {
 			case (Element.FRONT):
 				transform.basis.mul(mYC);
 				break;
@@ -219,31 +205,29 @@ public class SegmentPieceUtils {
 		return getControlledPieces(controller).contains(controlled);
 	}
 
-	public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
+	public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
 		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-		PositionControl control = segmentPiece.getSegmentController().getControlElementMap().getControlledElements(type, new Vector3i(segmentPiece.x, segmentPiece.y, segmentPiece.z));
-		if (control != null) {
-			for (long l : control.getControlMap().toLongArray()) {
-				SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-				if (p != null && p.getType() == type) controlledPieces.add(p);
-			}
+		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
+		for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
+			SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
+			if(p != null && p.getType() != 0) controlledPieces.add(p);
 		}
 		return controlledPieces;
 	}
 
-	public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
+	public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
 		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-		for(ElementInformation info : ElementKeyMap.getInfoArray()) {
-			try {
-				controlledPieces.addAll(getControlledPiecesMatching(segmentPiece, info.getId()));
-			} catch(Exception ignored) {}
+		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
+		for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
+			SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
+			if(p != null && p.getType() == type) controlledPieces.add(p);
 		}
 		return controlledPieces;
 	}
 
 	public static SegmentPiece getFirstMatchingAdjacent(SegmentPiece segmentPiece, short type) {
 		ArrayList<SegmentPiece> matching = getMatchingAdjacent(segmentPiece, type);
-		if (matching.isEmpty()) return null;
+		if(matching.isEmpty()) return null;
 		else return matching.get(0);
 	}
 
@@ -252,23 +236,16 @@ public class SegmentPieceUtils {
 		SegmentBufferInterface buffer = segmentPiece.getSegmentController().getSegmentBuffer();
 		Vector3i pos = new Vector3i(segmentPiece.getAbsolutePos(new Vector3i()));
 		Vector3i[] offsets = getAdjacencyOffsets(pos);
-		for (Vector3i offset : offsets) {
-			if (buffer.existsPointUnsave(offset)) {
+		for(Vector3i offset : offsets) {
+			if(buffer.existsPointUnsave(offset)) {
 				SegmentPiece piece = buffer.getPointUnsave(offset);
-				if (piece.getType() == type) matchingAdjacent.add(piece);
+				if(piece.getType() == type) matchingAdjacent.add(piece);
 			}
 		}
 		return matchingAdjacent;
 	}
 
 	private static Vector3i[] getAdjacencyOffsets(Vector3i absPos) {
-		return new Vector3i[] {
-				new Vector3i(absPos.x - 1, absPos.y, absPos.z),
-				new Vector3i(absPos.x + 1, absPos.y, absPos.z),
-				new Vector3i(absPos.x, absPos.y - 1, absPos.z),
-				new Vector3i(absPos.x, absPos.y + 1, absPos.z),
-				new Vector3i(absPos.x, absPos.y, absPos.z - 1),
-				new Vector3i(absPos.x, absPos.y, absPos.z + 1)
-		};
+		return new Vector3i[] {new Vector3i(absPos.x - 1, absPos.y, absPos.z), new Vector3i(absPos.x + 1, absPos.y, absPos.z), new Vector3i(absPos.x, absPos.y - 1, absPos.z), new Vector3i(absPos.x, absPos.y + 1, absPos.z), new Vector3i(absPos.x, absPos.y, absPos.z - 1), new Vector3i(absPos.x, absPos.y, absPos.z + 1)};
 	}
 }

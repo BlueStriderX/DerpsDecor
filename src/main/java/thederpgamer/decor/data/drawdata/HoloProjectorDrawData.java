@@ -16,7 +16,6 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @since 07/19/2021
  */
 public class HoloProjectorDrawData implements ProjectorInterface {
-
 	public long indexAndOrientation;
 	public Vector3i offset;
 	public Vector3i rotation;
@@ -24,22 +23,13 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 	public String src;
 	public boolean holographic;
 	public boolean changed;
-
 	public transient ScalableImageSubSprite[] subSprite;
 	public transient Transform transform;
 	public transient Sprite image;
-
 	public transient int currentFrame;
 	public transient Sprite[] frames;
 
-	public HoloProjectorDrawData(
-			long indexAndOrientation,
-			Vector3i offset,
-			Vector3i rotation,
-			int scale,
-			String src,
-			boolean holographic,
-			boolean changed) {
+	public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, String src, boolean holographic, boolean changed) {
 		this.indexAndOrientation = indexAndOrientation;
 		this.offset = offset;
 		this.rotation = rotation;
@@ -57,10 +47,8 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 		src = "";
 		holographic = true;
 		changed = true;
-		if (segmentPiece != null) {
-			indexAndOrientation =
-					ElementCollection.getIndex4(
-							segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
+		if(segmentPiece != null) {
+			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
 		}
 	}
@@ -78,21 +66,21 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 	}
 
 	public void nextFrame() {
-		if (!src.endsWith(".gif") || frames == null) currentFrame = 0;
+		if(!src.endsWith(".gif") || frames == null) currentFrame = 0;
 		else {
-			if (currentFrame < frames.length - 1) currentFrame++;
+			if(currentFrame < frames.length - 1) currentFrame++;
 			else currentFrame = 0;
 			image = frames[currentFrame];
 		}
 	}
 
 	public Sprite getCurrentFrame() {
-		if (!src.endsWith(".gif")) return image;
+		if(!src.endsWith(".gif")) return image;
 		else {
-			if (frames == null) frames = ImageManager.getAnimatedImage(src);
-			if (frames == null) return image;
+			if(frames == null) frames = ImageManager.getAnimatedImage(src);
+			if(frames == null) return image;
 			else {
-				if (currentFrame < frames.length) image = frames[currentFrame];
+				if(currentFrame < frames.length) image = frames[currentFrame];
 				else image = frames[frames.length - 1];
 				return image;
 			}
@@ -101,13 +89,9 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 
 	@Override
 	public boolean equals(Object object) {
-		if (object instanceof HoloProjectorDrawData) {
+		if(object instanceof HoloProjectorDrawData) {
 			HoloProjectorDrawData drawData = (HoloProjectorDrawData) object;
-			return drawData.src.equals(src)
-					&& drawData.offset.equals(offset)
-					&& drawData.rotation.equals(rotation)
-					&& drawData.scale == scale
-					&& drawData.holographic == holographic;
+			return drawData.src.equals(src) && drawData.offset.equals(offset) && drawData.rotation.equals(rotation) && drawData.scale == scale && drawData.holographic == holographic;
 		} else return false;
 	}
 }

@@ -9,7 +9,7 @@ import org.schema.game.common.data.element.ElementCategory;
  * @since 09/01/2021
  */
 public interface BlockGroup {
-  Block[] getBlocks();
+	Block[] getBlocks();
 
-  ElementCategory getCategory();
+	ElementCategory getCategory();
 }

@@ -1,6 +1,6 @@
 package thederpgamer.decor.data.system.storagecapsule;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 /**
  * <Description>
@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version 1.0 - [03/16/2022]
  */
 public class StorageCapsuleSystemData {
-  public ConcurrentHashMap<Long, StorageCapsuleData> map;
+	public HashMap<Long, StorageCapsuleData> map;
 
-  public StorageCapsuleSystemData() {
-    map = new ConcurrentHashMap<>();
-  }
+	public StorageCapsuleSystemData() {
+		map = new HashMap<>();
+	}
 
-  public StorageCapsuleSystemData(ConcurrentHashMap<Long, StorageCapsuleData> map) {
-    this.map = map;
-  }
+	public StorageCapsuleSystemData(HashMap<Long, StorageCapsuleData> map) {
+		this.map = map;
+	}
 }

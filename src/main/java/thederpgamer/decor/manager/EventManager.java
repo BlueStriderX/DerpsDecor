@@ -22,6 +22,7 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.systems.inventories.StorageCapsuleModule;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ProjectorUtils;
@@ -36,7 +37,6 @@ import java.util.ArrayList;
  * @author TheDerpGamer (MrGoose#0027)
  */
 public class EventManager {
-
 	public static void initialize(DerpsDecor instance) {
 		StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
 			@Override
@@ -44,15 +44,14 @@ public class EventManager {
 				GlobalDrawManager.initialize(event);
 			}
 		}, instance);
-
 		StarLoader.registerListener(ManagerContainerRegisterEvent.class, new Listener<ManagerContainerRegisterEvent>() {
 			@Override
 			public void onEvent(ManagerContainerRegisterEvent event) {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
+				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, instance);
-
 		StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
 			@Override
 			public void onEvent(SegmentPieceActivateByPlayer event) {
@@ -64,7 +63,6 @@ public class EventManager {
 				}
 			}
 		}, instance);
-
 		StarLoader.registerListener(SegmentPieceActivateEvent.class, new Listener<SegmentPieceActivateEvent>() {
 			@Override
 			public void onEvent(SegmentPieceActivateEvent event) {
@@ -74,128 +72,126 @@ public class EventManager {
 						break;
 					}
 				}
-
-					if(event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) {
-						if(SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).isEmpty()) return;
-						SegmentPiece controller = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).get(0);
-						if(controller != null && !event.isServer()) {
-							try {
-								if(!event.getSegmentPiece().isActive()) return;
-								ShipyardElementManager shipyard = SegmentControllerUtils.getElementManager((ManagedUsableSegmentController<?>) event.getSegmentPiece().getSegmentController(), ShipyardElementManager.class);
-								assert shipyard != null;
-
-								SegmentPiece textBlock = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementKeyMap.TEXT_BOX);
-								String text = textBlock.getSegmentController().getTextMap().get(ElementCollection.getIndex4(textBlock.getAbsoluteIndex(), textBlock.getOrientation()));
-								String command = text.split("\n")[0].trim().replaceAll(" ", "_").toUpperCase();
-								String[] args = (text.split("\n").length > 1) ? text.split("\n")[1].trim().split(", ") : new String[] {""};
-								int factionId = event.getSegmentPiece().getSegmentController().getFactionId();
-
-								ShipyardCollectionManager collection = shipyard.getCollectionManagers().get(0);
-								switch(command) {
-									case "NEW":
-									case "CREATE":
-									case "CREATE_NEW":
-									case "CREATE_NEW_DESIGN":
-									case "CREATE_DESIGN":
-									case "NEW_DESIGN":
-										assert args.length == 1;
-										collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.CREATE_NEW_DESIGN, args[0]);
-										break;
-									case "UNLOAD":
-									case "UNLOAD_DESIGN":
-										collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.UNLOAD_DESIGN);
-										break;
-									case "LOAD":
-									case "LOAD_DESIGN":
-										assert args.length == 1;
-										int designId = -1;
-										for(VirtualBlueprintMetaItem item : collection.getDesignList()) {
-											if(item.UID.toLowerCase().contains(args[0].toLowerCase())) {
-												designId = item.getId();
-												break;
-											}
+				if(event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM) {
+					if(SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).isEmpty()) return;
+					SegmentPiece controller = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementKeyMap.SHIPYARD_COMPUTER).get(0);
+					if(controller != null && !event.isServer()) {
+						try {
+							if(!event.getSegmentPiece().isActive()) return;
+							ShipyardElementManager shipyard = SegmentControllerUtils.getElementManager((ManagedUsableSegmentController<?>) event.getSegmentPiece().getSegmentController(), ShipyardElementManager.class);
+							assert shipyard != null;
+							SegmentPiece textBlock = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementKeyMap.TEXT_BOX);
+							assert textBlock != null;
+							String text = textBlock.getSegmentController().getTextMap().get(ElementCollection.getIndex4(textBlock.getAbsoluteIndex(), textBlock.getOrientation()));
+							String command = text.split("\n")[0].trim().replaceAll(" ", "_").toUpperCase();
+							String[] args = (text.split("\n").length > 1) ? text.split("\n")[1].trim().split(", ") : new String[] {""};
+							int factionId = event.getSegmentPiece().getSegmentController().getFactionId();
+							ShipyardCollectionManager collection = shipyard.getCollectionManagers().get(0);
+							switch(command) {
+								case "NEW":
+								case "CREATE":
+								case "CREATE_NEW":
+								case "CREATE_NEW_DESIGN":
+								case "CREATE_DESIGN":
+								case "NEW_DESIGN":
+									assert args.length == 1;
+									collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.CREATE_NEW_DESIGN, args[0]);
+									break;
+								case "UNLOAD":
+								case "UNLOAD_DESIGN":
+									collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.UNLOAD_DESIGN);
+									break;
+								case "LOAD":
+								case "LOAD_DESIGN":
+									assert args.length == 1;
+									int designId = -1;
+									for(VirtualBlueprintMetaItem item : collection.getDesignList()) {
+										if(item.UID.toLowerCase().contains(args[0].toLowerCase())) {
+											designId = item.getId();
+											break;
 										}
-										if(designId != -1) collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.LOAD_DESIGN, designId);
-										break;
-									case "DECONSTRUCT":
-									case "DECONSTRUCT_DESIGN":
-									case "RECYCLE":
-									case "RECYCLE_DESIGN":
-										assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid();
-										collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.DECONSTRUCT_RECYCLE);
-										break;
-									case "SPAWN":
-									case "SPAWN_DESIGN":
-									case "CONSTRUCT":
-									case "CONSTRUCT_DESIGN":
-										assert collection.isLoadedDesignValid() && args.length == 1;
-										collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.SPAWN_DESIGN, args[0]);
-										break;
-									case "REPAIR":
-									case "REPAIR_DESIGN":
-									case "REPAIR_TO_DESIGN":
-									case "REPAIR_DOCKED":
-									case "REPAIR_DOCKED_DESIGN":
-									case "REPAIR_DOCKED_TO_DESIGN":
-										assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid() && args.length == 1;
-										int design = -1;
-										for(VirtualBlueprintMetaItem item : collection.getDesignList()) {
-											if(item.UID.toLowerCase().contains(args[0].toLowerCase())) {
-												design = item.getId();
-												break;
-											}
+									}
+									if(designId != -1) collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.LOAD_DESIGN, designId);
+									break;
+								case "DECONSTRUCT":
+								case "DECONSTRUCT_DESIGN":
+								case "RECYCLE":
+								case "RECYCLE_DESIGN":
+									assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid();
+									collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.DECONSTRUCT_RECYCLE);
+									break;
+								case "SPAWN":
+								case "SPAWN_DESIGN":
+								case "CONSTRUCT":
+								case "CONSTRUCT_DESIGN":
+									assert collection.isLoadedDesignValid() && args.length == 1;
+									collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.SPAWN_DESIGN, args[0]);
+									break;
+								case "REPAIR":
+								case "REPAIR_DESIGN":
+								case "REPAIR_TO_DESIGN":
+								case "REPAIR_DOCKED":
+								case "REPAIR_DOCKED_DESIGN":
+								case "REPAIR_DOCKED_TO_DESIGN":
+									assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid() && args.length == 1;
+									int design = -1;
+									for(VirtualBlueprintMetaItem item : collection.getDesignList()) {
+										if(item.UID.toLowerCase().contains(args[0].toLowerCase())) {
+											design = item.getId();
+											break;
 										}
-										collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.REPAIR_FROM_DESIGN, design);
-										break;
-									case "UNDOCK":
-									case "UNDOCK_DOCKED":
-										assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid();
-										collection.undockRequestedFromShipyard();
-										break;
+									}
+									collection.sendShipyardCommandToServer(factionId, ShipyardCollectionManager.ShipyardCommandType.REPAIR_FROM_DESIGN, design);
+									break;
+								case "UNDOCK":
+								case "UNDOCK_DOCKED":
+									assert collection.isCurrentStateUndockable() && collection.isCurrentDockedValid();
+									collection.undockRequestedFromShipyard();
+									break;
+							}
+						} catch(Exception ignored) {}
+					}
+				} else if((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM)) {
+					SegmentPiece adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+					if(adjacent != null) {
+						HoloProjectorDrawData adjacentDrawData = (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+						ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+						if(!controlling.isEmpty() && adjacentDrawData != null) {
+							boolean needsUpdate = false;
+							for(SegmentPiece segmentPiece : controlling) {
+								Object drawData = ProjectorUtils.getDrawData(segmentPiece);
+								if(drawData instanceof HoloProjectorDrawData) {
+									HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
+									if(!(holoProjectorDrawData.equals(adjacentDrawData)) || segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
+										adjacentDrawData.copyTo(holoProjectorDrawData);
+										needsUpdate = true;
+									}
 								}
- 							} catch(Exception ignored) {}
+							}
+							if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Holo Projector").getId())).flagUpdatedData();
 						}
-					} else if((event.getSegmentPiece().getType() == ElementKeyMap.ACTIVAION_BLOCK_ID || event.getSegmentPiece().getType() == ElementKeyMap.LOGIC_BUTTON_NORM)) {
-						SegmentPiece adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+					} else {
+						adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
 						if(adjacent != null) {
-							HoloProjectorDrawData adjacentDrawData = (HoloProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-							ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Holo Projector").getId());
+							TextProjectorDrawData adjacentDrawData = (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
+							ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
 							if(!controlling.isEmpty() && adjacentDrawData != null) {
 								boolean needsUpdate = false;
 								for(SegmentPiece segmentPiece : controlling) {
 									Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-									if(drawData instanceof HoloProjectorDrawData) {
-										HoloProjectorDrawData holoProjectorDrawData = (HoloProjectorDrawData) drawData;
-										if(!(holoProjectorDrawData.equals(adjacentDrawData)) || segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
-											adjacentDrawData.copyTo(holoProjectorDrawData);
+									if(drawData instanceof TextProjectorDrawData) {
+										TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
+										if(!(textProjectorDrawData.equals(adjacentDrawData)) || segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
+											adjacentDrawData.copyTo(textProjectorDrawData);
 											needsUpdate = true;
 										}
 									}
 								}
-								if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Holo Projector").getId())).flagUpdatedData();
-							}
-						} else {
-							adjacent = SegmentPieceUtils.getFirstMatchingAdjacent(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
-							if(adjacent != null) {
-								TextProjectorDrawData adjacentDrawData = (TextProjectorDrawData) ProjectorUtils.getDrawData(adjacent);
-								ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(event.getSegmentPiece(), ElementManager.getBlock("Text Projector").getId());
-								if(!controlling.isEmpty() && adjacentDrawData != null) {
-									boolean needsUpdate = false;
-									for(SegmentPiece segmentPiece : controlling) {
-										Object drawData = ProjectorUtils.getDrawData(segmentPiece);
-										if(drawData instanceof TextProjectorDrawData) {
-											TextProjectorDrawData textProjectorDrawData = (TextProjectorDrawData) drawData;
-											if(!(textProjectorDrawData.equals(adjacentDrawData)) || segmentPiece.isActive() != event.getSegmentPiece().isActive()) {
-												adjacentDrawData.copyTo(textProjectorDrawData);
-												needsUpdate = true;
-											}
-										}
-									}
-									if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Text Projector").getId())).flagUpdatedData();
-								}
+								if(needsUpdate) ((SimpleDataStorageMCModule) ServerUtils.getManagerContainer(event.getSegmentPiece().getSegmentController()).getModMCModule(ElementManager.getBlock("Text Projector").getId())).flagUpdatedData();
 							}
 						}
 					}
+				}
 			}
 		}, instance);
 	}

@@ -23,26 +23,14 @@ import thederpgamer.decor.systems.modules.TextProjectorModule;
  * @since 07/15/2021
  */
 public class TextProjectorConfigDialog extends GUIInputDialog {
-
 	private SegmentPiece segmentPiece;
 
 	public void setSegmentPiece(SegmentPiece segmentPiece) {
 		this.segmentPiece = segmentPiece;
-
-		ManagedUsableSegmentController<?> segmentController =
-				(ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
-		TextProjectorModule module =
-				(TextProjectorModule)
-						segmentController
-								.getManagerContainer()
-								.getModMCModule(ElementManager.getBlock("Text Projector").getId());
-		TextProjectorDrawData drawData =
-				(TextProjectorDrawData)
-						module.getDrawData(
-								ElementCollection.getIndex4(
-										segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+		ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
+		TextProjectorModule module = (TextProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
+		TextProjectorDrawData drawData = (TextProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
 		setDefaults(drawData);
-
 		getConfigPanel().setText(drawData.text);
 		getConfigPanel().setColor(drawData.color);
 		getConfigPanel().setXOffset(drawData.offset.x);
@@ -55,6 +43,17 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
 		getConfigPanel().setHolographic(drawData.holographic);
 	}
 
+	private void setDefaults(TextProjectorDrawData drawData) {
+		if(drawData.offset == null) drawData.offset = new Vector3i();
+		if(drawData.rotation == null) drawData.rotation = new Vector3i();
+		if(drawData.text == null) drawData.text = "";
+		if(drawData.color == null) drawData.color = "FFFFFF";
+	}
+
+	private TextProjectorConfigPanel getConfigPanel() {
+		return (TextProjectorConfigPanel) getInputPanel();
+	}
+
 	@Override
 	public GUIInputDialogPanel createPanel() {
 		return new TextProjectorConfigPanel(getState(), this);
@@ -62,40 +61,23 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
 
 	@Override
 	public void callback(GUIElement callingElement, MouseEvent mouseEvent) {
-		if (!isOccluded() && mouseEvent.pressedLeftMouse()) {
-			if (callingElement.getUserPointer() != null) {
-				switch ((String) callingElement.getUserPointer()) {
+		if(!isOccluded() && mouseEvent.pressedLeftMouse()) {
+			if(callingElement.getUserPointer() != null) {
+				switch((String) callingElement.getUserPointer()) {
 					case "X":
 					case "CANCEL":
 						deactivate();
 						break;
 					case "OK":
-						TextProjectorDrawData drawData =
-								(TextProjectorDrawData)
-										getModule()
-												.getDrawData(
-														ElementCollection.getIndex4(
-																segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+						TextProjectorDrawData drawData = getModule().getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
 						drawData.text = getConfigPanel().getText();
 						drawData.color = getConfigPanel().getColor();
-						drawData.offset =
-								new Vector3i(
-										getConfigPanel().getXOffset(),
-										getConfigPanel().getYOffset(),
-										getConfigPanel().getZOffset());
-						drawData.rotation =
-								new Vector3i(
-										getConfigPanel().getXRot(),
-										getConfigPanel().getYRot(),
-										getConfigPanel().getZRot());
+						drawData.offset = new Vector3i(getConfigPanel().getXOffset(), getConfigPanel().getYOffset(), getConfigPanel().getZOffset());
+						drawData.rotation = new Vector3i(getConfigPanel().getXRot(), getConfigPanel().getYRot(), getConfigPanel().getZRot());
 						drawData.scale = getConfigPanel().getScaleSetting();
 						drawData.holographic = getConfigPanel().getHolographic();
 						drawData.changed = true;
-						getModule()
-								.setDrawData(
-										ElementCollection.getIndex4(
-												segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()),
-										drawData);
+						getModule().setDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()), drawData);
 						deactivate();
 						break;
 				}
@@ -106,42 +88,14 @@ public class TextProjectorConfigDialog extends GUIInputDialog {
 	@Override
 	public void onDeactivate() {
 		super.onDeactivate();
-		GameClient.getClientState()
-				.getGlobalGameControlManager()
-				.getIngameControlManager()
-				.getPlayerGameControlManager()
-				.getPlayerIntercationManager()
-				.suspend(false);
-	}
-
-	private TextProjectorConfigPanel getConfigPanel() {
-		return (TextProjectorConfigPanel) getInputPanel();
+		GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().getPlayerGameControlManager().getPlayerIntercationManager().suspend(false);
 	}
 
 	private TextProjectorModule getModule() {
-		if (segmentPiece
-				.getSegmentController()
-				.getType()
-				.equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
-			return (TextProjectorModule)
-					((Ship) segmentPiece.getSegmentController())
-							.getManagerContainer()
-							.getModMCModule(ElementManager.getBlock("Text Projector").getId());
-		} else if (segmentPiece
-				.getSegmentController()
-				.getType()
-				.equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
-			return (TextProjectorModule)
-					((SpaceStation) segmentPiece.getSegmentController())
-							.getManagerContainer()
-							.getModMCModule(ElementManager.getBlock("Text Projector").getId());
+		if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SHIP)) {
+			return (TextProjectorModule) ((Ship) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
+		} else if(segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION)) {
+			return (TextProjectorModule) ((SpaceStation) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("Text Projector").getId());
 		} else return null;
-	}
-
-	private void setDefaults(TextProjectorDrawData drawData) {
-		if (drawData.offset == null) drawData.offset = new Vector3i();
-		if (drawData.rotation == null) drawData.rotation = new Vector3i();
-		if (drawData.text == null) drawData.text = "";
-		if (drawData.color == null) drawData.color = "FFFFFF";
 	}
 }

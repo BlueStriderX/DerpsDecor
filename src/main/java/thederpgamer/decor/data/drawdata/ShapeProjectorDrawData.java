@@ -15,16 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
 public class ShapeProjectorDrawData implements ProjectorInterface {
-
-	private long indexAndOrientation;
 	private final Vector3i offset = new Vector3i();
 	private final Vector3i rotation = new Vector3i();
+	private final transient Transform transform = new Transform();
+	private long indexAndOrientation;
 	private int scale;
 	private boolean filled;
 	private String color;
 	private boolean holographic;
 	private boolean changed;
-	private final transient Transform transform = new Transform();
 	private transient Mesh mesh;
 
 	public ShapeProjectorDrawData(long indexAndOrientation, int scale, boolean filled, String color, boolean holographic) {
@@ -33,6 +32,18 @@ public class ShapeProjectorDrawData implements ProjectorInterface {
 		this.filled = filled;
 		this.color = color;
 		this.holographic = holographic;
+	}
+
+	public ShapeProjectorDrawData(SegmentPiece segmentPiece) {
+		scale = 1;
+		filled = false;
+		color = "FFFFFF";
+		holographic = true;
+		changed = true;
+		if(segmentPiece != null) {
+			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
+			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
+		}
 	}
 
 	public long getIndexAndOrientation() {
@@ -99,18 +110,6 @@ public class ShapeProjectorDrawData implements ProjectorInterface {
 		return mesh;
 	}
 
-	public ShapeProjectorDrawData(SegmentPiece segmentPiece) {
-		scale = 1;
-		filled = false;
-		color = "FFFFFF";
-		holographic = true;
-		changed = true;
-		if(segmentPiece != null) {
-			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
-		}
-	}
-
 	@Override
 	public void copyTo(ProjectorInterface drawData) {
 		if(drawData instanceof ShapeProjectorDrawData) {
@@ -134,7 +133,6 @@ public class ShapeProjectorDrawData implements ProjectorInterface {
 	}
 
 	public class ShapeProjectorDrawMap {
-
 		public ConcurrentHashMap<Long, ShapeProjectorDrawData> map;
 
 		public ShapeProjectorDrawMap() {

@@ -1,6 +1,5 @@
 package thederpgamer.decor.data.drawdata;
 
-import com.bulletphysics.linearmath.Transform;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
@@ -12,49 +11,45 @@ import thederpgamer.decor.data.graphics.mesh.SystemMesh;
  * @author TheDerpGamer
  * @version 1.0 - [03/03/2022]
  */
-public class HoloTableDrawData {
+public class HoloTableDrawData implements ProjectorInterface {
+	public long tableIndex;
+	public long targetIndex;
+	public Vector3i offset;
+	public Vector3i rotation;
+	public int scale;
+	public boolean changed;
+	public SystemMesh systemMesh;
 
-  public long tableIndex;
-  public long targetIndex;
-  public Vector3i offset;
-  public Vector3i rotation;
-  public int scale;
-  public boolean changed;
+	public HoloTableDrawData(long tableIndex, long targetIndex, Vector3i offset, Vector3i rotation, int scale, boolean changed) {
+		this.tableIndex = tableIndex;
+		this.targetIndex = targetIndex;
+		this.offset = offset;
+		this.rotation = rotation;
+		this.scale = scale;
+		this.changed = changed;
+	}
 
-  public transient SystemMesh systemMesh;
+	public HoloTableDrawData(SegmentPiece table, SegmentPiece target) {
+		if(table != null) tableIndex = ElementCollection.getIndex4(table.getAbsoluteIndex(), table.getOrientation());
+		if(target != null) targetIndex = ElementCollection.getIndex4(target.getAbsoluteIndex(), target.getOrientation());
+		scale = 1;
+		offset = new Vector3i();
+		rotation = new Vector3i();
+		changed = true;
+		systemMesh = new SystemMesh(table, target);
+	}
 
-  public HoloTableDrawData(
-      long tableIndex,
-      long targetIndex,
-      Vector3i offset,
-      Vector3i rotation,
-      int scale,
-      boolean changed) {
-    this.tableIndex = tableIndex;
-    this.targetIndex = targetIndex;
-    this.offset = offset;
-    this.rotation = rotation;
-    this.scale = scale;
-    this.changed = changed;
-    // Todo: Load mesh from json?
-  }
-
-  public HoloTableDrawData(SegmentPiece table, SegmentPiece target) {
-    if (table != null)
-      this.tableIndex =
-          ElementCollection.getIndex4(table.getAbsoluteIndex(), table.getOrientation());
-    if (target != null)
-      this.targetIndex =
-          ElementCollection.getIndex4(target.getAbsoluteIndex(), target.getOrientation());
-    this.scale = 1;
-    this.offset = new Vector3i();
-    this.rotation = new Vector3i();
-    this.changed = true;
-    this.systemMesh = new SystemMesh(table, target);
-  }
-
-  public Transform getTransform() {
-    return new Transform();
-    // return systemMesh.getTransform();
-  }
+	@Override
+	public void copyTo(ProjectorInterface drawData) {
+		if(drawData instanceof HoloTableDrawData) {
+			HoloTableDrawData holoTableDrawData = (HoloTableDrawData) drawData;
+			holoTableDrawData.tableIndex = tableIndex;
+			holoTableDrawData.targetIndex = targetIndex;
+			holoTableDrawData.offset = offset;
+			holoTableDrawData.rotation = rotation;
+			holoTableDrawData.scale = scale;
+			holoTableDrawData.changed = changed;
+			holoTableDrawData.systemMesh = systemMesh;
+		}
+	}
 }

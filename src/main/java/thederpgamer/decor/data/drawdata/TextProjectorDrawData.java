@@ -14,7 +14,6 @@ import thederpgamer.decor.utils.SegmentPieceUtils;
  * @since 08/06/2021
  */
 public class TextProjectorDrawData implements ProjectorInterface {
-
 	public long indexAndOrientation;
 	public Vector3i offset;
 	public Vector3i rotation;
@@ -23,7 +22,6 @@ public class TextProjectorDrawData implements ProjectorInterface {
 	public String color;
 	public boolean holographic;
 	public boolean changed;
-
 	public transient Transform transform;
 	public transient GUITextOverlay textOverlay;
 
@@ -47,7 +45,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 		color = "FFFFFF";
 		holographic = true;
 		changed = true;
-		if (segmentPiece != null) {
+		if(segmentPiece != null) {
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
 		}

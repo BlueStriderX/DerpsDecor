@@ -6,6 +6,5 @@ package thederpgamer.decor.data.drawdata;
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
 public interface ProjectorInterface {
-
 	void copyTo(ProjectorInterface drawData);
 }

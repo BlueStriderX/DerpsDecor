@@ -9,8 +9,7 @@ import api.listener.events.block.SegmentPieceActivateEvent;
  * @author TheDerpGamer
  */
 public interface ActivationInterface {
+	void onPlayerActivation(SegmentPieceActivateByPlayer event);
 
-  void onPlayerActivation(SegmentPieceActivateByPlayer event);
-
-  void onLogicActivation(SegmentPieceActivateEvent event);
+	void onLogicActivation(SegmentPieceActivateEvent event);
 }

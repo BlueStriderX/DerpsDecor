@@ -14,73 +14,6 @@ import java.util.Locale;
  * @author TheDerpGamer (MrGoose#0027)
  */
 public class HullBlock {
-
-	public enum Color {
-		GREY("Grey"),
-		WHITE("White"),
-		DARK_GREY("Dark Grey"),
-		BLACK("Black"),
-		YELLOW("Yellow"),
-		ORANGE("Orange"),
-		RED("Red"),
-		PINK("Pink"),
-		PURPLE("Purple"),
-		BLUE("Blue"),
-		TEAL("Teal"),
-		GREEN("Green"),
-		BROWN("Brown");
-
-		public final String name;
-
-		Color(String name) {
-			this.name = name;
-		}
-
-		public java.awt.Color getColor() {
-			switch(this) {
-				default:
-				case GREY:
-					return new java.awt.Color(0.5f, 0.5f, 0.5f);
-				case WHITE:
-					return java.awt.Color.WHITE;
-				case DARK_GREY:
-					return new java.awt.Color(0.25f, 0.25f, 0.25f);
-				case BLACK:
-					return java.awt.Color.BLACK;
-				case YELLOW:
-					return java.awt.Color.YELLOW;
-				case ORANGE:
-					return java.awt.Color.ORANGE;
-				case RED:
-					return java.awt.Color.RED;
-				case PINK:
-					return java.awt.Color.PINK;
-				case PURPLE:
-					return java.awt.Color.MAGENTA;
-				case BLUE:
-					return java.awt.Color.BLUE;
-				case TEAL:
-					return new java.awt.Color(0, 0.5f, 0.5f);
-				case GREEN:
-					return java.awt.Color.GREEN;
-				case BROWN:
-					return new java.awt.Color(0.5f, 0.25f, 0);
-			}
-		}
-	}
-
-	public enum Type {
-		BASIC("Basic"),
-		STANDARD("Standard"),
-		ADVANCED("Advanced");
-
-		public final String name;
-
-		Type(String name) {
-			this.name = name;
-		}
-	}
-
 	public final Block[] colorVariants = new Block[13];
 
 	public HullBlock(String name, Type type) {
@@ -269,7 +202,6 @@ public class HullBlock {
 					blockInfo.setInRecipe(false);
 					blockInfo.setShoppable(false);
 					blockInfo.setOrientatable(false);
-
 					if(GraphicsContext.initialized) {
 						try {
 							short textureId = (short) ResourceManager.getTexture(blockInfo.name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "-")).getTextureId();
@@ -279,12 +211,25 @@ public class HullBlock {
 					}
 					BlockConfig.add(blockInfo);
 				}
-
-				@Override
-				public void createGraphics() {
-
-				}
 			};
+		}
+	}
+
+	public enum Color {
+		GREY("Grey"), WHITE("White"), DARK_GREY("Dark Grey"), BLACK("Black"), YELLOW("Yellow"), ORANGE("Orange"), RED("Red"), PINK("Pink"), PURPLE("Purple"), BLUE("Blue"), TEAL("Teal"), GREEN("Green"), BROWN("Brown");
+		public final String name;
+
+		Color(String name) {
+			this.name = name;
+		}
+	}
+
+	public enum Type {
+		BASIC("Basic"), STANDARD("Standard"), ADVANCED("Advanced");
+		public final String name;
+
+		Type(String name) {
+			this.name = name;
 		}
 	}
 }

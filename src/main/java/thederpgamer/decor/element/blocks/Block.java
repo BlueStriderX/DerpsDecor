@@ -12,23 +12,20 @@ import thederpgamer.decor.DerpsDecor;
  * @since 04/25/2021
  */
 public abstract class Block {
+	protected ElementInformation blockInfo;
 
-  protected ElementInformation blockInfo;
+	public Block(String name, ElementCategory category) {
+		blockInfo = BlockConfig.newElement(DerpsDecor.getInstance(), name, new short[6]);
+		BlockConfig.setElementCategory(blockInfo, category);
+	}
 
-  public Block(String name, ElementCategory category) {
-    blockInfo = BlockConfig.newElement(DerpsDecor.getInstance(), name, new short[6]);
-    BlockConfig.setElementCategory(blockInfo, category);
-  }
+	public final ElementInformation getBlockInfo() {
+		return blockInfo;
+	}
 
-  public final ElementInformation getBlockInfo() {
-    return blockInfo;
-  }
+	public final short getId() {
+		return blockInfo.getId();
+	}
 
-  public final short getId() {
-    return blockInfo.getId();
-  }
-
-  public abstract void initialize();
-
-  public abstract void createGraphics();
+	public abstract void initialize();
 }

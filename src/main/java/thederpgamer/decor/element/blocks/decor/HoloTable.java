@@ -16,7 +16,6 @@ import thederpgamer.decor.manager.ResourceManager;
  * @since 09/02/2021
  */
 public class HoloTable extends Block {
-
 	public HoloTable() {
 		super("Holo Table", ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getType());
 	}
@@ -33,25 +32,13 @@ public class HoloTable extends Block {
 		blockInfo.setBlockStyle(BlockStyle.NORMAL.id);
 		blockInfo.lodShapeStyle = 1;
 		blockInfo.sideTexturesPointToOrientation = false;
-
-		if (GraphicsContext.initialized) {
+		if(GraphicsContext.initialized) {
 			try {
 				blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
 				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_table", null);
 			} catch(Exception ignored) {}
 		}
-
-		BlockConfig.addRecipe(
-				blockInfo,
-				ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(),
-				(int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(),
-				new FactoryResource(1, ElementKeyMap.TEXT_BOX),
-				new FactoryResource(1, (short) 660));
+		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX), new FactoryResource(1, (short) 660));
 		BlockConfig.add(blockInfo);
-	}
-
-	@Override
-	public void createGraphics() {
-		// BlockIconUtils.createBlockIcon(blockInfo);
 	}
 }
