@@ -13,14 +13,16 @@ import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.graphicsengine.core.*;
-import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.ShaderLibrary;
 import org.schema.schine.graphicsengine.shader.Shaderable;
 import org.schema.schine.network.objects.Sendable;
-import thederpgamer.decor.data.drawdata.*;
+import thederpgamer.decor.data.drawdata.HoloProjectorDrawData;
+import thederpgamer.decor.data.drawdata.HoloTableDrawData;
+import thederpgamer.decor.data.drawdata.ProjectorInterface;
+import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.HoloTableModule;
@@ -85,20 +87,15 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
 						drawCount++;
 					}
-				} else if(projector instanceof ShapeProjectorDrawData) {
-					ShapeProjectorDrawData drawData = (ShapeProjectorDrawData) projector;
-					Mesh mesh = drawData.getShape();
-					if(mesh != null) {
-						if(drawData.isHolographic()) {
-							ShaderLibrary.scanlineShader.setShaderInterface(this);
-							ShaderLibrary.scanlineShader.load();
-						}
-						mesh.setTransform(drawData.getTransform());
-						mesh.transform();
-						mesh.draw();
-						if(drawData.isHolographic()) ShaderLibrary.scanlineShader.unload();
+				} else if(projector instanceof HoloTableDrawData) {
+					HoloTableDrawData drawData = (HoloTableDrawData) projector;
+					if(drawData.systemMesh != null) {
+						ShaderLibrary.scanlineShader.setShaderInterface(this);
+						ShaderLibrary.scanlineShader.load();
+						drawData.systemMesh.draw();
+						ShaderLibrary.scanlineShader.unload();
 						drawCount++;
-					}
+					} else System.err.println("HoloTableDrawData systemMesh is null!");
 				}
 			}
 		}
@@ -155,7 +152,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 			}
 		}
 		if(managerContainer.getModMCModule(holoTableId) != null) {
-			HoloTableModule holoTableModule = (HoloTableModule) managerContainer.getModMCModule(textProjectorId);
+			HoloTableModule holoTableModule = (HoloTableModule) managerContainer.getModMCModule(holoTableId);
 			for(Map.Entry<Long, HoloTableDrawData> entry : holoTableModule.getProjectorMap().entrySet()) {
 				SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(entry.getKey());
 				if(segmentPiece == null || !checkDraw(segmentPiece)) continue;

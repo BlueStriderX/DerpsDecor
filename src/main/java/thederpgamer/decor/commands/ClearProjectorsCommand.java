@@ -14,6 +14,7 @@ import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * <Description>
@@ -69,8 +70,8 @@ public class ClearProjectorsCommand implements CommandInterface {
 
 	private void clearAllProjectors(SegmentController entity) {
 		ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) entity;
-		short holoId = ElementManager.getBlock("Holo Projector").getId();
-		short textId = ElementManager.getBlock("Text Projector").getId();
+		short holoId = Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId();
+		short textId = Objects.requireNonNull(ElementManager.getBlock("Text Projector")).getId();
 		if(segmentController.getManagerContainer().getModMCModule(holoId) != null && segmentController.getManagerContainer().getModMCModule(holoId).getSize() > 0) {
 			try {
 				HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(holoId);

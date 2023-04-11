@@ -2,7 +2,6 @@ package thederpgamer.decor.data.drawdata;
 
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementCollection;
 import thederpgamer.decor.data.graphics.mesh.SystemMesh;
 
 /**
@@ -18,7 +17,7 @@ public class HoloTableDrawData implements ProjectorInterface {
 	public Vector3i rotation;
 	public int scale;
 	public boolean changed;
-	public SystemMesh systemMesh;
+	public transient SystemMesh systemMesh;
 
 	public HoloTableDrawData(long tableIndex, long targetIndex, Vector3i offset, Vector3i rotation, int scale, boolean changed) {
 		this.tableIndex = tableIndex;
@@ -30,8 +29,10 @@ public class HoloTableDrawData implements ProjectorInterface {
 	}
 
 	public HoloTableDrawData(SegmentPiece table, SegmentPiece target) {
-		if(table != null) tableIndex = ElementCollection.getIndex4(table.getAbsoluteIndex(), table.getOrientation());
-		if(target != null) targetIndex = ElementCollection.getIndex4(target.getAbsoluteIndex(), target.getOrientation());
+		assert table != null;
+		assert target != null;
+		tableIndex = table.getAbsoluteIndex();
+		targetIndex = target.getAbsoluteIndex();
 		scale = 1;
 		offset = new Vector3i();
 		rotation = new Vector3i();

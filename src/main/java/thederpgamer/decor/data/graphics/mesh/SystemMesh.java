@@ -1,22 +1,18 @@
 package thederpgamer.decor.data.graphics.mesh;
 
-import api.utils.other.HashList;
+import api.utils.game.SegmentControllerUtils;
 import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.lwjgl.opengl.GL11;
-import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.elements.ElementCollectionManager;
-import org.schema.game.common.controller.elements.ManagerContainer;
-import org.schema.game.common.controller.elements.ManagerModule;
-import org.schema.game.common.controller.elements.UsableControllableElementManager;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.util.FastCopyLongOpenHashSet;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.Shaderable;
-import thederpgamer.decor.utils.ModuleUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import javax.vecmath.Vector3f;
@@ -32,37 +28,31 @@ import java.util.Map;
  * @version 1.0 - [03/03/2022]
  */
 public class SystemMesh implements Drawable, Shaderable {
-	private final HashMap<ElementCollection<?, ?, ?>, LongArrayList> collections = new HashMap<>();
-	private final HashList<Short, Vector3i> points = new HashList<>();
-	private final Vector4f lineColor = new Vector4f(0.15F, 0.15F, 0.15F, 1.0F);
-	private final Vector4f faceColor = new Vector4f(0.15F, 0.15F, 0.15F, 0.5F);
-	private boolean initialized;
-	private SegmentPiece table;
-	private SegmentPiece target;
+	private final transient ArrayList<Vector3f> points = new ArrayList<>();
+	private final transient Vector4f lineColor = new Vector4f(0.15F, 0.15F, 0.15F, 1.0F);
+	private final transient Vector4f faceColor = new Vector4f(0.15F, 0.15F, 0.15F, 0.5F);
+	private transient boolean initialized;
+	private final transient SegmentPiece table;
+	private final transient SegmentPiece target;
 
 	public SystemMesh(SegmentPiece table, SegmentPiece target) {
+		assert table != null;
+		assert target != null;
 		this.table = table;
 		this.target = target;
 		createMesh();
 	}
 
 	private void createMesh() {
-		collections.clear();
-		points.clear();
+		HashMap<Short, LongArrayList> longs = new HashMap<>();
 		try {
 			if(SegmentPieceUtils.isControlling(table, target) && table.getSegmentController().getId() == target.getSegmentController().getId()) {
-				ManagerContainer<?> managerContainer = ModuleUtils.getManagerContainer(table.getSegmentController());
-				for(ManagerModule<?, ?, ?> module : managerContainer.getModules()) {
-					if(module.getElementManager() instanceof UsableControllableElementManager) {
-						UsableControllableElementManager<?, ?, ?> elementManager = (UsableControllableElementManager<?, ?, ?>) module.getElementManager();
-						for(ElementCollectionManager<?, ?, ?> collectionManager : elementManager.getCollectionManagers()) {
-							for(ElementCollection<?, ?, ?> elementCollection : collectionManager.getElementCollections()) {
-								if(elementCollection.getElementCollectionId().getType() == target.getType()) {
-									// if(elementCollection.getMesh() == null)
-									// elementCollection.calculateMesh(target.getAbsoluteIndex(), true);
-									if(elementCollection.isDetailedNeighboringCollection()) collections.put(elementCollection, elementCollection.getNeighboringCollectionUnsave());
-								}
-							}
+				for(ElementCollectionManager<?, ?, ?> cm : SegmentControllerUtils.getAllCollectionManagers((ManagedUsableSegmentController<?>) table.getSegmentController())) {
+					if(cm.getEnhancerClazz() == target.getType()) {
+						FastCopyLongOpenHashSet l = cm.rawCollection;
+						for(long l2 : l) {
+							if(!longs.containsKey(target.getType())) longs.put(target.getType(), new LongArrayList());
+							longs.get(target.getType()).add(l2);
 						}
 					}
 				}
@@ -70,27 +60,26 @@ public class SystemMesh implements Drawable, Shaderable {
 		} catch(Exception exception) {
 			exception.printStackTrace();
 		}
-		for(Map.Entry<ElementCollection<?, ?, ?>, LongArrayList> entry : collections.entrySet()) {
-			ArrayList<Vector3i> points = new ArrayList<>();
+		ArrayList<Vector3f> tempPoints = new ArrayList<>();
+		for(Map.Entry<Short, LongArrayList> entry : longs.entrySet()) {
 			for(Long l : entry.getValue()) {
 				SegmentPiece segmentPiece = table.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-				if(segmentPiece != null && segmentPiece.getType() != 0) points.add(new Vector3i(segmentPiece.x, segmentPiece.y, segmentPiece.z));
+				if(segmentPiece != null && segmentPiece.getType() != 0) tempPoints.add(new Vector3f(segmentPiece.x, segmentPiece.y, segmentPiece.z));
 			}
-			ArrayList<Vector3i> optimizedPoints = new ArrayList<>();
-			//Optimize points and remove any points that aren't a corner, edge, or vertex
-			for(int i = 0; i < points.size(); i++) {
-				Vector3i point = points.get(i);
-				int count = 0;
-				for(int j = 0; j < points.size(); j++) {
-					if(i == j) continue;
-					Vector3i point2 = points.get(j);
-					if(point.x == point2.x && point.y == point2.y && point.z == point2.z) count++;
-				}
-				if(count == 1) optimizedPoints.add(point);
-			}
-			short type = entry.getKey().getElementCollectionId().getType();
-			for(Vector3i point : optimizedPoints) this.points.add(type, point);
 		}
+		//Optimize points and remove any points that aren't a corner, edge, or vertex
+		ArrayList<Vector3f> optimizedPoints = new ArrayList<>();
+		for(int i = 0; i < tempPoints.size(); i++) {
+			Vector3f point = tempPoints.get(i);
+			int count = 0;
+			for(int j = 0; j < tempPoints.size(); j++) {
+				if(i == j) continue;
+				Vector3f point2 = tempPoints.get(j);
+				if(point.x == point2.x && point.y == point2.y && point.z == point2.z) count++;
+			}
+			if(count < 3) optimizedPoints.add(point);
+		}
+		points.addAll(optimizedPoints);
 	}
 
 	@Override
@@ -99,17 +88,17 @@ public class SystemMesh implements Drawable, Shaderable {
 
 	@Override
 	public void draw() {
-		if(target.getType() == 0) return;
 		if(!initialized) onInit();
 		//Go through the points and draw lines between them
 		//Shade the faces in between with a semi transparent color
-		for(Vector3i point : points.get(target.getType())) {
+		GL11.glClearColor(0.0F, 0.0F, 0.0F, 0.0F);
+		for(Vector3f point : points) {
 			//Draw line
 			GlUtil.glPushMatrix();
 			GlUtil.glTranslatef(point.x, point.y, point.z);
 			GlUtil.glColor4f(lineColor.x, lineColor.y, lineColor.z, lineColor.w);
 			GlUtil.glBegin(1);
-			for(Vector3i point2 : points.get(target.getType())) {
+			for(Vector3f point2 : points) {
 				if(point.x == point2.x && point.y == point2.y && point.z == point2.z) continue;
 				GL11.glVertex3f(0.0F, 0.0F, 0.0F);
 				GL11.glVertex3f(point2.x - point.x, point2.y - point.y, point2.z - point.z);
@@ -121,7 +110,7 @@ public class SystemMesh implements Drawable, Shaderable {
 			GlUtil.glTranslatef(point.x, point.y, point.z);
 			GlUtil.glColor4f(faceColor.x, faceColor.y, faceColor.z, faceColor.w);
 			GlUtil.glBegin(4);
-			for(Vector3i point2 : points.get(target.getType())) {
+			for(Vector3f point2 : points) {
 				if(point.x == point2.x && point.y == point2.y && point.z == point2.z) continue;
 				GL11.glVertex3f(0.0F, 0.0F, 0.0F);
 				GL11.glVertex3f(point2.x - point.x, point2.y - point.y, point2.z - point.z);
@@ -151,8 +140,7 @@ public class SystemMesh implements Drawable, Shaderable {
 			//Scale each point so it's relative to the table before drawing the model
 			Vector3f modelMin = new Vector3f();
 			Vector3f modelMax = new Vector3f();
-			if(target.getType() == 0) return;
-			for(Vector3i point : points.get(target.getType())) {
+			for(Vector3f point : points) {
 				Vector3f pointVector = new Vector3f(point.x, point.y, point.z);
 				pointVector.sub(transform.origin);
 				pointVector.scale(1.5F);
@@ -169,7 +157,7 @@ public class SystemMesh implements Drawable, Shaderable {
 			Vector3f modelCenter = new Vector3f();
 			modelCenter.add(modelMin, modelMax);
 			modelCenter.scale(0.5F);
-			for(Vector3i point : points.get(target.getType())) {
+			for(Vector3f point : points) {
 				//First, localize the points so they all fit with in the blocks size (1x1x1)
 				Vector3f pointVector = new Vector3f(point.x, point.y, point.z);
 				pointVector.sub(modelCenter);

@@ -12,10 +12,9 @@ import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.api.luamade.LuaMadeAPIManager;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.element.blocks.decor.ActivationLever;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
+import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
-import thederpgamer.decor.element.blocks.inventory.StorageCapsule;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.EventManager;
 import thederpgamer.decor.manager.LogManager;
@@ -87,14 +86,16 @@ public class DerpsDecor extends StarMod {
 	public void onBlockConfigLoad(BlockConfig config) {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
-		ElementManager.addBlock(new StorageCapsule());
-		ElementManager.addBlock(new ActivationLever());
-		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
-		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		ElementManager.addBlock(new HoloTable());
+//		ElementManager.addBlock(new StorageCapsule());
+//		ElementManager.addBlock(new ActivationLever());
+//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
 		ElementManager.initialize();
 	}
 
@@ -119,7 +120,7 @@ public class DerpsDecor extends StarMod {
 	private byte[] overwriteClass(String className, byte[] byteCode) {
 		byte[] bytes = null;
 		try {
-			ZipInputStream file = new ZipInputStream(new FileInputStream(this.getSkeleton().getJarFile()));
+			ZipInputStream file = new ZipInputStream(new FileInputStream(getSkeleton().getJarFile()));
 			while(true) {
 				ZipEntry nextEntry = file.getNextEntry();
 				if(nextEntry == null) break;

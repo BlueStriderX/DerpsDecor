@@ -22,8 +22,8 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
-import thederpgamer.decor.systems.inventories.StorageCapsuleModule;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
+import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
  * @author TheDerpGamer (MrGoose#0027)
  */
 public class EventManager {
-	public static void initialize(DerpsDecor instance) {
+	public static void initialize(final DerpsDecor instance) {
 		StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
 			@Override
 			public void onEvent(RegisterWorldDrawersEvent event) {
@@ -49,9 +49,11 @@ public class EventManager {
 			public void onEvent(ManagerContainerRegisterEvent event) {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
+				event.addModMCModule(new HoloTableModule(event.getSegmentController(), event.getContainer()));
+//				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, instance);
+
 		StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
 			@Override
 			public void onEvent(SegmentPieceActivateByPlayer event) {

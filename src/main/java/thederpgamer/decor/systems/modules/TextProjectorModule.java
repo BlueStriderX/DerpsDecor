@@ -68,6 +68,10 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 				}
 				if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
 					SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+					if(segmentPiece.getType() != getProjectorId()) {
+						drawDataMap.remove(indexAndOrientation);
+						continue;
+					}
 					if(canDraw(segmentPiece)) {
 						if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
 							if(drawData.transform == null) drawData.transform = new Transform();

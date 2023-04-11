@@ -39,6 +39,7 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 		HashMap<Long, HoloTableDrawData> drawDataMap = getProjectorMap();
 		for(HoloTableDrawData drawData : drawDataMap.values()) {
 			if(drawData == null) continue;
+			assert drawData.tableIndex != 0;
 			if(canDraw(drawData.tableIndex)) {
 				if(drawData.systemMesh == null) {
 					SegmentPiece table = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(drawData.tableIndex);
@@ -47,6 +48,13 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void handleRemove(long abs) {
+		super.handleRemove(abs);
+		removeDrawData(abs);
+		flagUpdatedData();
 	}
 
 	@Override
@@ -67,7 +75,7 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 	private boolean canDraw(long index) {
 		boolean canToggle = false;
 		SegmentController segmentController = getManagerContainer().getSegmentController();
-		SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(ElementCollection.getPosIndexFrom4(index));
+		SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
 		SegmentPiece activator = SegmentPieceUtils.getFirstMatchingAdjacent(segmentPiece, ElementKeyMap.ACTIVAION_BLOCK_ID);
 		if(activator != null) {
 			ArrayList<SegmentPiece> controlling = SegmentPieceUtils.getControlledPiecesMatching(activator, segmentPiece.getType());
@@ -81,13 +89,6 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 			}
 		}
 		return segmentController.getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) && segmentController.getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() == segmentPiece.getType() && segmentController.isFullyLoadedWithDock() && segmentController.isInClientRange() && ((canToggle && activator.isActive()) || activator == null);
-	}
-
-	@Override
-	public void handleRemove(long abs) {
-		super.handleRemove(abs);
-		removeDrawData(abs);
-		flagUpdatedData();
 	}
 
 	public void removeDrawData(long indexAndOrientation) {
@@ -111,7 +112,7 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 		long absIndex = ElementCollection.getPosIndexFrom4(indexAndOrientation);
 		SegmentPiece segmentPiece = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(absIndex);
 		ArrayList<SegmentPiece> segmentPieces = api.utils.SegmentPieceUtils.getControlledPieces(segmentPiece);
-		if(segmentPieces.isEmpty()) return null;
+		if(segmentPieces.isEmpty() || segmentPieces.get(0) == null) return null;
 		HoloTableDrawData drawData = new HoloTableDrawData(segmentPiece, segmentPieces.get(0));
 		drawData.tableIndex = indexAndOrientation;
 		getProjectorMap().put(indexAndOrientation, drawData);

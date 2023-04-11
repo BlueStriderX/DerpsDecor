@@ -49,6 +49,10 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 				}
 				if(segmentController.getSegmentBuffer().existsPointUnsave(index)) {
 					SegmentPiece segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+					if(segmentPiece.getType() != getProjectorId()) {
+						drawDataMap.remove(indexAndOrientation);
+						continue;
+					}
 					if(canDraw(segmentPiece)) {
 						if(obj.changed || obj.transform == null || obj.transform.origin.length() <= 0 || obj.subSprite == null) {
 							if(obj.getCurrentFrame() != null) {
