@@ -24,8 +24,8 @@ import thederpgamer.decor.utils.ClipboardUtils;
 import thederpgamer.decor.utils.MessageType;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -89,6 +89,10 @@ public class DerpsDecor extends StarMod {
 		ElementManager.addBlock(new HoloTable());
 //		ElementManager.addBlock(new StorageCapsule());
 //		ElementManager.addBlock(new ActivationLever());
+//		ElementManager.addBlock(new LargeDarkTiles());
+//		ElementManager.addBlock(new LargeLightTiles());
+//		ElementManager.addBlock(new SmallDarkTiles());
+//		ElementManager.addBlock(new SmallLightTiles());
 //		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
 //		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
 //		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
@@ -120,7 +124,7 @@ public class DerpsDecor extends StarMod {
 	private byte[] overwriteClass(String className, byte[] byteCode) {
 		byte[] bytes = null;
 		try {
-			ZipInputStream file = new ZipInputStream(new FileInputStream(getSkeleton().getJarFile()));
+			ZipInputStream file = new ZipInputStream(Files.newInputStream(getSkeleton().getJarFile().toPath()));
 			while(true) {
 				ZipEntry nextEntry = file.getNextEntry();
 				if(nextEntry == null) break;

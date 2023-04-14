@@ -208,9 +208,13 @@ public class SegmentPieceUtils {
 	public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
 		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
 		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
-		for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
-			SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-			if(p != null && p.getType() != 0) controlledPieces.add(p);
+		if(controlElementMapper != null) {
+			try {
+				for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
+					SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
+					if(p != null && p.getType() != 0) controlledPieces.add(p);
+				}
+			} catch(Exception ignored) {}
 		}
 		return controlledPieces;
 	}
@@ -218,9 +222,13 @@ public class SegmentPieceUtils {
 	public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
 		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
 		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
-		for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
-			SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-			if(p != null && p.getType() == type) controlledPieces.add(p);
+		if(controlElementMapper != null) {
+			try {
+				for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
+					SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
+					if(p != null && p.getType() == type) controlledPieces.add(p);
+				}
+			} catch(Exception ignored) {}
 		}
 		return controlledPieces;
 	}

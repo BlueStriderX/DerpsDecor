@@ -87,15 +87,6 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
 						drawCount++;
 					}
-				} else if(projector instanceof HoloTableDrawData) {
-					HoloTableDrawData drawData = (HoloTableDrawData) projector;
-					if(drawData.systemMesh != null) {
-						ShaderLibrary.scanlineShader.setShaderInterface(this);
-						ShaderLibrary.scanlineShader.load();
-						drawData.systemMesh.draw();
-						ShaderLibrary.scanlineShader.unload();
-						drawCount++;
-					} else System.err.println("HoloTableDrawData systemMesh is null!");
 				}
 			}
 		}
