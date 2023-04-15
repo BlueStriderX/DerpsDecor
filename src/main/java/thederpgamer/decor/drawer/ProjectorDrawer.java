@@ -1,6 +1,7 @@
 package thederpgamer.decor.drawer;
 
 import api.common.GameClient;
+import api.utils.SegmentPieceUtils;
 import api.utils.draw.ModWorldDrawer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -27,7 +28,6 @@ import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
-import api.utils.SegmentPieceUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -51,12 +51,12 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
 	@Override
 	public void update(Timer timer) {
-		time += timer.getDelta() * 2f;
+		time += timer.getDelta() * 2.0f;
 	}
 
 	@Override
 	public void draw() {
-		if(drawQueue.isEmpty() || lastAdd + 1 < System.currentTimeMillis()) enqueueDraws();
+		if(drawQueue.isEmpty() || lastAdd + 10000 < System.currentTimeMillis()) enqueueDraws();
 		else {
 			int drawCount = 0;
 			for(ProjectorInterface projector : drawQueue) {
@@ -95,16 +95,16 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 	private void enqueueDraws() {
 		drawQueue.clear();
 		updateLoaded();
-		for(final SegmentController segmentController : loadedControllers) {
-			new Thread() {
-				@Override
-				public void run() {
+		new Thread() {
+			@Override
+			public void run() {
+				for(SegmentController segmentController : loadedControllers) {
 					Long2ObjectArrayMap<ProjectorInterface> map = new Long2ObjectArrayMap<>();
 					getProjectorsForEntity(segmentController, map);
 					for(Map.Entry<Long, ProjectorInterface> entry : map.long2ObjectEntrySet()) drawQueue.add(entry.getValue());
 				}
-			}.start();
-		}
+			}
+		}.start();
 		lastAdd = System.currentTimeMillis();
 	}
 
