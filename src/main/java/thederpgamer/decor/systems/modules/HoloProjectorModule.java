@@ -17,7 +17,7 @@ import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.MathUtils;
-import thederpgamer.decor.utils.SegmentPieceUtils;
+import api.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -58,7 +58,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 							if(obj.getCurrentFrame() != null) {
 								float maxDim = Math.max(obj.image.getWidth(), obj.image.getHeight());
 								if(obj.transform == null) obj.transform = new Transform();
-								SegmentPieceUtils.getProjectorTransform(segmentPiece, obj.offset, obj.rotation, obj.transform);
+								thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, obj.offset, obj.rotation, obj.transform);
 								Quat4f currentRot = new Quat4f();
 								obj.transform.getRotation(currentRot);
 								Quat4f addRot = new Quat4f();

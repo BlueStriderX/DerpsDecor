@@ -1,5 +1,6 @@
 package thederpgamer.decor.data.graphics.mesh;
 
+import api.utils.SegmentPieceUtils;
 import api.utils.game.SegmentControllerUtils;
 import com.bulletphysics.linearmath.Transform;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -13,7 +14,6 @@ import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.shader.Shader;
 import org.schema.schine.graphicsengine.shader.Shaderable;
-import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;

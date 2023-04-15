@@ -13,7 +13,7 @@ import thederpgamer.decor.data.graphics.mesh.SystemMesh;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
-import thederpgamer.decor.utils.SegmentPieceUtils;
+import api.utils.SegmentPieceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

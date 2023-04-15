@@ -5,9 +5,7 @@ import com.bulletphysics.linearmath.Transform;
 import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.element.ControlElementMapper;
 import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.game.common.data.world.SegmentData;
@@ -15,7 +13,6 @@ import org.schema.game.common.data.world.SegmentData;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
-import java.util.ArrayList;
 
 /**
  * <Description>
@@ -199,61 +196,5 @@ public class SegmentPieceUtils {
 		}
 		segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
 		return transform;
-	}
-
-	public static boolean isControlling(SegmentPiece controller, SegmentPiece controlled) {
-		return getControlledPieces(controller).contains(controlled);
-	}
-
-	public static ArrayList<SegmentPiece> getControlledPieces(SegmentPiece segmentPiece) {
-		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
-		if(controlElementMapper != null) {
-			try {
-				for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
-					SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-					if(p != null && p.getType() != 0) controlledPieces.add(p);
-				}
-			} catch(Exception ignored) {}
-		}
-		return controlledPieces;
-	}
-
-	public static ArrayList<SegmentPiece> getControlledPiecesMatching(SegmentPiece segmentPiece, short type) {
-		ArrayList<SegmentPiece> controlledPieces = new ArrayList<>();
-		ControlElementMapper controlElementMapper = segmentPiece.getSegmentController().getControlElementMap().getControllingMap();
-		if(controlElementMapper != null) {
-			try {
-				for(long l : controlElementMapper.getAll().get(segmentPiece.getAbsoluteIndex())) {
-					SegmentPiece p = segmentPiece.getSegmentController().getSegmentBuffer().getPointUnsave(l);
-					if(p != null && p.getType() == type) controlledPieces.add(p);
-				}
-			} catch(Exception ignored) {}
-		}
-		return controlledPieces;
-	}
-
-	public static SegmentPiece getFirstMatchingAdjacent(SegmentPiece segmentPiece, short type) {
-		ArrayList<SegmentPiece> matching = getMatchingAdjacent(segmentPiece, type);
-		if(matching.isEmpty()) return null;
-		else return matching.get(0);
-	}
-
-	public static ArrayList<SegmentPiece> getMatchingAdjacent(SegmentPiece segmentPiece, short type) {
-		ArrayList<SegmentPiece> matchingAdjacent = new ArrayList<>();
-		SegmentBufferInterface buffer = segmentPiece.getSegmentController().getSegmentBuffer();
-		Vector3i pos = new Vector3i(segmentPiece.getAbsolutePos(new Vector3i()));
-		Vector3i[] offsets = getAdjacencyOffsets(pos);
-		for(Vector3i offset : offsets) {
-			if(buffer.existsPointUnsave(offset)) {
-				SegmentPiece piece = buffer.getPointUnsave(offset);
-				if(piece.getType() == type) matchingAdjacent.add(piece);
-			}
-		}
-		return matchingAdjacent;
-	}
-
-	private static Vector3i[] getAdjacencyOffsets(Vector3i absPos) {
-		return new Vector3i[] {new Vector3i(absPos.x - 1, absPos.y, absPos.z), new Vector3i(absPos.x + 1, absPos.y, absPos.z), new Vector3i(absPos.x, absPos.y - 1, absPos.z), new Vector3i(absPos.x, absPos.y + 1, absPos.z), new Vector3i(absPos.x, absPos.y, absPos.z - 1), new Vector3i(absPos.x, absPos.y, absPos.z + 1)};
 	}
 }

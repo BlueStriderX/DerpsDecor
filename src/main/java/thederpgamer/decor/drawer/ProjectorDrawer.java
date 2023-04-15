@@ -27,7 +27,7 @@ import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
-import thederpgamer.decor.utils.SegmentPieceUtils;
+import api.utils.SegmentPieceUtils;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -126,7 +126,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 					holoProjectorModule.removeDrawData(entry.getKey());
 					continue;
 				}
-				SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
+				thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
 				map.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -138,7 +138,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 					textProjectorModule.removeDrawData(entry.getKey());
 					continue;
 				}
-				SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
+				thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
 				map.put(entry.getKey(), entry.getValue());
 			}
 		}

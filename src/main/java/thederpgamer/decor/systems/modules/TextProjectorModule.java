@@ -16,7 +16,7 @@ import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.MathUtils;
-import thederpgamer.decor.utils.SegmentPieceUtils;
+import api.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -75,7 +75,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 					if(canDraw(segmentPiece)) {
 						if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
 							if(drawData.transform == null) drawData.transform = new Transform();
-							SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+							thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
 							Quat4f currentRot = new Quat4f();
 							drawData.transform.getRotation(currentRot);
 							Quat4f addRot = new Quat4f();

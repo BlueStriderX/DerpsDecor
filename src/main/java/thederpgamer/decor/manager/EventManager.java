@@ -26,7 +26,7 @@ import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ProjectorUtils;
-import thederpgamer.decor.utils.SegmentPieceUtils;
+import api.utils.SegmentPieceUtils;
 import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.ArrayList;
