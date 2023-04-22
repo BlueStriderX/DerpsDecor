@@ -90,16 +90,20 @@ public class DerpsDecor extends StarMod {
 //		ElementManager.addBlock(new StorageCapsule());
 //		ElementManager.addBlock(new ActivationLever());
 //		ElementManager.addBlock(new LargeDarkTiles());
+//		ElementManager.addBlock(new LargeDarkTilesWedge());
 //		ElementManager.addBlock(new LargeLightTiles());
+//		ElementManager.addBlock(new LargeLightTilesWedge());
 //		ElementManager.addBlock(new SmallDarkTiles());
+//		ElementManager.addBlock(new SmallDarkTilesWedge());
 //		ElementManager.addBlock(new SmallLightTiles());
-//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
-//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+//		ElementManager.addBlock(new SmallLightTilesWedge());
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Small Tiled", HullBlock.Type.BASIC)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.STANDARD)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Small Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
+		//		for(Block block : (new HullBlock("Large Tiles", HullBlock.Type.ADVANCED)).colorVariants) ElementManager.addBlock(block);
 		ElementManager.initialize();
 	}
 

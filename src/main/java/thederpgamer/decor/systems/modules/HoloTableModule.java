@@ -1,5 +1,6 @@
 package thederpgamer.decor.systems.modules;
 
+import api.utils.SegmentPieceUtils;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
@@ -9,11 +10,9 @@ import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.drawdata.HoloTableDrawData;
-import thederpgamer.decor.data.graphics.mesh.SystemMesh;
 import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
-import api.utils.SegmentPieceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,24 +36,14 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 	public void handle(Timer timer) {
 		if(isOnServer()) return;
 		HashMap<Long, HoloTableDrawData> drawDataMap = getProjectorMap();
-		for(HoloTableDrawData drawData : drawDataMap.values()) {
-			if(drawData == null) continue;
-			assert drawData.tableIndex != 0;
-			if(canDraw(drawData.tableIndex)) {
-				if(drawData.systemMesh == null) {
-					SegmentPiece table = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(drawData.tableIndex);
-					SegmentPiece target = getManagerContainer().getSegmentController().getSegmentBuffer().getPointUnsave(drawData.targetIndex);
-					drawData.systemMesh = new SystemMesh(table, target);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void handleRemove(long abs) {
-		super.handleRemove(abs);
-		removeDrawData(abs);
-		flagUpdatedData();
+		//		for(HoloTableDrawData drawData : drawDataMap.values()) {
+		//			if(drawData == null) continue;
+		//			assert drawData.tableIndex != 0;
+		//			if(canDraw(drawData.tableIndex)) {
+		//				if(drawData.getMesh() != null) {
+		//				}
+		//			}
+		//		}
 	}
 
 	@Override
@@ -70,6 +59,17 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 	public HashMap<Long, HoloTableDrawData> getProjectorMap() {
 		if(!(data instanceof HoloTableDrawMap)) data = new HoloTableDrawMap();
 		return ((HoloTableDrawMap) data).map;
+	}
+
+	@Override
+	public void handleRemove(long abs) {
+		super.handleRemove(abs);
+		removeDrawData(abs);
+		flagUpdatedData();
+	}
+
+	public void removeDrawData(long indexAndOrientation) {
+		getProjectorMap().remove(indexAndOrientation);
 	}
 
 	private boolean canDraw(long index) {
@@ -89,10 +89,6 @@ public class HoloTableModule extends SimpleDataStorageMCModule {
 			}
 		}
 		return segmentController.getSegmentBuffer().existsPointUnsave(segmentPiece.getAbsoluteIndex()) && segmentController.getSegmentBuffer().getPointUnsave(segmentPiece.getAbsoluteIndex()).getType() == segmentPiece.getType() && segmentController.isFullyLoadedWithDock() && segmentController.isInClientRange() && ((canToggle && activator.isActive()) || activator == null);
-	}
-
-	public void removeDrawData(long indexAndOrientation) {
-		getProjectorMap().remove(indexAndOrientation);
 	}
 
 	public short getProjectorId() {

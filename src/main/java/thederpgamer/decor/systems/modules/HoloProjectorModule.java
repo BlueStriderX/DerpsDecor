@@ -1,5 +1,6 @@
 package thederpgamer.decor.systems.modules;
 
+import api.utils.SegmentPieceUtils;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
@@ -17,7 +18,6 @@ import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.MathUtils;
-import api.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -93,6 +93,10 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 		return ((HoloProjectorDrawMap) data).map;
 	}
 
+	public short getProjectorId() {
+		return ElementManager.getBlock("Holo Projector").getId();
+	}
+
 	private boolean canDraw(SegmentPiece segmentPiece) {
 		boolean canToggle = false;
 		SegmentController segmentController = segmentPiece.getSegmentController();
@@ -125,10 +129,6 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 	@Override
 	public String getName() {
 		return "HoloProjector_ManagerModule";
-	}
-
-	public short getProjectorId() {
-		return ElementManager.getBlock("Holo Projector").getId();
 	}
 
 	public HoloProjectorDrawData getDrawData(SegmentPiece segmentPiece) {

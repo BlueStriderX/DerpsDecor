@@ -6,6 +6,7 @@ import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import thederpgamer.decor.data.graphics.image.ScalableImageSubSprite;
+import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.manager.ImageManager;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
@@ -38,6 +39,7 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 		this.changed = changed;
 		this.holographic = holographic;
 		this.transform = new Transform();
+		if(changed) ProjectorDrawer.needsUpdate = true;
 	}
 
 	public HoloProjectorDrawData(SegmentPiece segmentPiece) {
@@ -51,6 +53,7 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
 		}
+		ProjectorDrawer.needsUpdate = true;
 	}
 
 	public void copyTo(ProjectorInterface drawData) {
@@ -62,6 +65,7 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 			projectorDrawData.scale = scale;
 			projectorDrawData.holographic = holographic;
 			projectorDrawData.changed = true;
+			ProjectorDrawer.needsUpdate = true;
 		}
 	}
 
@@ -93,5 +97,9 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 			HoloProjectorDrawData drawData = (HoloProjectorDrawData) object;
 			return drawData.src.equals(src) && drawData.offset.equals(offset) && drawData.rotation.equals(rotation) && drawData.scale == scale && drawData.holographic == holographic;
 		} else return false;
+	}
+
+	public boolean isGif() {
+		return src.toLowerCase().endsWith(".gif");
 	}
 }

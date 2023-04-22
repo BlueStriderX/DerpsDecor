@@ -1,18 +1,35 @@
 package thederpgamer.decor.utils;
 
+import api.common.GameClient;
+import api.common.GameServer;
+import api.utils.game.SegmentControllerUtils;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.controller.ManagedUsableSegmentController;
+import org.schema.game.common.controller.SegmentController;
+import org.schema.game.common.controller.elements.ElementCollectionManager;
+import org.schema.game.common.controller.elements.beam.damageBeam.DamageBeamElementManager;
+import org.schema.game.common.controller.elements.beam.repair.RepairElementManager;
+import org.schema.game.common.controller.elements.beam.tractorbeam.TractorElementManager;
+import org.schema.game.common.controller.elements.cargo.CargoElementManager;
+import org.schema.game.common.controller.elements.missile.MissileElementManager;
+import org.schema.game.common.controller.elements.weapon.WeaponElementManager;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
+import org.schema.game.common.data.element.ElementInformation;
+import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.world.SegmentData;
+import org.schema.schine.network.objects.Sendable;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
+import java.util.ArrayList;
 
 /**
  * <Description>
@@ -28,6 +45,15 @@ public class SegmentPieceUtils {
 	private static final Matrix3f mX = new Matrix3f();
 	private static final Matrix3f mXB = new Matrix3f();
 	private static final Matrix3f mXC = new Matrix3f();
+
+	private static final Class[] elementManagerClasses = {
+		WeaponElementManager.class,
+		DamageBeamElementManager.class,
+		TractorElementManager.class,
+		MissileElementManager.class,
+		CargoElementManager.class,
+		RepairElementManager.class
+	};
 
 	public static void initialize() {
 		mY.setIdentity();
@@ -196,5 +222,55 @@ public class SegmentPieceUtils {
 		}
 		segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
 		return transform;
+	}
+
+	public static ElementCollection<?, ?, ?> getElementCollectionFromPiece(SegmentPiece piece) {
+		if(piece == null) return null;
+		SegmentController segmentController = piece.getSegmentController();
+		if(segmentController == null) return null;
+		if(segmentController instanceof ManagedUsableSegmentController) {
+			ManagedUsableSegmentController<?> managedUsableSegmentController = (ManagedUsableSegmentController<?>) segmentController;
+			for(ElementCollectionManager collectionManager : SegmentControllerUtils.getAllCollectionManagers(managedUsableSegmentController)) {
+				ElementCollectionManager<?, ?, ?> elementCollectionManager = (ElementCollectionManager<?, ?, ?>) collectionManager;
+				for(ElementCollection<?, ?, ?> elementCollection : elementCollectionManager.getElementCollections()) {
+					if(elementCollection.contains(piece.getAbsoluteIndex())) return elementCollection;
+				}
+			}
+		}
+		System.err.println("Could not find ElementCollection for SegmentPiece " + piece);
+		return null;
+	}
+
+	public static SegmentController getEntityFromDbId(long entityId) {
+		for(SegmentController controller : getSegmentControllers()) {
+			if(controller.getDbId() == entityId) return controller;
+		}
+		return null;
+	}
+
+	private static ArrayList<SegmentController> getSegmentControllers() {
+		ArrayList<SegmentController> controllers = new ArrayList<>();
+		if(GameClient.getClientState() != null) {
+			for(Sendable sendable : GameClient.getClientState().getLocalAndRemoteObjectContainer().getLocalObjects().values()) {
+				if(sendable instanceof SegmentController) controllers.add((SegmentController) sendable);
+			}
+		} else {
+			for(Sendable sendable : GameServer.getServerState().getLocalAndRemoteObjectContainer().getLocalObjects().values()) {
+				if(sendable instanceof SegmentController) controllers.add((SegmentController) sendable);
+			}
+		}
+		return controllers;
+	}
+
+	public static Vector4f getConnectedColor(SegmentPiece table) {
+		if(table == null) return null;
+		for(short s : ElementKeyMap.lightTypes) {
+			if(api.utils.SegmentPieceUtils.getControlledPiecesMatching(table, s).size() > 0) {
+				ElementInformation info = ElementKeyMap.getInfo(s);
+				if(!info.isLightSource()) continue;
+				return info.getLightSourceColor();
+			}
+		}
+		return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 }

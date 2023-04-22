@@ -5,6 +5,7 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.forms.gui.GUITextOverlay;
+import thederpgamer.decor.drawer.ProjectorDrawer;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 /**
@@ -35,6 +36,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 		this.holographic = holographic;
 		this.changed = changed;
 		this.transform = new Transform();
+		if(changed) ProjectorDrawer.needsUpdate = true;
 	}
 
 	public TextProjectorDrawData(SegmentPiece segmentPiece) {
@@ -45,6 +47,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 		color = "FFFFFF";
 		holographic = true;
 		changed = true;
+		ProjectorDrawer.needsUpdate = true;
 		if(segmentPiece != null) {
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
@@ -70,6 +73,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 			projectorDrawData.scale = scale;
 			projectorDrawData.holographic = holographic;
 			projectorDrawData.changed = true;
+			ProjectorDrawer.needsUpdate = true;
 		}
 	}
 }

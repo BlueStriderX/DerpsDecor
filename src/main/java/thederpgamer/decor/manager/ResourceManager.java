@@ -25,7 +25,7 @@ import java.util.HashMap;
  * @since 06/15/2021
  */
 public class ResourceManager {
-	private static final String[] textureNames = {"holo-projector-front", "holo-projector-icon", "text-projector-front", "text-projector-icon", "holo-table-icon"};
+	private static final String[] textureNames = {"holo-projector-front", "holo-projector-icon", "text-projector-front", "text-projector-icon", "holo-table-icon", "large-dark-tiles", "large-dark-tiles-icon", "large-dark-tiles-wedge-icon", "small-dark-tiles", "small-dark-tiles-icon", "small-dark-tiles-wedge-icon", "large-light-tiles", "large-light-tiles-icon", "large-light-tiles-wedge-icon", "small-light-tiles", "small-light-tiles-icon", "small-light-tiles-wedge-icon"};
 	/*
 			"grey-basic-armor-small-tiles",
 			"grey-basic-armor-small-tiles-icon",
@@ -285,7 +285,7 @@ public class ResourceManager {
 				for(String textureName : textureNames) {
 					try {
 						if(textureName.endsWith("icon")) textureMap.put(textureName, StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png"))));
-						else textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png"))));
+						else textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png")), ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + "-normal.png"))));
 					} catch(Exception exception) {
 						LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
 					}

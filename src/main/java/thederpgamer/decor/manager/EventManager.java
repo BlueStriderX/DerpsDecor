@@ -4,10 +4,15 @@ import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceActivateEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
+import api.listener.events.input.KeyPressEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
+import api.utils.SegmentPieceUtils;
 import api.utils.game.SegmentControllerUtils;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
+import org.lwjgl.input.Keyboard;
+import org.schema.game.client.view.WorldDrawer;
+import org.schema.game.client.view.tools.IconTextureBakery;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.elements.shipyard.ShipyardCollectionManager;
 import org.schema.game.common.controller.elements.shipyard.ShipyardElementManager;
@@ -26,7 +31,6 @@ import thederpgamer.decor.systems.modules.HoloProjectorModule;
 import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ProjectorUtils;
-import api.utils.SegmentPieceUtils;
 import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.ArrayList;
@@ -37,7 +41,24 @@ import java.util.ArrayList;
  * @author TheDerpGamer (MrGoose#0027)
  */
 public class EventManager {
-	public static void initialize(final DerpsDecor instance) {
+	public static void initialize(DerpsDecor instance) {
+		StarLoader.registerListener(KeyPressEvent.class, new Listener<KeyPressEvent>() {
+			@Override
+			public void onEvent(KeyPressEvent event) {
+				if(ConfigManager.getMainConfig().getBoolean("debug-mode")) {
+					if(event.getKey() == Keyboard.KEY_GRAVE) {
+						if(event.isKeyDown()) {
+							IconTextureBakery.normalWrite = false;
+							WorldDrawer.flagTextureBake = true;
+						} else {
+							IconTextureBakery.normalWrite = true;
+							WorldDrawer.flagTextureBake = false;
+						}
+					}
+				}
+			}
+		}, instance);
+
 		StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
 			@Override
 			public void onEvent(RegisterWorldDrawersEvent event) {
@@ -50,10 +71,9 @@ public class EventManager {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new HoloTableModule(event.getSegmentController(), event.getContainer()));
-//				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
+				//				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, instance);
-
 		StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
 			@Override
 			public void onEvent(SegmentPieceActivateByPlayer event) {

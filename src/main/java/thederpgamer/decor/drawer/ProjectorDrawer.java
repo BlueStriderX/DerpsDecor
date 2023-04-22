@@ -8,8 +8,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
-import org.schema.game.common.controller.Ship;
-import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementKeyMap;
@@ -44,10 +42,11 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 	private final Vector3i lastClientSector = new Vector3i();
 	private final ObjectArrayList<SegmentController> loadedControllers = new ObjectArrayList<>();
 	private float time;
-	private float lastAdd;
+	private long lastAdd;
 	private short holoProjectorId;
 	private short textProjectorId;
 	private short holoTableId;
+	public static boolean needsUpdate = true;
 
 	@Override
 	public void update(Timer timer) {
@@ -56,7 +55,8 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 
 	@Override
 	public void draw() {
-		if(drawQueue.isEmpty() || lastAdd + 10000 < System.currentTimeMillis()) enqueueDraws();
+		if(System.currentTimeMillis() - lastAdd > 10000) needsUpdate = true;
+		if(needsUpdate) enqueueDraws();
 		else {
 			int drawCount = 0;
 			for(ProjectorInterface projector : drawQueue) {
@@ -70,7 +70,10 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 							ShaderLibrary.scanlineShader.load();
 						}
 						image.setTransform(drawData.transform);
-						Sprite.draw3D(image, drawData.subSprite, 1, Controller.getCamera());
+						if(drawData.isGif()) {
+							Sprite.draw3D(drawData.getCurrentFrame(), drawData.subSprite, 1, Controller.getCamera());
+							drawData.nextFrame();
+						} else Sprite.draw3D(image, drawData.subSprite, 1, Controller.getCamera());
 						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
 						drawCount++;
 					}
@@ -87,6 +90,15 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
 						drawCount++;
 					}
+				} else if(projector instanceof HoloTableDrawData) {
+					HoloTableDrawData drawData = (HoloTableDrawData) projector;
+//					if(drawData.canDraw()) {
+						ShaderLibrary.scanlineShader.setShaderInterface(this);
+						ShaderLibrary.scanlineShader.load();
+						drawData.draw();
+						ShaderLibrary.scanlineShader.unload();
+						drawCount++;
+//					}
 				}
 			}
 		}
@@ -95,24 +107,21 @@ public class ProjectorDrawer extends ModWorldDrawer implements Drawable, Shadera
 	private void enqueueDraws() {
 		drawQueue.clear();
 		updateLoaded();
-		new Thread() {
-			@Override
-			public void run() {
-				for(SegmentController segmentController : loadedControllers) {
-					Long2ObjectArrayMap<ProjectorInterface> map = new Long2ObjectArrayMap<>();
-					getProjectorsForEntity(segmentController, map);
-					for(Map.Entry<Long, ProjectorInterface> entry : map.long2ObjectEntrySet()) drawQueue.add(entry.getValue());
-				}
-			}
-		}.start();
+		for(SegmentController segmentController : loadedControllers) {
+			if(!(segmentController instanceof ManagedUsableSegmentController)) continue;
+			Long2ObjectArrayMap<ProjectorInterface> map = new Long2ObjectArrayMap<>();
+			getProjectorsForEntity(segmentController, map);
+			for(Map.Entry<Long, ProjectorInterface> entry : map.long2ObjectEntrySet()) drawQueue.add(entry.getValue());
+		}
 		lastAdd = System.currentTimeMillis();
+		needsUpdate = false;
 	}
 
 	private void updateLoaded() {
 		lastClientSector.set(GameClient.getClientPlayerState().getCurrentSector());
 		loadedControllers.clear();
 		for(Sendable sendable : GameClient.getClientState().getLocalAndRemoteObjectContainer().getLocalObjects().values()) {
-			if(sendable instanceof Ship || sendable instanceof SpaceStation) loadedControllers.add((SegmentController) sendable);
+			if(sendable instanceof SegmentController && ((SegmentController) sendable).isFullyLoadedWithDock() && ((SegmentController) sendable).getSectorId() == GameClient.getClientPlayerState().getSectorId()) loadedControllers.add((SegmentController) sendable);
 		}
 	}
 

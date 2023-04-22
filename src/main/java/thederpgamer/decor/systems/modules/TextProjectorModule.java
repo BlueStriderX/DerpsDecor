@@ -1,6 +1,7 @@
 package thederpgamer.decor.systems.modules;
 
 import api.common.GameClient;
+import api.utils.SegmentPieceUtils;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import com.bulletphysics.linearmath.QuaternionUtil;
 import com.bulletphysics.linearmath.Transform;
@@ -16,7 +17,6 @@ import thederpgamer.decor.data.drawdata.TextProjectorDrawData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.MathUtils;
-import api.utils.SegmentPieceUtils;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -123,6 +123,10 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 		return ((TextProjectorDrawMap) data).map;
 	}
 
+	public short getProjectorId() {
+		return ElementManager.getBlock("Text Projector").getId();
+	}
+
 	private boolean canDraw(SegmentPiece segmentPiece) {
 		boolean canToggle = false;
 		SegmentController segmentController = segmentPiece.getSegmentController();
@@ -155,10 +159,6 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	@Override
 	public String getName() {
 		return "TextProjector_ManagerModule";
-	}
-
-	public short getProjectorId() {
-		return ElementManager.getBlock("Text Projector").getId();
 	}
 
 	public TextProjectorDrawData getDrawData(SegmentPiece segmentPiece) {
