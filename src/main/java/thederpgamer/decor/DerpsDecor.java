@@ -13,15 +13,12 @@ import thederpgamer.decor.api.luamade.LuaMadeAPIManager;
 import thederpgamer.decor.commands.ClearProjectorsCommand;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.decor.HoloProjector;
-import thederpgamer.decor.element.blocks.decor.HoloTable;
 import thederpgamer.decor.element.blocks.decor.TextProjector;
 import thederpgamer.decor.manager.ConfigManager;
 import thederpgamer.decor.manager.EventManager;
-import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.manager.ResourceManager;
 import thederpgamer.decor.utils.BlockIconUtils;
 import thederpgamer.decor.utils.ClipboardUtils;
-import thederpgamer.decor.utils.MessageType;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
 import java.io.IOException;
@@ -69,11 +66,10 @@ public class DerpsDecor extends StarMod {
 		instance = this;
 		clipboard = new ClipboardUtils();
 		ConfigManager.initialize(this);
-		LogManager.initialize();
 		SegmentPieceUtils.initialize();
 		EventManager.initialize(this);
 		registerCommands();
-		if(LuaMadeAPIManager.initialize()) LogManager.logMessage(MessageType.INFO, "Loaded LuaMade API integration.");
+		if(LuaMadeAPIManager.initialize()) logInfo("Loaded LuaMade API integration.");
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class DerpsDecor extends StarMod {
 	public void onBlockConfigLoad(BlockConfig config) {
 		ElementManager.addBlock(new HoloProjector());
 		ElementManager.addBlock(new TextProjector());
-		ElementManager.addBlock(new HoloTable());
+//		ElementManager.addBlock(new HoloTable());
 //		ElementManager.addBlock(new StorageCapsule());
 //		ElementManager.addBlock(new ActivationLever());
 //		ElementManager.addBlock(new LargeDarkTiles());

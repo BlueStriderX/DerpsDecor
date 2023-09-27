@@ -29,8 +29,9 @@ public class HoloTable extends Block implements ActivationInterface {
 	@Override
 	public void initialize() {
 		blockInfo.setDescription("A decorative hologram table. Can display a miniaturized hologram of a connected system.\nConnect a light source to change the color.");
-		blockInfo.setInRecipe(true);
-		blockInfo.setShoppable(true);
+		blockInfo.setInRecipe(false);
+		blockInfo.setShoppable(false);
+		blockInfo.setPlacable(false);
 		blockInfo.setCanActivate(true);
 		blockInfo.setPrice(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).price);
 		blockInfo.setOrientatable(true);
@@ -49,7 +50,7 @@ public class HoloTable extends Block implements ActivationInterface {
 		blockInfo.sideTexturesPointToOrientation = false;
 		if(GraphicsContext.initialized) {
 			try {
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-table-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("holo-table-icon").getTextureId());
 				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "holo_table", null);
 			} catch(Exception ignored) {}
 		}

@@ -24,11 +24,13 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 	public String src;
 	public boolean holographic;
 	public boolean changed;
+	public int entityId;
 	public transient ScalableImageSubSprite[] subSprite;
 	public transient Transform transform;
 	public transient Sprite image;
 	public transient int currentFrame;
 	public transient Sprite[] frames;
+	public transient SegmentPiece segmentPiece;
 
 	public HoloProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, String src, boolean holographic, boolean changed) {
 		this.indexAndOrientation = indexAndOrientation;
@@ -50,6 +52,7 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 		holographic = true;
 		changed = true;
 		if(segmentPiece != null) {
+			this.segmentPiece = segmentPiece;
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
 		}
@@ -59,6 +62,7 @@ public class HoloProjectorDrawData implements ProjectorInterface {
 	public void copyTo(ProjectorInterface drawData) {
 		if(drawData instanceof HoloProjectorDrawData) {
 			HoloProjectorDrawData projectorDrawData = (HoloProjectorDrawData) drawData;
+			projectorDrawData.entityId = entityId;
 			projectorDrawData.src = src;
 			projectorDrawData.offset.set(offset);
 			projectorDrawData.rotation.set(rotation);

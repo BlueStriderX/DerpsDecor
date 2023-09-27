@@ -18,7 +18,6 @@ import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
 import thederpgamer.decor.manager.ConfigManager;
-import thederpgamer.decor.manager.LogManager;
 import thederpgamer.decor.systems.modules.StrutConnectorModule;
 import thederpgamer.decor.utils.PaintColor;
 import thederpgamer.decor.utils.PlayerUtils;
@@ -106,7 +105,7 @@ public class StrutConnector extends Block implements ActivationInterface {
 							return;
 						}
 					}
-					LogManager.logWarning("Player \"" + GameClient.getClientPlayerState().getName() + "\" attempted to create a strut on an invalid entity.", null);
+					DerpsDecor.getInstance().logWarning("Player \"" + GameClient.getClientPlayerState().getName() + "\" attempted to create a strut on an invalid entity.");
 					PlayerUtils.currentConnectionIndex = 0;
 					break;
 			}

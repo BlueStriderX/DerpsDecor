@@ -31,7 +31,7 @@ public class LargeDarkTiles extends Block {
 			try {
 				short textureId = (short) ResourceManager.getTexture("large-dark-tiles").getTextureId();
 				blockInfo.setTextureId(new short[] {textureId, textureId, textureId, textureId, textureId, textureId});
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("large-dark-tiles-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("large-dark-tiles-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, (short) 205));

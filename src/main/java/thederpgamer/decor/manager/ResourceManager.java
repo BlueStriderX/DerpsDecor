@@ -11,7 +11,6 @@ import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.decor.DerpsDecor;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -19,13 +18,12 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * <Description>
+ * Manager class for handling resource loading.
  *
  * @author TheDerpGamer
- * @since 06/15/2021
  */
 public class ResourceManager {
-	private static final String[] textureNames = {"holo-projector-front", "holo-projector-icon", "text-projector-front", "text-projector-icon", "holo-table-icon", "large-dark-tiles", "large-dark-tiles-icon", "large-dark-tiles-wedge-icon", "small-dark-tiles", "small-dark-tiles-icon", "small-dark-tiles-wedge-icon", "large-light-tiles", "large-light-tiles-icon", "large-light-tiles-wedge-icon", "small-light-tiles", "small-light-tiles-icon", "small-light-tiles-wedge-icon"};
+	private static final String[] textureNames = {"holo-projector-front", "text-projector-front", "large-dark-tiles", "small-dark-tiles", "large-light-tiles", "small-light-tiles"};
 	/*
 			"grey-basic-armor-small-tiles",
 			"grey-basic-armor-small-tiles-icon",
@@ -210,10 +208,12 @@ public class ResourceManager {
 			"brown-advanced-armor-large-tiles-icon",
 	}
 	 */
+	private static final String[] iconNames = {"holo-projector-icon", "text-projector-icon", "holo-table-icon", "large-dark-tiles-icon", "large-dark-tiles-wedge-icon", "small-dark-tiles-icon", "small-dark-tiles-wedge-icon", "large-light-tiles-icon", "large-light-tiles-wedge-icon", "small-light-tiles-icon", "small-light-tiles-wedge-icon"};
 	private static final String[] spriteNames = {"projectors-infographic", "transparent", "projector-debug-grid"};
 	private static final String[] modelNames = {"holo_table"};
 	private static final String[] fontNames = {"Monda-Extended-Regular", "Monda-Extended-Bold"};
 	private static final HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
+	private static final HashMap<String, StarLoaderTexture> iconMap = new HashMap<>();
 	private static final HashMap<String, Sprite> spriteMap = new HashMap<>();
 	private static final HashMap<String, Mesh> meshMap = new HashMap<>();
 	private static final HashMap<String, Font> fontMap = new HashMap<>();
@@ -275,22 +275,31 @@ public class ResourceManager {
 			try {
 				fontMap.put(fontName, Font.createFont(Font.TRUETYPE_FONT, DerpsDecor.getInstance().getJarResource("fonts/" + fontName + ".ttf")));
 			} catch(Exception exception) {
-				LogManager.logException("Failed to load font \"" + fontName + "\"", exception);
+				DerpsDecor.getInstance().logException("Failed to load font \"" + fontName + "\"", exception);
 			}
 		}
 		StarLoaderTexture.runOnGraphicsThread(new Runnable() {
 			@Override
 			public void run() {
-				// Load Textures
+				//Load Textures
 				for(String textureName : textureNames) {
 					try {
-						if(textureName.endsWith("icon")) textureMap.put(textureName, StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png"))));
-						else textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png")), ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + "-normal.png"))));
+						textureMap.put(textureName, StarLoaderTexture.newBlockTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + ".png")), ImageIO.read(DerpsDecor.getInstance().getJarResource("textures/" + textureName + "-normal.png"))));
 					} catch(Exception exception) {
-						LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
+						instance.logException("Failed to load texture \"" + textureName + "\"", exception);
 					}
 				}
-				// Load Sprites
+
+				//Load Icons
+				for(String iconName : iconNames) {
+					try {
+						iconMap.put(iconName, StarLoaderTexture.newIconTexture(ImageIO.read(DerpsDecor.getInstance().getJarResource("icons/" + iconName + ".png"))));
+					} catch(Exception exception) {
+						instance.logException("Failed to load icon \"" + iconName + "\"", exception);
+					}
+				}
+
+				//Load Sprites
 				for(String spriteName : spriteNames) {
 					try {
 						Sprite sprite = StarLoaderTexture.newSprite(ImageIO.read(DerpsDecor.getInstance().getJarResource("sprites/" + spriteName + ".png")), instance, spriteName);
@@ -298,37 +307,18 @@ public class ResourceManager {
 						sprite.setName(spriteName);
 						spriteMap.put(spriteName, sprite);
 					} catch(Exception exception) {
-						LogManager.logException("Failed to load sprite \"" + spriteName + "\"", exception);
+						instance.logException("Failed to load sprite \"" + spriteName + "\"", exception);
 					}
 				}
-				// Load models
+				//Load models
 				for(String modelName : modelNames) {
 					try {
-						Vector3f offset = new Vector3f();
-						if(modelName.contains("~")) {
-							String meshName = modelName.substring(0, modelName.indexOf('~'));
-							String offsetString = modelName.substring(modelName.indexOf('(') + 1, modelName.lastIndexOf(')'));
-							String[] values = offsetString.split(", ");
-							assert values.length == 3;
-							offset.x = Float.parseFloat(values[0]);
-							offset.y = Float.parseFloat(values[1]);
-							offset.z = Float.parseFloat(values[2]);
-							loader.getMeshLoader().loadModMesh(instance, meshName, DerpsDecor.getInstance().getJarResource("models/" + meshName + ".zip"), null);
-							Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), meshName);
-							mesh.getTransform().origin.add(offset);
-							meshMap.put(meshName, mesh);
-						} else {
-							loader.getMeshLoader().loadModMesh(instance, modelName, DerpsDecor.getInstance().getJarResource("models/" + modelName + ".zip"), null);
-							Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
-							mesh.setFirstDraw(true);
-							//if(modelName.equals("display_screen")) { // Temp fix
-							//	mesh.rotateBy(0.0f, 180.0f, 0.0f);
-							//	mesh.getPos().add(new Vector3f(0.0f, 0.0f, 0.5f));
-							//}
-							meshMap.put(modelName, mesh);
-						}
+						loader.getMeshLoader().loadModMesh(instance, modelName, DerpsDecor.getInstance().getJarResource("models/" + modelName + ".zip"), null);
+						Mesh mesh = loader.getMeshLoader().getModMesh(DerpsDecor.getInstance(), modelName);
+						mesh.setFirstDraw(true);
+						meshMap.put(modelName, mesh);
 					} catch(ResourceException | IOException exception) {
-						LogManager.logException("Failed to load model \"" + modelName + "\"", exception);
+						instance.logException("Failed to load model \"" + modelName + "\"", exception);
 					}
 				}
 			}
@@ -337,6 +327,10 @@ public class ResourceManager {
 
 	public static StarLoaderTexture getTexture(String name) {
 		return textureMap.get(name);
+	}
+
+	public static StarLoaderTexture getIcon(String name) {
+		return iconMap.get(name);
 	}
 
 	public static Sprite getSprite(String name) {

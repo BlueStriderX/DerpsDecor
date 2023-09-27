@@ -31,7 +31,7 @@ public class SmallLightTilesWedge extends Block {
 			try {
 				short textureId = (short) ResourceManager.getTexture("small-light-tiles").getTextureId();
 				blockInfo.setTextureId(new short[] {textureId, textureId, textureId, textureId, textureId, textureId});
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("small-light-tiles-wedge-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("small-light-tiles-wedge-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.add(blockInfo);

@@ -23,8 +23,10 @@ public class TextProjectorDrawData implements ProjectorInterface {
 	public String color;
 	public boolean holographic;
 	public boolean changed;
+	public int entityId;
 	public transient Transform transform;
 	public transient GUITextOverlay textOverlay;
+	public transient SegmentPiece segmentPiece;
 
 	public TextProjectorDrawData(long indexAndOrientation, Vector3i offset, Vector3i rotation, int scale, String text, String color, boolean holographic, boolean changed) {
 		this.indexAndOrientation = indexAndOrientation;
@@ -49,6 +51,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 		changed = true;
 		ProjectorDrawer.needsUpdate = true;
 		if(segmentPiece != null) {
+			this.segmentPiece = segmentPiece;
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
 		}
@@ -66,6 +69,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 	public void copyTo(ProjectorInterface drawData) {
 		if(drawData instanceof TextProjectorDrawData) {
 			TextProjectorDrawData projectorDrawData = (TextProjectorDrawData) drawData;
+			projectorDrawData.entityId = entityId;
 			projectorDrawData.text = text;
 			projectorDrawData.color = color;
 			projectorDrawData.offset.set(offset);

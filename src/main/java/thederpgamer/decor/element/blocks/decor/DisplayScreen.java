@@ -48,7 +48,7 @@ public class DisplayScreen extends Block implements ActivationInterface {
 		if(GraphicsContext.initialized) {
 			try {
 				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "display_screen", null);
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("display-screen-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("display-screen-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX));

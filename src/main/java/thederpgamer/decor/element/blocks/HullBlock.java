@@ -206,7 +206,7 @@ public class HullBlock {
 						try {
 							short textureId = (short) ResourceManager.getTexture(blockInfo.name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "-")).getTextureId();
 							blockInfo.setTextureId(new short[] {textureId, textureId, textureId, textureId, textureId, textureId});
-							blockInfo.setBuildIconNum(ResourceManager.getTexture(blockInfo.name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "-") + "-icon").getTextureId());
+							blockInfo.setBuildIconNum(ResourceManager.getIcon(blockInfo.name.toLowerCase(Locale.ENGLISH).replaceAll(" ", "-") + "-icon").getTextureId());
 						} catch(Exception ignored) {}
 					}
 					BlockConfig.add(blockInfo);

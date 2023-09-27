@@ -43,7 +43,7 @@ public class StorageCapsule extends InventoryBlock {
 		for(short id : ElementKeyMap.getInfo(120).controlling) blockInfo.controlling.add(id);
 		if(GraphicsContext.initialized) {
 			try {
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("storage-capsule-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("storage-capsule-icon").getTextureId());
 				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
 			} catch(Exception ignored) {}
 		}

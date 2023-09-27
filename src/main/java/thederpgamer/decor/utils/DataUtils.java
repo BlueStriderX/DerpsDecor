@@ -3,7 +3,6 @@ package thederpgamer.decor.utils;
 import api.common.GameClient;
 import api.common.GameCommon;
 import thederpgamer.decor.DerpsDecor;
-import thederpgamer.decor.manager.LogManager;
 
 /**
  * <Description>
@@ -18,7 +17,7 @@ public class DataUtils {
 			return getResourcesPath() + "/data/" + universeName;
 		} else {
 			try {
-				LogManager.logMessage(MessageType.ERROR, "Client " + GameClient.getClientPlayerState().getName() + " attempted to illegally access server data.");
+				DerpsDecor.getInstance().logWarning("Client " + GameClient.getClientPlayerState().getName() + " attempted to illegally access server data.");
 			} catch(Exception ignored) {
 			}
 			return null;

@@ -31,7 +31,7 @@ public class SmallDarkTiles extends Block {
 			try {
 				short textureId = (short) ResourceManager.getTexture("small-dark-tiles").getTextureId();
 				blockInfo.setTextureId(new short[] {textureId, textureId, textureId, textureId, textureId, textureId});
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("small-dark-tiles-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("small-dark-tiles-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(205).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(205).getFactoryBakeTime(), new FactoryResource(1, ElementManager.getBlock("Large Dark Tiles").getId()));

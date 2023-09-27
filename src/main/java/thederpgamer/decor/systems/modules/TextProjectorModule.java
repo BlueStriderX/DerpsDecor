@@ -22,8 +22,8 @@ import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -39,7 +39,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	@Override
 	public void handle(Timer timer) {
 		if(isOnServer()) return;
-		final HashMap<Long, TextProjectorDrawData> drawDataMap = getProjectorMap();
+		ConcurrentHashMap<Long, TextProjectorDrawData> drawDataMap = getProjectorMap();
 		for(Map.Entry<Long, TextProjectorDrawData> obj : drawDataMap.entrySet()) {
 			TextProjectorDrawData drawData = obj.getValue();
 			long indexAndOrientation = obj.getKey();
@@ -118,7 +118,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 		return 0;
 	}
 
-	public HashMap<Long, TextProjectorDrawData> getProjectorMap() {
+	public ConcurrentHashMap<Long, TextProjectorDrawData> getProjectorMap() {
 		if(!(data instanceof TextProjectorDrawMap)) data = new TextProjectorDrawMap();
 		return ((TextProjectorDrawMap) data).map;
 	}
@@ -196,10 +196,10 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 	}
 
 	private static class TextProjectorDrawMap {
-		public HashMap<Long, TextProjectorDrawData> map;
+		public ConcurrentHashMap<Long, TextProjectorDrawData> map;
 
 		public TextProjectorDrawMap() {
-			map = new HashMap<>();
+			map = new ConcurrentHashMap<>();
 		}
 	}
 }

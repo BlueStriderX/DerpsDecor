@@ -1,6 +1,6 @@
 package thederpgamer.decor.utils;
 
-import thederpgamer.decor.manager.LogManager;
+import thederpgamer.decor.DerpsDecor;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -21,7 +21,7 @@ public class ClipboardUtils implements ClipboardOwner {
 		try {
 			return (String) Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null).getTransferData(DataFlavor.stringFlavor);
 		} catch(UnsupportedFlavorException | IOException exception) {
-			LogManager.logException("Encountered an exception while trying to get clipboard data", exception);
+			DerpsDecor.getInstance().logException("Encountered an exception while trying to get clipboard data", exception);
 		}
 		return "";
 	}

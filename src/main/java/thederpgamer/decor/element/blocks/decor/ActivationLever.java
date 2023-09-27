@@ -39,7 +39,7 @@ public class ActivationLever extends Block implements ActivationInterface {
 		for(short id : ElementKeyMap.getInfo(ElementKeyMap.LOGIC_BUTTON_NORM).controlledBy) ElementKeyMap.getInfo(id).controlling.add(blockInfo.getId());
 		if(GraphicsContext.initialized) {
 			try {
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("activation-lever-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("activation-lever-icon").getTextureId());
 				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "activation_lever_off", "activation_lever_on");
 			} catch(Exception ignored) {}
 		}

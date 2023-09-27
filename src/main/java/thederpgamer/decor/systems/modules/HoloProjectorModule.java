@@ -22,7 +22,7 @@ import thederpgamer.decor.utils.MathUtils;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <Description>
@@ -38,7 +38,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 	@Override
 	public void handle(Timer timer) {
 		if(isOnServer()) return;
-		HashMap<Long, HoloProjectorDrawData> drawDataMap = getProjectorMap();
+		ConcurrentHashMap<Long, HoloProjectorDrawData> drawDataMap = getProjectorMap();
 		for(HoloProjectorDrawData obj : drawDataMap.values()) {
 			long indexAndOrientation = obj.indexAndOrientation;
 			long index = ElementCollection.getPosIndexFrom4(indexAndOrientation);
@@ -88,7 +88,7 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 		return 0;
 	}
 
-	public HashMap<Long, HoloProjectorDrawData> getProjectorMap() {
+	public ConcurrentHashMap<Long, HoloProjectorDrawData> getProjectorMap() {
 		if(!(data instanceof HoloProjectorDrawMap)) data = new HoloProjectorDrawMap();
 		return ((HoloProjectorDrawMap) data).map;
 	}
@@ -170,10 +170,10 @@ public class HoloProjectorModule extends SimpleDataStorageMCModule {
 	}
 
 	private static class HoloProjectorDrawMap {
-		public HashMap<Long, HoloProjectorDrawData> map;
+		public ConcurrentHashMap<Long, HoloProjectorDrawData> map;
 
 		public HoloProjectorDrawMap() {
-			map = new HashMap<>();
+			map = new ConcurrentHashMap<>();
 		}
 	}
 }

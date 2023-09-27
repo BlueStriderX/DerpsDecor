@@ -41,7 +41,7 @@ public class HoloProjector extends Block implements ActivationInterface {
 		ElementKeyMap.getInfo(399).controlling.add(getId());
 		if(GraphicsContext.initialized) {
 			try {
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("holo-projector-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("holo-projector-icon").getTextureId());
 				blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
 				blockInfo.setTextureId(0, (short) ResourceManager.getTexture("holo-projector-front").getTextureId());
 			} catch(Exception ignored) {}

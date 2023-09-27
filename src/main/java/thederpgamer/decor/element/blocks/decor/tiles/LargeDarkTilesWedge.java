@@ -31,7 +31,7 @@ public class LargeDarkTilesWedge extends Block {
 			try {
 				short textureId = (short) ResourceManager.getTexture("large-dark-tiles").getTextureId();
 				blockInfo.setTextureId(new short[] {textureId, textureId, textureId, textureId, textureId, textureId});
-				blockInfo.setBuildIconNum(ResourceManager.getTexture("large-dark-tiles-wedge-icon").getTextureId());
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("large-dark-tiles-wedge-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.add(blockInfo);
