@@ -12,11 +12,11 @@ import java.util.Arrays;
  * @since 09/02/2021
  */
 public class GlobalDrawManager {
-	private static final ModWorldDrawer[] worldDrawers = new ModWorldDrawer[1];
+	private static final ModWorldDrawer[] worldDrawers = new ModWorldDrawer[2];
 
 	public static void initialize(RegisterWorldDrawersEvent event) {
 		worldDrawers[0] = new ProjectorDrawer();
-		// worldDrawers[1] = new StrutDrawer();
+		worldDrawers[1] = new NPCDrawer();
 		event.getModDrawables().addAll(Arrays.asList(worldDrawers));
 	}
 
@@ -24,9 +24,7 @@ public class GlobalDrawManager {
 		return (ProjectorDrawer) worldDrawers[0];
 	}
 
-  /*
-  public static StrutDrawer getStrutDrawer() {
-  	return (StrutDrawer) worldDrawers[1];
-  }
-   */
+	public static NPCDrawer getNPCDrawer() {
+		return (NPCDrawer) worldDrawers[1];
+	}
 }

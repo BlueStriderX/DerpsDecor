@@ -23,7 +23,7 @@ import java.util.HashMap;
  * @author TheDerpGamer
  */
 public class ResourceManager {
-	private static final String[] textureNames = {"holo-projector-front", "text-projector-front", "large-dark-tiles", "small-dark-tiles", "large-light-tiles", "small-light-tiles"};
+	private static final String[] textureNames = {"holo-projector-front", "text-projector-front", "crew-station-front"};
 	/*
 			"grey-basic-armor-small-tiles",
 			"grey-basic-armor-small-tiles-icon",
@@ -208,7 +208,7 @@ public class ResourceManager {
 			"brown-advanced-armor-large-tiles-icon",
 	}
 	 */
-	private static final String[] iconNames = {"holo-projector-icon", "text-projector-icon", "holo-table-icon", "large-dark-tiles-icon", "large-dark-tiles-wedge-icon", "small-dark-tiles-icon", "small-dark-tiles-wedge-icon", "large-light-tiles-icon", "large-light-tiles-wedge-icon", "small-light-tiles-icon", "small-light-tiles-wedge-icon"};
+	private static final String[] iconNames = {"holo-projector-icon", "text-projector-icon", "crew-station-icon"};
 	private static final String[] spriteNames = {"projectors-infographic", "transparent", "projector-debug-grid"};
 	private static final String[] modelNames = {"holo_table"};
 	private static final String[] fontNames = {"Monda-Extended-Regular", "Monda-Extended-Bold"};

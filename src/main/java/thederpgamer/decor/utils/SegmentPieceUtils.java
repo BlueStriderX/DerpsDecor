@@ -9,6 +9,7 @@ import org.schema.common.FastMath;
 import org.schema.common.util.linAlg.Vector3fTools;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
+import org.schema.game.common.controller.SegmentBufferInterface;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ElementCollectionManager;
 import org.schema.game.common.controller.elements.beam.damageBeam.DamageBeamElementManager;
@@ -272,5 +273,46 @@ public class SegmentPieceUtils {
 			}
 		}
 		return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	/**
+	 * Finds an unobstructed position the size of area as close to the original position as possible.
+	 * @param segmentPiece The SegmentPiece
+	 * @return The unobstructed position
+	 */
+	public static Vector3i getUnobstructedPosition(SegmentPiece segmentPiece, Vector3i area) {
+		SegmentBufferInterface segmentBuffer = segmentPiece.getSegmentController().getSegmentBuffer();
+		Vector3i pos = new Vector3i(segmentPiece.x, segmentPiece.y, segmentPiece.z);
+		int offsetLimit = 5; //If no unobstructed position is found within this limit, return the original position
+		int currentOffset = 1;
+		//Gradually offset from the starting position until an unobstructed position is found that fits the area
+		while(currentOffset <= offsetLimit) {
+			for(int x = pos.x - currentOffset; x <= pos.x + currentOffset; x ++) {
+				for(int y = pos.y - currentOffset; y <= pos.y + currentOffset; y ++) {
+					for(int z = pos.z - currentOffset; z <= pos.z + currentOffset; z ++) {
+						if(x == pos.x - currentOffset || x == pos.x + currentOffset || y == pos.y - currentOffset || y == pos.y + currentOffset || z == pos.z - currentOffset || z == pos.z + currentOffset) {
+							if(!segmentBuffer.existsPointUnsave(x, y, z)) { //No piece there
+								boolean valid = true;
+								for(int x2 = x; x2 < x + area.x; x2 ++) {
+									for(int y2 = y; y2 < y + area.y; y2 ++) {
+										for(int z2 = z; z2 < z + area.z; z2 ++) {
+											if(segmentBuffer.existsPointUnsave(x2, y2, z2)) { //Piece there
+												valid = false;
+												break;
+											}
+										}
+										if(!valid) break;
+									}
+									if(!valid) break;
+								}
+								if(valid) return new Vector3i(x, y, z);
+							}
+						}
+					}
+				}
+			}
+			currentOffset ++;
+		}
+		return pos;
 	}
 }
