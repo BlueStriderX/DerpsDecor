@@ -136,7 +136,7 @@ public class CrewData {
 	}
 
 	public boolean isAlreadySpawned() {
-		return getCrewMember() != null;
+		return getCrewMember() != null && getCrewMember().isHasSpawnedOnServer();
 	}
 
 	public void recall() {
