@@ -3,6 +3,7 @@ package thederpgamer.decor.manager;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
 import api.listener.events.block.SegmentPieceActivateEvent;
+import api.listener.events.block.SegmentPieceKillEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.input.KeyPressEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
@@ -27,13 +28,14 @@ import thederpgamer.decor.drawer.GlobalDrawManager;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.element.blocks.ActivationInterface;
 import thederpgamer.decor.element.blocks.Block;
+import thederpgamer.decor.systems.modules.CrewStationModule;
 import thederpgamer.decor.systems.modules.HoloProjectorModule;
-import thederpgamer.decor.systems.modules.HoloTableModule;
 import thederpgamer.decor.systems.modules.TextProjectorModule;
 import thederpgamer.decor.utils.ProjectorUtils;
 import thederpgamer.decor.utils.ServerUtils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * [Description]
@@ -70,7 +72,8 @@ public class EventManager {
 			public void onEvent(ManagerContainerRegisterEvent event) {
 				event.addModMCModule(new HoloProjectorModule(event.getSegmentController(), event.getContainer()));
 				event.addModMCModule(new TextProjectorModule(event.getSegmentController(), event.getContainer()));
-				event.addModMCModule(new HoloTableModule(event.getSegmentController(), event.getContainer()));
+				event.addModMCModule(new CrewStationModule(event.getSegmentController(), event.getContainer()));
+//				event.addModMCModule(new HoloTableModule(event.getSegmentController(), event.getContainer()));
 				//				event.addModMCModule(new StorageCapsuleModule(event.getSegmentController(), event.getContainer()));
 			}
 		}, instance);
@@ -213,6 +216,20 @@ public class EventManager {
 							}
 						}
 					}
+				}
+			}
+		}, instance);
+
+		StarLoader.registerListener(SegmentPieceKillEvent.class, new Listener<SegmentPieceKillEvent>() {
+			@Override
+			public void onEvent(SegmentPieceKillEvent event) {
+				ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) event.getPiece().getSegmentController();
+				if(event.getPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("NPC Station")).getId()) {
+					((CrewStationModule) segmentController.getManagerContainer().getModMCModule(event.getPiece().getType())).removeCrewBlock(ElementCollection.getIndex4(event.getPiece().getAbsoluteIndex(), event.getPiece().getOrientation()));
+				} else if(event.getPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Holo Projector")).getId()) {
+					segmentController.getManagerContainer().getModMCModule(event.getPiece().getType()).handleRemove(ElementCollection.getIndex4(event.getPiece().getAbsoluteIndex(), event.getPiece().getOrientation()));
+				} else if(event.getPiece().getType() == Objects.requireNonNull(ElementManager.getBlock("Text Projector")).getId()) {
+					segmentController.getManagerContainer().getModMCModule(event.getPiece().getType()).handleRemove(ElementCollection.getIndex4(event.getPiece().getAbsoluteIndex(), event.getPiece().getOrientation()));
 				}
 			}
 		}, instance);

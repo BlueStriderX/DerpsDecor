@@ -4,11 +4,7 @@ import api.utils.draw.ModWorldDrawer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.schine.graphicsengine.core.Drawable;
-import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.Timer;
-import org.schema.schine.graphicsengine.shader.Shader;
-import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.decor.data.system.strut.StrutData;
 
 import java.util.Map;
@@ -20,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @since 09/02/2021
  */
-public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable {
+public class StrutDrawer extends ModWorldDrawer {
 	public final ConcurrentHashMap<Pair<SegmentPiece, SegmentPiece>, StrutData> drawMap = new ConcurrentHashMap<>();
 
 	@Override
@@ -51,17 +47,5 @@ public class StrutDrawer extends ModWorldDrawer implements Drawable, Shaderable 
 
 	@Override
 	public void onInit() {
-	}
-
-	@Override
-	public void onExit() {
-	}
-
-	@Override
-	public void updateShader(DrawableScene drawableScene) {
-	}
-
-	@Override
-	public void updateShaderParameters(Shader shader) {
 	}
 }

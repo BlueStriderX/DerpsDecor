@@ -7,7 +7,6 @@ import org.schema.game.client.view.gui.advanced.tools.GUIAdvCheckbox;
 import org.schema.game.client.view.gui.buildtools.GUIBuildToolSettingSelector;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.core.MouseEvent;
-import org.schema.schine.graphicsengine.core.settings.PrefixNotFoundException;
 import org.schema.schine.graphicsengine.forms.font.FontLibrary;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
@@ -54,7 +53,7 @@ public class HoloProjectorConfigPanel extends GUIInputDialogPanel {
 			}
 
 			@Override
-			public String handleAutoComplete(String s, TextCallback textCallback, String s1) throws PrefixNotFoundException {
+			public String handleAutoComplete(String s, TextCallback textCallback, String s1) {
 				return null;
 			}
 

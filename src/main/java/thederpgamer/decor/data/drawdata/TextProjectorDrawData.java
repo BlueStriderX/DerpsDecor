@@ -53,7 +53,7 @@ public class TextProjectorDrawData implements ProjectorInterface {
 		if(segmentPiece != null) {
 			this.segmentPiece = segmentPiece;
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
+			SegmentPieceUtils.getFaceTransform(segmentPiece, offset, rotation, transform);
 		}
 	}
 

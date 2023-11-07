@@ -11,12 +11,6 @@ import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.ManagedUsableSegmentController;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ElementCollectionManager;
-import org.schema.game.common.controller.elements.beam.damageBeam.DamageBeamElementManager;
-import org.schema.game.common.controller.elements.beam.repair.RepairElementManager;
-import org.schema.game.common.controller.elements.beam.tractorbeam.TractorElementManager;
-import org.schema.game.common.controller.elements.cargo.CargoElementManager;
-import org.schema.game.common.controller.elements.missile.MissileElementManager;
-import org.schema.game.common.controller.elements.weapon.WeaponElementManager;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.Element;
 import org.schema.game.common.data.element.ElementCollection;
@@ -46,16 +40,7 @@ public class SegmentPieceUtils {
 	private static final Matrix3f mXB = new Matrix3f();
 	private static final Matrix3f mXC = new Matrix3f();
 
-	private static final Class[] elementManagerClasses = {
-		WeaponElementManager.class,
-		DamageBeamElementManager.class,
-		TractorElementManager.class,
-		MissileElementManager.class,
-		CargoElementManager.class,
-		RepairElementManager.class
-	};
-
-	public static void initialize() {
+	static {
 		mY.setIdentity();
 		mY.rotY(FastMath.HALF_PI);
 		mYB.setIdentity();
@@ -87,34 +72,13 @@ public class SegmentPieceUtils {
 	}
 
 	/**
-	 * Gets the position of the specified face from the provided SegmentPiece.
-	 *
-	 * @param segmentPiece The SegmentPiece
-	 * @param face         The face to find the position of (NOT the orientation of the piece itself)
-	 *
-	 * @return The position of the specified face
-	 */
-	public static Vector3f getPieceFacePos(SegmentPiece segmentPiece, int face) {
-		Vector3f piecePos = new Vector3f();
-		ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), piecePos);
-		piecePos.x -= SegmentData.SEG_HALF;
-		piecePos.y -= SegmentData.SEG_HALF;
-		piecePos.z -= SegmentData.SEG_HALF;
-		segmentPiece.getSegmentController().getWorldTransform().transform(piecePos);
-		Vector3f forward = new Vector3f();
-		Element.getRelativeForward(segmentPiece.getOrientation(), face, forward);
-		forward.add(piecePos);
-		return forward;
-	}
-
-	/**
 	 * Gets the full Transform of a Projector.
 	 *
 	 * @param segmentPiece The SegmentPiece
 	 *
 	 * @return The full transform of the Projector
 	 */
-	public static Transform getProjectorTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
+	public static Transform getFaceTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation, Transform out) {
 		if(out == null) out = new Transform();
 		out.setIdentity();
 		segmentPiece.getTransform(out);
@@ -174,54 +138,6 @@ public class SegmentPieceUtils {
 		}
 		segmentPiece.getSegmentController().getWorldTransform().transform(out.origin);
 		return out;
-	}
-
-	/**
-	 * Gets the full Transform of a SegmentPiece.
-	 *
-	 * @param segmentPiece The SegmentPiece
-	 *
-	 * @return The full transform of the SegmentPiece
-	 */
-	public static Transform getPieceTransform(SegmentPiece segmentPiece, Vector3i offset, Vector3i rotation) {
-		Transform transform = new Transform();
-		transform.setIdentity();
-		segmentPiece.getTransform(transform);
-		ElementCollection.getPosFromIndex(segmentPiece.getAbsoluteIndex(), transform.origin);
-		transform.origin.x -= SegmentData.SEG_HALF;
-		transform.origin.y -= SegmentData.SEG_HALF;
-		transform.origin.z -= SegmentData.SEG_HALF;
-		transform.origin.add(offset.toVector3f());
-		Quat4f currentRot = new Quat4f();
-		transform.getRotation(currentRot);
-		Quat4f addRot = new Quat4f();
-		QuaternionUtil.setEuler(addRot, rotation.y / 100.0f, rotation.z / 100.0f, rotation.x / 100.0f);
-		currentRot.mul(addRot);
-		MathUtils.roundQuat(currentRot);
-		transform.setRotation(currentRot);
-		int orientation = segmentPiece.getOrientation();
-		switch(orientation) {
-			case (Element.FRONT):
-				transform.basis.mul(mYC);
-				break;
-			case (Element.BACK):
-				break;
-			case (Element.TOP):
-				transform.basis.mul(mX);
-				break;
-			case (Element.BOTTOM):
-				transform.basis.mul(mYC);
-				transform.basis.mul(mXB);
-				break;
-			case (Element.RIGHT):
-				transform.basis.mul(mY);
-				break;
-			case (Element.LEFT):
-				transform.basis.mul(mYB);
-				break;
-		}
-		segmentPiece.getSegmentController().getWorldTransform().transform(transform.origin);
-		return transform;
 	}
 
 	public static ElementCollection<?, ?, ?> getElementCollectionFromPiece(SegmentPiece piece) {

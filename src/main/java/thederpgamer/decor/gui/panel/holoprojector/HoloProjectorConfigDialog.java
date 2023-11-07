@@ -29,7 +29,7 @@ public class HoloProjectorConfigDialog extends GUIInputDialog {
 		this.segmentPiece = segmentPiece;
 		ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
 		HoloProjectorModule module = (HoloProjectorModule) segmentController.getManagerContainer().getModMCModule(ElementManager.getBlock("Holo Projector").getId());
-		HoloProjectorDrawData drawData = (HoloProjectorDrawData) module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
+		HoloProjectorDrawData drawData = module.getDrawData(ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation()));
 		setDefaults(drawData);
 		getConfigPanel().setText(drawData.src);
 		getConfigPanel().setXOffset(drawData.offset.x);
