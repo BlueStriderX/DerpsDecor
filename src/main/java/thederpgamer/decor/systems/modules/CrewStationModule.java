@@ -32,7 +32,7 @@ public class CrewStationModule extends SimpleDataStorageMCModule {
 
 	@Override
 	public void handle(Timer timer) {
-		getCrewModuleData().handleUpdates();
+		if(isOnServer()) getCrewModuleData().handleUpdates();
 	}
 
 	@Override

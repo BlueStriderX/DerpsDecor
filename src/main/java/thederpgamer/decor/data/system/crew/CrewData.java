@@ -46,8 +46,10 @@ public class CrewData {
 		transform = new Transform();
 		segmentPiece.getTransform(transform);
 		offset = new Vector3i();
-		updateCrew();
-		recall();
+		if(segmentPiece.getSegmentController().isOnServer()) {
+			updateCrew();
+			recall();
+		}
 	}
 
 	public void spawn() {
@@ -84,8 +86,10 @@ public class CrewData {
 			AICharacter crewMember = getCrewMember();
 			DrawableAIHumanCharacterNew drawer = getDrawer();
 			crewMember.setFactionId(getSegmentPiece().getSegmentController().getFactionId());
-			if(active) AnimationUtils.setAnimation(crewMember, drawer, getAnimation(), looping);
-			else AnimationUtils.setAnimation(crewMember, drawer, AnimationIndex.IDLING_FLOATING, true);
+			if(crewMember.forcedAnimation != null && (!crewMember.forcedAnimation.animation.equals(getAnimation()))) {
+				if(active) AnimationUtils.setAnimation(crewMember, drawer, getAnimation(), looping);
+				else AnimationUtils.setAnimation(crewMember, drawer, AnimationIndex.IDLING_FLOATING, true);
+			}
 		} catch(Exception exception) {
 			DerpsDecor.getInstance().logException("Failed to update crew member", exception);
 		}
