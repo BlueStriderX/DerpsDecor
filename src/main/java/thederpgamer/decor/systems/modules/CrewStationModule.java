@@ -36,7 +36,7 @@ public class CrewStationModule extends SimpleDataStorageMCModule {
 	@Override
 	public void handlePlace(long abs, byte orientation) {
 		super.handlePlace(abs, orientation);
-		getData(ElementCollection.getIndex4(abs, orientation));
+		if(isOnServer()) (getData(ElementCollection.getIndex4(abs, orientation))).recall();
 	}
 
 
