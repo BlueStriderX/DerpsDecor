@@ -33,7 +33,7 @@ import java.util.zip.ZipInputStream;
  */
 public class DerpsDecor extends StarMod {
 	private static DerpsDecor instance;
-	private final String[] overwriteClasses = {"GUIQuickReferencePanel", "AbstractAnimatedObject", "Inventory"};
+	private final String[] overwriteClasses = {"GUIQuickReferencePanel", "AbstractAnimatedObject", "Inventory", "AbstractOwnerState"};
 	public ClipboardUtils clipboard;
 
 	public DerpsDecor() {instance = this;}

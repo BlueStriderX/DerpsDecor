@@ -81,9 +81,11 @@ public class CrewData {
 	public void updateCrew() {
 		try {
 			recall();
-			getCrewMember().setFactionId(getSegmentPiece().getSegmentController().getFactionId());
-			if(active) AnimationUtils.setAnimation(getCrewMember(), getDrawer(), getAnimation(), looping);
-			else AnimationUtils.setAnimation(getCrewMember(), getDrawer(), AnimationIndex.IDLING_FLOATING, true);
+			AICharacter crewMember = getCrewMember();
+			DrawableAIHumanCharacterNew drawer = getDrawer();
+			crewMember.setFactionId(getSegmentPiece().getSegmentController().getFactionId());
+			if(active) AnimationUtils.setAnimation(crewMember, drawer, getAnimation(), looping);
+			else AnimationUtils.setAnimation(crewMember, drawer, AnimationIndex.IDLING_FLOATING, true);
 		} catch(Exception exception) {
 			DerpsDecor.getInstance().logException("Failed to update crew member", exception);
 		}
