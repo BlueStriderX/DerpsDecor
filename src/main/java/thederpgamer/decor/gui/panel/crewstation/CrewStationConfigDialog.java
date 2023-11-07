@@ -54,7 +54,7 @@ public class CrewStationConfigDialog extends GUIInputDialog {
 							data.animationName = getConfigPanel().getAnimationName();
 							data.offset = getConfigPanel().getOffset();
 							getModule().setCrewBlock(index, data);
-							data.recall();
+//							data.recall();
 							deactivate();
 							break;
 						case "RECALL":

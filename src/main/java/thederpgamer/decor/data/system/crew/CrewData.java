@@ -47,6 +47,7 @@ public class CrewData {
 		entityID = segmentPiece.getSegmentController().getDbId();
 		indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
 		segmentPiece.getTransform(transform);
+		transform.origin.add(offset.toVector3f());
 		if(segmentPiece.getSegmentController().isOnServer()) {
 			updateCrew();
 			recall();
@@ -94,6 +95,7 @@ public class CrewData {
 			}
 			recall();
 			AICharacter crewMember = getCrewMember();
+			crewMember.getAiConfiguration().getAiEntityState().start();
 			DrawableAIHumanCharacterNew drawer = getDrawer();
 			crewMember.setFactionId(getSegmentPiece().getSegmentController().getFactionId());
 			if(crewMember.forcedAnimation != null && (!crewMember.forcedAnimation.animation.equals(getAnimation()))) {
