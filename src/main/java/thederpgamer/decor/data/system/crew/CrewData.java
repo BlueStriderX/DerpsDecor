@@ -8,6 +8,7 @@ import org.schema.game.client.view.character.CharactersDrawer;
 import org.schema.game.client.view.character.DrawableAIHumanCharacterNew;
 import org.schema.game.common.controller.ai.AIGameCreatureConfiguration;
 import org.schema.game.common.controller.ai.Types;
+import org.schema.game.common.data.ManagedSegmentController;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.creature.AICharacter;
 import org.schema.game.common.data.element.ElementCollection;
@@ -18,6 +19,8 @@ import org.schema.schine.graphicsengine.animation.structure.classes.AnimationInd
 import org.schema.schine.graphicsengine.core.settings.StateParameterNotFoundException;
 import org.schema.schine.network.objects.Sendable;
 import thederpgamer.decor.DerpsDecor;
+import thederpgamer.decor.element.ElementManager;
+import thederpgamer.decor.systems.modules.CrewStationModule;
 import thederpgamer.decor.utils.AnimationUtils;
 import thederpgamer.decor.utils.SegmentPieceUtils;
 
@@ -33,19 +36,17 @@ public class CrewData {
 	public long indexAndOrientation;
 	public String crewName = "Crew Member";
 	public String animationName = AnimationIndex.IDLING_FLOATING.toString();
-	public Vector3i offset;
+	public Vector3i offset = new Vector3i();
 	public boolean looping = true;
 	public boolean needsUpdate = true;
 	public boolean active = true;
-	private transient Transform transform;
+	public Transform transform = new Transform();
 	private transient DrawableAIHumanCharacterNew drawer;
 
 	public CrewData(SegmentPiece segmentPiece) {
 		entityID = segmentPiece.getSegmentController().getDbId();
 		indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-		transform = new Transform();
 		segmentPiece.getTransform(transform);
-		offset = new Vector3i();
 		if(segmentPiece.getSegmentController().isOnServer()) {
 			updateCrew();
 			recall();
@@ -54,6 +55,7 @@ public class CrewData {
 
 	public void spawn() {
 		assert getSegmentPiece() != null && getSegmentPiece().getSegmentController().isOnServer();
+		if(getCrewMember() != null) getCrewMember().setMarkedForDeleteVolatile(true); //Remove old crew member (if exists)
 		if(isAlreadySpawned()) recall();
 		else {
 			SegmentPiece segmentPiece = getSegmentPiece();
@@ -82,6 +84,14 @@ public class CrewData {
 
 	public void updateCrew() {
 		try {
+			if(!isSegmentPieceValid() && getCrewMember() != null) {
+				getCrewMember().setMarkedForDeleteVolatile(true);
+				if(getSegmentPiece() != null) {
+					CrewStationModule module = (CrewStationModule) ((ManagedSegmentController<?>) getSegmentPiece().getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("NPC Station").getId());
+					if(module != null) module.removeCrewBlock(indexAndOrientation);
+				}
+				return;
+			}
 			recall();
 			AICharacter crewMember = getCrewMember();
 			DrawableAIHumanCharacterNew drawer = getDrawer();
@@ -94,6 +104,10 @@ public class CrewData {
 			DerpsDecor.getInstance().logException("Failed to update crew member", exception);
 		}
 		needsUpdate = false;
+	}
+
+	private boolean isSegmentPieceValid() {
+		return getSegmentPiece() != null && getSegmentPiece().getSegmentController().getSegmentBuffer().existsPointUnsave(ElementCollection.getPosIndexFrom4(indexAndOrientation)) && getSegmentPiece().getSegmentController().getSegmentBuffer().getPointUnsave(ElementCollection.getPosIndexFrom4(indexAndOrientation)).getType() == getSegmentPiece().getType() && getSegmentPiece().getSegmentController().getSegmentBuffer().getPointUnsave(ElementCollection.getPosIndexFrom4(indexAndOrientation)).equals(getSegmentPiece());
 	}
 
 	public AICharacter getCrewMember() {
@@ -148,8 +162,8 @@ public class CrewData {
 	}
 
 	public void recall() {
-		if(!isAlreadySpawned()) spawn();
 		try {
+			if(!isAlreadySpawned()) spawn();
 			if(getCrewMember() == null) throw new NullPointerException("Crew member is null!");
 			transform.setIdentity();
 			getSegmentPiece().getTransform(transform);

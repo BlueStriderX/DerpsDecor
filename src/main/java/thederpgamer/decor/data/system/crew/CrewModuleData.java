@@ -43,7 +43,6 @@ public class CrewModuleData {
 
 	public void handleUpdates() {
 		for(CrewData crewData : crewDataMap.values()) {
-			if(!crewData.isAlreadySpawned() && crewData.getSegmentPiece() != null && crewData.getSegmentPiece().getSegmentController().isOnServer()) crewData.spawn();
 			if(crewData.needsUpdate) crewData.updateCrew();
 		}
 	}

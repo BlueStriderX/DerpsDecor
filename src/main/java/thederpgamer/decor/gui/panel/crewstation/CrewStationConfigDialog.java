@@ -7,6 +7,7 @@ import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.element.ElementCollection;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
+import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.data.system.crew.CrewData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.systems.modules.CrewStationModule;
@@ -38,31 +39,36 @@ public class CrewStationConfigDialog extends GUIInputDialog {
 
 	@Override
 	public void callback(GUIElement callingElement, MouseEvent mouseEvent) {
-		if(!isOccluded() && mouseEvent.pressedLeftMouse()) {
-			if(callingElement.getUserPointer() != null) {
-				long index = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-				CrewData data = getModule().getData(segmentPiece);
-				switch((String) callingElement.getUserPointer()) {
-					case "X":
-					case "CANCEL":
-						deactivate();
-						break;
-					case "OK":
-						data.setCrewName(getConfigPanel().getCrewName());
-						data.animationName = getConfigPanel().getAnimationName();
-						data.offset = getConfigPanel().getOffset();
-						getModule().setCrewBlock(index, data);
-						deactivate();
-						break;
-					case "RECALL":
-						data.recall();
-						break;
-					case "TOGGLE LOOPING":
-						data.looping = !data.looping;
-						getModule().setCrewBlock(index, data);
-						break;
+		try {
+			if(!isOccluded() && mouseEvent.pressedLeftMouse()) {
+				if(callingElement.getUserPointer() != null) {
+					long index = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
+					CrewData data = getModule().getData(segmentPiece);
+					switch((String) callingElement.getUserPointer()) {
+						case "X":
+						case "CANCEL":
+							deactivate();
+							break;
+						case "OK":
+							data.setCrewName(getConfigPanel().getCrewName());
+							data.animationName = getConfigPanel().getAnimationName();
+							data.offset = getConfigPanel().getOffset();
+							getModule().setCrewBlock(index, data);
+							data.recall();
+							deactivate();
+							break;
+						case "RECALL":
+							data.recall();
+							break;
+						case "TOGGLE LOOPING":
+							data.looping = !data.looping;
+							getModule().setCrewBlock(index, data);
+							break;
+					}
 				}
 			}
+		} catch(NullPointerException exception) {
+			DerpsDecor.getInstance().logException("Failed to handle crew station config dialog callback", exception);
 		}
 	}
 

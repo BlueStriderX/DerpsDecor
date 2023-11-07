@@ -21,6 +21,8 @@ import java.util.Objects;
  */
 public class CrewStationModule extends SimpleDataStorageMCModule {
 
+	private float timer;
+
 	public CrewStationModule(SegmentController entity, ManagerContainer<?> managerContainer) {
 		super(entity, managerContainer, DerpsDecor.getInstance(), Objects.requireNonNull(ElementManager.getBlock("NPC Station")).getId());
 	}
@@ -32,7 +34,12 @@ public class CrewStationModule extends SimpleDataStorageMCModule {
 
 	@Override
 	public void handle(Timer timer) {
-		if(isOnServer()) getCrewModuleData().handleUpdates();
+		if(isOnServer()) {
+			if(timer.currentTime - this.timer >= 3000) {
+				this.timer = timer.currentTime;
+				getCrewModuleData().handleUpdates();
+			}
+		}
 	}
 
 	@Override
