@@ -147,6 +147,7 @@ public class CrewData {
 			Transform tempTransform = new Transform(transform);
 			tempTransform.origin.add(offset.toVector3f());
 			getCrewMember().getWorldTransform().set(tempTransform);
+			transform.set(tempTransform);
 		} catch(NullPointerException exception) {
 			DerpsDecor.getInstance().logException("Failed to recall crew member", exception);
 		}
