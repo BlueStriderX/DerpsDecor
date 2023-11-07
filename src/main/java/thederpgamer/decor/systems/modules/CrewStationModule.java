@@ -1,5 +1,6 @@
 package thederpgamer.decor.systems.modules;
 
+import api.utils.StarRunnable;
 import api.utils.game.module.util.SimpleDataStorageMCModule;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
@@ -19,6 +20,7 @@ import java.util.Objects;
  * @author TheDerpGamer
  */
 public class CrewStationModule extends SimpleDataStorageMCModule {
+
 	public CrewStationModule(SegmentController entity, ManagerContainer<?> managerContainer) {
 		super(entity, managerContainer, DerpsDecor.getInstance(), Objects.requireNonNull(ElementManager.getBlock("NPC Station")).getId());
 	}
@@ -34,9 +36,22 @@ public class CrewStationModule extends SimpleDataStorageMCModule {
 	}
 
 	@Override
-	public void handlePlace(long abs, byte orientation) {
+	public void handlePlace(final long abs, final byte orientation) {
 		super.handlePlace(abs, orientation);
-		if(isOnServer()) (getData(ElementCollection.getIndex4(abs, orientation))).recall();
+		flagUpdatedData();
+		if(isOnServer()) {
+			(new StarRunnable() {
+				@Override
+				public void run() {
+					try { //Run later to prevent null pointer exception
+						(getData(ElementCollection.getIndex4(abs, orientation))).recall();
+						flagUpdatedData();
+					} catch(Exception exception) {
+						exception.printStackTrace();
+					}
+				}
+			}).runLater(DerpsDecor.getInstance(), 100);
+		}
 	}
 
 
