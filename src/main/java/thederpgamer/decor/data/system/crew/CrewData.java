@@ -80,6 +80,7 @@ public class CrewData {
 
 	public void updateCrew() {
 		try {
+			recall();
 			getCrewMember().setFactionId(getSegmentPiece().getSegmentController().getFactionId());
 			if(active) AnimationUtils.setAnimation(getCrewMember(), getDrawer(), getAnimation(), looping);
 			else AnimationUtils.setAnimation(getCrewMember(), getDrawer(), AnimationIndex.IDLING_FLOATING, true);
@@ -144,10 +145,10 @@ public class CrewData {
 		if(!isAlreadySpawned()) spawn();
 		try {
 			if(getCrewMember() == null) throw new NullPointerException("Crew member is null!");
-			Transform tempTransform = new Transform(transform);
-			tempTransform.origin.add(offset.toVector3f());
-			getCrewMember().getWorldTransform().set(tempTransform);
-			transform.set(tempTransform);
+			transform.setIdentity();
+			getSegmentPiece().getTransform(transform);
+			transform.origin.add(offset.toVector3f());
+			getCrewMember().getWorldTransform().set(transform);
 		} catch(NullPointerException exception) {
 			DerpsDecor.getInstance().logException("Failed to recall crew member", exception);
 		}
