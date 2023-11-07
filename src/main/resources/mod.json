@@ -3,7 +3,7 @@
   "author": "TheDerpGamer",
   "description": "Adds some new decorative blocks for the creative builder.",
   "version": "1.8.0 - Eye Candy",
-  "starmade_version": "0.203.155",
+  "starmade_version": "0.203.156",
   "client_mod": false,
   "server_mod": false,
   "main_class": "thederpgamer.decor.DerpsDecor",
