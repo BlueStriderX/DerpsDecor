@@ -41,9 +41,9 @@ public class NPCStation extends Block implements ActivationInterface {
 		blockInfo.setOrientatable(true);
 		if(GraphicsContext.initialized) {
 			try {
+				blockInfo.setBuildIconNum(ResourceManager.getIcon("npc-station-icon").getTextureId());
 				blockInfo.setTextureId(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getTextureIds());
 				blockInfo.setTextureId(0, (short) ResourceManager.getTexture("npc-station-front").getTextureId());
-				blockInfo.setBuildIconNum(ResourceManager.getIcon("npc-station-icon").getTextureId());
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getFactoryBakeTime(), new FactoryResource(1, ElementKeyMap.TEXT_BOX), new FactoryResource(50, (short) 220));
