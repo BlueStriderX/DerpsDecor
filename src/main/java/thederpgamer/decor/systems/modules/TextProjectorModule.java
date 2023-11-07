@@ -75,7 +75,7 @@ public class TextProjectorModule extends SimpleDataStorageMCModule {
 					if(canDraw(segmentPiece)) {
 						if(drawData.changed || drawData.transform == null || drawData.transform.origin.length() <= 0) {
 							if(drawData.transform == null) drawData.transform = new Transform();
-							thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
+							thederpgamer.decor.utils.SegmentPieceUtils.getFaceTransform(segmentPiece, drawData.offset, drawData.rotation, drawData.transform);
 							Quat4f currentRot = new Quat4f();
 							drawData.transform.getRotation(currentRot);
 							Quat4f addRot = new Quat4f();

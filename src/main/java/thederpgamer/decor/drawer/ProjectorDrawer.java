@@ -71,7 +71,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Shaderable {
 							ShaderLibrary.scanlineShader.load();
 						}
 						if(drawData.segmentPiece == null) drawData.segmentPiece = ((SegmentController) GameCommon.getGameObject(drawData.entityId)).getSegmentBuffer().getPointUnsave(ElementCollection.getPosIndexFrom4(drawData.indexAndOrientation));
-						drawData.transform.set(thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(drawData.segmentPiece, drawData.offset, drawData.rotation, drawData.transform));
+						drawData.transform.set(thederpgamer.decor.utils.SegmentPieceUtils.getFaceTransform(drawData.segmentPiece, drawData.offset, drawData.rotation, drawData.transform));
 						image.setTransform(drawData.transform);
 						if(drawData.isGif()) {
 							Sprite.draw3D(drawData.getCurrentFrame(), drawData.subSprite, 1, Controller.getCamera());
@@ -89,7 +89,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Shaderable {
 							ShaderLibrary.scanlineShader.load();
 						}
 						if(drawData.segmentPiece == null) drawData.segmentPiece = ((SegmentController) GameCommon.getGameObject(drawData.entityId)).getSegmentBuffer().getPointUnsave(ElementCollection.getPosIndexFrom4(drawData.indexAndOrientation));
-						drawData.transform.set(thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(drawData.segmentPiece, drawData.offset, drawData.rotation, drawData.transform));
+						drawData.transform.set(thederpgamer.decor.utils.SegmentPieceUtils.getFaceTransform(drawData.segmentPiece, drawData.offset, drawData.rotation, drawData.transform));
 						text.setTransform(drawData.transform);
 						text.draw();
 						if(drawData.holographic) ShaderLibrary.scanlineShader.unload();
@@ -132,7 +132,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Shaderable {
 					continue;
 				}
 				entry.getValue().entityId = segmentController.getId();
-				thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
+				thederpgamer.decor.utils.SegmentPieceUtils.getFaceTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
 				map.put(entry.getKey(), entry.getValue());
 			}
 		}
@@ -144,7 +144,7 @@ public class ProjectorDrawer extends ModWorldDrawer implements Shaderable {
 					textProjectorModule.removeDrawData(entry.getKey());
 					continue;
 				}
-				thederpgamer.decor.utils.SegmentPieceUtils.getProjectorTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
+				thederpgamer.decor.utils.SegmentPieceUtils.getFaceTransform(segmentPiece, entry.getValue().offset, entry.getValue().rotation, entry.getValue().transform);
 				entry.getValue().entityId = segmentController.getId();
 				map.put(entry.getKey(), entry.getValue());
 			}

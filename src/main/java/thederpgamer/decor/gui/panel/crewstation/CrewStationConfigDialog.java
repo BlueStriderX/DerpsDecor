@@ -11,8 +11,6 @@ import thederpgamer.decor.data.system.crew.CrewData;
 import thederpgamer.decor.element.ElementManager;
 import thederpgamer.decor.systems.modules.CrewStationModule;
 
-import java.util.Objects;
-
 /**
  * [Description]
  *
@@ -20,6 +18,10 @@ import java.util.Objects;
  */
 public class CrewStationConfigDialog extends GUIInputDialog {
 	private SegmentPiece segmentPiece;
+
+	public CrewStationConfigDialog(SegmentPiece segmentPiece) {
+		this.segmentPiece = segmentPiece;
+	}
 
 	public void setSegmentPiece(SegmentPiece segmentPiece) {
 		this.segmentPiece = segmentPiece;
@@ -29,15 +31,9 @@ public class CrewStationConfigDialog extends GUIInputDialog {
 		return (CrewStationConfigPanel) getInputPanel();
 	}
 
-	private CrewData getCrewData() {
-		ManagedUsableSegmentController<?> segmentController = (ManagedUsableSegmentController<?>) segmentPiece.getSegmentController();
-		CrewStationModule module = (CrewStationModule) segmentController.getManagerContainer().getModMCModule(Objects.requireNonNull(ElementManager.getBlock("NPC Station")).getId());
-		return module.getData(segmentPiece);
-	}
-
 	@Override
 	public CrewStationConfigPanel createPanel() {
-		return new CrewStationConfigPanel(getState(), this, getCrewData());
+		return new CrewStationConfigPanel(getState(), this);
 	}
 
 	@Override
@@ -54,7 +50,7 @@ public class CrewStationConfigDialog extends GUIInputDialog {
 					case "OK":
 						data.setCrewName(getConfigPanel().getCrewName());
 						data.animationName = getConfigPanel().getAnimationName();
-						data.spawnPos = getConfigPanel().getOffset();
+						data.offset = getConfigPanel().getOffset();
 						getModule().setCrewBlock(index, data);
 						deactivate();
 						break;
@@ -78,5 +74,9 @@ public class CrewStationConfigDialog extends GUIInputDialog {
 
 	private CrewStationModule getModule() {
 		return (CrewStationModule) ((ManagedUsableSegmentController<?>) segmentPiece.getSegmentController()).getManagerContainer().getModMCModule(ElementManager.getBlock("NPC Station").getId());
+	}
+
+	public void setCrewData(CrewData data) {
+		getConfigPanel().setCrewData(data);
 	}
 }

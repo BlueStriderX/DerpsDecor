@@ -42,7 +42,7 @@ public class ShapeProjectorDrawData implements ProjectorInterface {
 		changed = true;
 		if(segmentPiece != null) {
 			indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-			SegmentPieceUtils.getProjectorTransform(segmentPiece, offset, rotation, transform);
+			SegmentPieceUtils.getFaceTransform(segmentPiece, offset, rotation, transform);
 		}
 	}
 

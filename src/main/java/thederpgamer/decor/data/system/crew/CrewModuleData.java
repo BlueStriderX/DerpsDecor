@@ -16,8 +16,10 @@ public class CrewModuleData {
 	}
 
 	public void removeBlock(long indexAndOrientation) {
-		crewDataMap.get(indexAndOrientation).removeCrew();
-		crewDataMap.remove(indexAndOrientation);
+		try {
+			crewDataMap.get(indexAndOrientation).removeCrew();
+			crewDataMap.remove(indexAndOrientation);
+		} catch(Exception ignored) {}
 	}
 
 	public void putData(long indexAndOrientation, CrewData data) {

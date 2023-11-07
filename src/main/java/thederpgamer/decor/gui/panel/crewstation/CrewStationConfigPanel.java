@@ -3,7 +3,6 @@ package thederpgamer.decor.gui.panel.crewstation;
 import api.utils.gui.GUIInputDialogPanel;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.client.view.gui.buildtools.GUIBuildToolSettingSelector;
-import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.common.TextCallback;
 import org.schema.schine.graphicsengine.animation.structure.classes.AnimationIndex;
 import org.schema.schine.graphicsengine.animation.structure.classes.AnimationIndexElement;
@@ -26,18 +25,18 @@ public class CrewStationConfigPanel extends GUIInputDialogPanel {
 	private GUIMinMaxSetting yOffsetSetting;
 	private GUIMinMaxSetting zOffsetSetting;
 	private final GUICallback guiCallback;
-	private final CrewData crewData;
-	private final SegmentPiece segmentPiece;
+	private CrewData crewData;
 
-	public CrewStationConfigPanel(InputState inputState, GUICallback guiCallback, CrewData crewData) {
-		super(inputState, "crew_station_config_panel", "NPC Station Configuration", "", 610, 530, guiCallback);
+	public CrewStationConfigPanel(InputState inputState, GUICallback guiCallback) {
+		super(inputState, "crew_station_config_panel", "NPC Station Configuration", "", 610, 300, guiCallback);
 		this.guiCallback = guiCallback;
+	}
+
+	public void setCrewData(CrewData crewData) {
 		this.crewData = crewData;
-		segmentPiece = crewData.getSegmentPiece();
 		setCrewName(crewData.crewName);
 		setAnimationName(crewData.animationName);
-		Vector3i piecePos = segmentPiece.getAbsolutePos(new Vector3i());
-		setOffset(new Vector3i(piecePos.x - crewData.spawnPos.x, piecePos.y - crewData.spawnPos.y, piecePos.z - crewData.spawnPos.z));
+		setOffset(crewData.offset);
 	}
 
 	@Override
@@ -150,21 +149,21 @@ public class CrewStationConfigPanel extends GUIInputDialogPanel {
 		GUIBuildToolSettingSelector xOffsetSelector = new GUIBuildToolSettingSelector(getState(), xOffsetSetting);
 		xOffsetSelector.onInit();
 		xOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (xOffsetSelector.getWidth() / 3)) - 100;
-		xOffsetSelector.getPos().y += 80;
+		xOffsetSelector.getPos().y += 100;
 		contentPane.getContent(0).attach(xOffsetSelector);
 
 		yOffsetSetting = new GUIMinMaxSetting(-10, 10);
 		GUIBuildToolSettingSelector yOffsetSelector = new GUIBuildToolSettingSelector(getState(), yOffsetSetting);
 		yOffsetSelector.onInit();
 		yOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (yOffsetSelector.getWidth() / 3));
-		yOffsetSelector.getPos().y += 80;
+		yOffsetSelector.getPos().y += 100;
 		contentPane.getContent(0).attach(yOffsetSelector);
 
 		zOffsetSetting = new GUIMinMaxSetting(-10, 10);
 		GUIBuildToolSettingSelector zOffsetSelector = new GUIBuildToolSettingSelector(getState(), zOffsetSetting);
 		zOffsetSelector.onInit();
 		zOffsetSelector.getPos().x = ((contentPane.getWidth() / 3) + (zOffsetSelector.getWidth() / 3)) + 100;
-		zOffsetSelector.getPos().y += 80;
+		zOffsetSelector.getPos().y += 100;
 		contentPane.getContent(0).attach(zOffsetSelector);
 	}
 
@@ -218,12 +217,13 @@ public class CrewStationConfigPanel extends GUIInputDialogPanel {
 	}
 
 	public void setOffset(Vector3i offset) {
+		if(offset == null) offset = new Vector3i();
 		xOffsetSetting.set(offset.x);
 		yOffsetSetting.set(offset.y);
 		zOffsetSetting.set(offset.z);
 	}
 
 	public Vector3i getOffset() {
-		return new Vector3i(segmentPiece.getAbsolutePos(new Vector3i()).x - crewData.spawnPos.x, segmentPiece.getAbsolutePos(new Vector3i()).y - crewData.spawnPos.y, segmentPiece.getAbsolutePos(new Vector3i()).z - crewData.spawnPos.z);
+		return new Vector3i(xOffsetSetting.get(), yOffsetSetting.get(), zOffsetSetting.get());
 	}
 }

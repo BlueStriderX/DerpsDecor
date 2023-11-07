@@ -33,19 +33,20 @@ public class CrewData {
 	public long indexAndOrientation;
 	public String crewName = "Crew Member";
 	public String animationName = AnimationIndex.IDLING_FLOATING.toString();
-	public Vector3i spawnPos;
+	public Vector3i offset;
 	public boolean looping = true;
 	public boolean needsUpdate = true;
 	public boolean active = true;
+	private transient Transform transform;
 	private transient DrawableAIHumanCharacterNew drawer;
 
 	public CrewData(SegmentPiece segmentPiece) {
 		entityID = segmentPiece.getSegmentController().getDbId();
 		indexAndOrientation = ElementCollection.getIndex4(segmentPiece.getAbsoluteIndex(), segmentPiece.getOrientation());
-		Transform transform = new Transform();
-		transform.setIdentity();
+		transform = new Transform();
 		segmentPiece.getTransform(transform);
-		spawnPos = new Vector3i(transform.origin);
+		offset = new Vector3i();
+		updateCrew();
 		recall();
 	}
 
@@ -54,11 +55,11 @@ public class CrewData {
 		if(isAlreadySpawned()) recall();
 		else {
 			SegmentPiece segmentPiece = getSegmentPiece();
-			Transform transform = new Transform();
-			transform.setIdentity();
+			if(transform == null) transform = new Transform();
 			segmentPiece.getTransform(transform);
-			if(spawnPos == null) spawnPos = new Vector3i(transform.origin);
-			CreatureSpawn spawn = new CreatureSpawn(segmentPiece.getSegmentController().getSector(new Vector3i()), transform, crewName, CreatureType.CHARACTER) {
+			Transform tempTransform = new Transform(transform);
+			tempTransform.origin.add(offset.toVector3f());
+			CreatureSpawn spawn = new CreatureSpawn(segmentPiece.getSegmentController().getSector(new Vector3i()), tempTransform, crewName, CreatureType.CHARACTER) {
 				@Override
 				public void initAI(AIGameCreatureConfiguration<?, ?> aiConfiguration) {
 					try {
@@ -143,10 +144,9 @@ public class CrewData {
 		if(!isAlreadySpawned()) spawn();
 		try {
 			if(getCrewMember() == null) throw new NullPointerException("Crew member is null!");
-			Transform transform = getCrewMember().getWorldTransform();
-			transform.origin.set(spawnPos.x, spawnPos.y, spawnPos.z);
-			getSegmentPiece().getTransform(transform);
-			getCrewMember().getWorldTransform().set(transform);
+			Transform tempTransform = new Transform(transform);
+			tempTransform.origin.add(offset.toVector3f());
+			getCrewMember().getWorldTransform().set(tempTransform);
 		} catch(NullPointerException exception) {
 			DerpsDecor.getInstance().logException("Failed to recall crew member", exception);
 		}

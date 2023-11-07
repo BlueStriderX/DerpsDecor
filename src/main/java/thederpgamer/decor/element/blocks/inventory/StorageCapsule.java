@@ -8,9 +8,7 @@ import org.schema.game.common.data.element.ElementKeyMap;
 import org.schema.game.common.data.element.FactoryResource;
 import org.schema.game.common.data.player.inventory.Inventory;
 import org.schema.game.common.data.player.inventory.InventoryHolder;
-import org.schema.game.common.data.player.inventory.StashInventory;
 import org.schema.schine.graphicsengine.core.GraphicsContext;
-import thederpgamer.decor.DerpsDecor;
 import thederpgamer.decor.element.blocks.InventoryBlock;
 import thederpgamer.decor.manager.ResourceManager;
 
@@ -27,7 +25,7 @@ public class StorageCapsule extends InventoryBlock {
 
 	@Override
 	public void initialize() {
-		blockInfo.setDescription(ElementKeyMap.getInfo(ElementKeyMap.TEXT_BOX).getDescription());
+		blockInfo.setDescription("The Storage Capsule is used to store large amounts of a single item or block.");
 		blockInfo.setCanActivate(true);
 		blockInfo.setInRecipe(true);
 		blockInfo.setShoppable(true);
@@ -35,7 +33,6 @@ public class StorageCapsule extends InventoryBlock {
 		blockInfo.setOrientatable(true);
 		blockInfo.setIndividualSides(6);
 		blockInfo.setBlockStyle(BlockStyle.NORMAL24.id);
-		blockInfo.lodShapeStyle = 1;
 		blockInfo.sideTexturesPointToOrientation = false;
 		blockInfo.controlling.addAll(ElementKeyMap.getInfo(120).controlling);
 		blockInfo.controlledBy.addAll(ElementKeyMap.getInfo(120).controlledBy);
@@ -44,7 +41,7 @@ public class StorageCapsule extends InventoryBlock {
 		if(GraphicsContext.initialized) {
 			try {
 				blockInfo.setBuildIconNum(ResourceManager.getIcon("storage-capsule-icon").getTextureId());
-				BlockConfig.assignLod(blockInfo, DerpsDecor.getInstance(), "storage_capsule_closed", "storage_capsule_open");
+
 			} catch(Exception ignored) {}
 		}
 		BlockConfig.addRecipe(blockInfo, ElementKeyMap.getInfo(120).getProducedInFactoryType(), (int) ElementKeyMap.getInfo(120).getFactoryBakeTime(), new FactoryResource(1, (short) 120), new FactoryResource(1, (short) 976));
@@ -53,7 +50,8 @@ public class StorageCapsule extends InventoryBlock {
 
 	@Override
 	public Inventory createInventory(InventoryHolder holder, SegmentPiece segmentPiece) {
-		return new StashInventory(holder, segmentPiece.getAbsoluteIndex());
+//		return new StorageCapsuleInventory(holder, segmentPiece.getAbsoluteIndex());
+		return null;
 	}
 
 	@Override
